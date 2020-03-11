@@ -1,7 +1,7 @@
 package project.models;
 
 import lombok.Data;
-import project.models.enumClasses.NotificationEnum;
+import project.models.enums.NotificationEnum;
 
 import javax.persistence.*;
 
