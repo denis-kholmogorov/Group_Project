@@ -11,6 +11,12 @@ public class StarterController {
     @RequestMapping("/")
     public String index(Model model)
     {
+        return "index";
+    }
+
+    @RequestMapping("/hello")
+    public String hello(Model model)
+    {
         return "hello";
     }
 }
