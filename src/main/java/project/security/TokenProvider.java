@@ -18,16 +18,17 @@ import javax.management.relation.Role;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.*;
-
+/**
+ * Данный класс работает с нашим токеном*/
 @Slf4j
 @Component
 public class TokenProvider
 {
     @Value("${jwt.token.secret}")
-    private String secret;
+    private String secret; // секретное слово из application.yml
 
     @Value("${jwt.token.expired}")
-    private long validityInMillis;
+    private long validityInMillis; // время действия из application.yml
 
     private UserDetailsService userDetailsService;
 
@@ -42,63 +43,53 @@ public class TokenProvider
 
     @PostConstruct
     protected void init(){
-        secret = Base64.getEncoder().encodeToString(secret.getBytes());
+        secret = Base64.getEncoder().encodeToString(secret.getBytes()); // шифрование токена перед запуском класса
     }
 
-    public String createToken(String email){
+    public String createToken(String email){ //создание токена
 
-        Claims claims = Jwts.claims().setSubject(email);
-        log.info("Создан токен " + email);
+        Claims claims = Jwts.claims().setSubject(email); //создаем клайм
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMillis);
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(validity)
-                .signWith(SignatureAlgorithm.HS256, secret)
+        return Jwts.builder()       // создаем токен
+                .setClaims(claims)  // установка клайм
+                .setIssuedAt(now)   // установка даты создания
+                .setExpiration(validity) // установка действия создания
+                .signWith(SignatureAlgorithm.HS256, secret) //хэширование секретного кода
                 .compact();
     }
 
+    /** Получение аутентификации по токену*/
     public Authentication getAuthentication(String token){
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUserEmail(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
+    /** Получение email по токену*/
     public String getUserEmail(String token){
-        log.info("Получаем юзера " + token);
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
     }
 
+    /** Получение токена из header запроса*/
     public String resolveToken(HttpServletRequest request){
         String bearerToken = request.getHeader("Authorization");
-        log.info("токен = " + bearerToken);
         if(bearerToken != null && bearerToken.startsWith("Bearer_")){
-            log.info("Достаем токен из заголовка запроса " + bearerToken);
             return bearerToken.substring(7);
         }
         return null;
     }
 
+    /** Валидация токена*/
     public boolean validateToken(String token) {
-    try {
-        Jws<Claims> claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
-        if(claims.getBody().getExpiration().before(new Date())){
-            log.info("Токен НЕ валиден");
-            return false;
+        try {
+            Jws<Claims> claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
+            if (claims.getBody().getExpiration().before(new Date())) {
+                return false;
+            }
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new JwtAuthentificationExecption("JWT token is expired or invalid");
         }
-        log.info("Токен валиден");
-        return true;
-    }catch (JwtException | IllegalArgumentException e){
-        throw new JwtAuthentificationExecption("JWT token is expired or invalid");
     }
 
-
-    }
-    private List<String> getRolNames(List<Role> userRole){
-        List<String> result = new ArrayList<>();
-        userRole.forEach(role -> {
-            result.add(role.getRoleName());
-        });
-        return result;
-    }
 }

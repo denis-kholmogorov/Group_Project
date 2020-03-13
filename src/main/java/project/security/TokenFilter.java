@@ -12,6 +12,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+/**
+ * Создаем фильтр, который будет проверять наш токен из заголовка запроса.
+ * В TokenConfig.class мы его добавим в SecurityFilters */
 
 @Slf4j
 public class TokenFilter extends GenericFilterBean
@@ -27,19 +30,14 @@ public class TokenFilter extends GenericFilterBean
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException
     {
-        log.info("Запрос страницы");
-       String token = tokenProvider.resolveToken((HttpServletRequest) servletRequest);
-       if(token != null && tokenProvider.validateToken(token)){
-           log.info("Прошли валидацю - ");
-           Authentication auth = tokenProvider.getAuthentication(token);
+       String token = tokenProvider.resolveToken((HttpServletRequest) servletRequest); //Берем заголовок
+       if(token != null && tokenProvider.validateToken(token)){ //проверяем его валидность
+           Authentication auth = tokenProvider.getAuthentication(token); //получаем аутентификацию
 
            if(auth != null){
-               SecurityContextHolder.getContext().setAuthentication(auth);
+               SecurityContextHolder.getContext().setAuthentication(auth); // добавляем в контекст security
            }
        }
-        log.info("Разрешен доступ");
-        filterChain.doFilter(servletRequest, servletResponse);
-
-
+        filterChain.doFilter(servletRequest, servletResponse); // переводим запрос дальше(разрешаем доступ)
     }
 }

@@ -5,9 +5,10 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class LoginRequestDto
+public
+class LoginResponseDto
 {
     String email;
 
-    String password;
+    String token;
 }

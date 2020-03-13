@@ -10,6 +10,7 @@ import project.models.Person;
 
 import project.services.PersonService;
 
+/** Используется для работы с Security, т.к. Security должен работать с UserDetails*/
 @Slf4j
 @Service
 public class UserDetailServiceImpl implements UserDetailsService
@@ -20,7 +21,6 @@ public class UserDetailServiceImpl implements UserDetailsService
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Person person = personService.findPersonByEmail(email);
-        log.info("Получили email - " +person.getEmail() + " в UserDetailsService");
         if(person != null){
             return person;
         }

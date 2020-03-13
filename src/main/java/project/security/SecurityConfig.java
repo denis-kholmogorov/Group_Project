@@ -10,8 +10,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * Основные конфигурации security находятся здесь*/
@@ -36,7 +34,9 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-    /** настраиваю конфигурацию хранения Person для security*/
+    /** Настраиваю конфигурацию хранения Person для security. antMatchers("/**").permitAll() создает полный доступ
+     * ко всем urls */
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception{
         auth.userDetailsService(userDetailsService);
@@ -49,15 +49,9 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests().antMatchers("/api/auth").permitAll()
-                .antMatchers("/hello/user").hasRole("USER")
-                .antMatchers("/hello/admin").hasRole("ADMIN")
+                .authorizeRequests().antMatchers("/**").permitAll()
                 .and()
-                .apply(new TokenConfig(tokenProvider))
-
-        ;
-
-
+                .apply(new TokenConfig(tokenProvider));
     }
 
 }
