@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import project.models.Friendship;
 
 @Repository
-public interface FriendshipRepository extends CrudRepository<Friendship, Long> {
+public interface FriendshipRepository extends CrudRepository<Friendship, Integer> {
 }

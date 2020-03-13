@@ -1,19 +1,13 @@
-package project.controllers;
+package project.controllers.rest;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import project.dto.LoginRequestDto;
 import project.dto.LoginResponseDto;
 import project.dto.RegistrationRequestDto;
-import project.models.Person;
-import project.security.JwtAuthentificationExecption;
-import project.security.TokenProvider;
 import project.services.PersonService;
 
 import javax.servlet.http.HttpServletRequest;

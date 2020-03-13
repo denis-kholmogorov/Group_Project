@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import project.models.BlockHistory;
 
 @Repository
-public interface BlockHistoryRepository extends CrudRepository<BlockHistory, Long> {
+public interface BlockHistoryRepository extends CrudRepository<BlockHistory, Integer> {
 }
