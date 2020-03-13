@@ -12,9 +12,6 @@ public class MvcConfig implements WebMvcConfigurer {
     @Value("${spring.resources.static-locations}")
     String resourceLocations;
 
-    @Value("${spring.profiles.active}")
-    String activeProfile;
-
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations(resourceLocations);
