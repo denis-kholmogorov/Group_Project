@@ -11,8 +11,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.validation.constraints.Size;
 import java.io.IOException;
 
 @Slf4j
@@ -30,16 +28,18 @@ public class TokenFilter extends GenericFilterBean
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException
     {
         log.info("Запрос страницы");
-        HttpServletRequest servletRequest1 = (HttpServletRequest) servletRequest;
-        if(tokenProvider.validitySession(servletRequest1.getSession())){
-            Authentication authentication = tokenProvider.getAuthentication(servletRequest1.getSession());
+       String token = tokenProvider.resolveToken((HttpServletRequest) servletRequest);
+       if(token != null && tokenProvider.validateToken(token)){
+           log.info("Прошли валидацю - ");
+           Authentication auth = tokenProvider.getAuthentication(token);
 
-            if(authentication != null){
-                log.info("Авторизация прошла");
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        }
+           if(auth != null){
+               SecurityContextHolder.getContext().setAuthentication(auth);
+           }
+       }
+        log.info("Разрешен доступ");
         filterChain.doFilter(servletRequest, servletResponse);
+
 
     }
 }

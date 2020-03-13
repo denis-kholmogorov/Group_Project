@@ -38,17 +38,18 @@ public class PersonService {
 
     }
 
-    public boolean login(LoginRequestDto dto, HttpSession session){
+    public Person login(LoginRequestDto dto){
         Person person = personRepository.findPersonByEmail(dto.getEmail()).orElse(null);
         log.info(person.getPassword());
         if(person != null && encoder.matches(dto.getPassword(), person.getPassword())){
-            tokenProvider.createToken(session, person.getEmail());
-            return true;
+            return person;
         }
-        return false;
+        return null;
     }
 
-    public boolean logout(HttpSession session){
-        return tokenProvider.tokenDelete(session);
+    public Person findPersonByEmail(String email){
+        Person person = personRepository.findPersonByEmail(email).get();
+        if(person == null){log.info("Юзер не найден!! в юзер сервисе"); return null; }
+        return person;
     }
 }

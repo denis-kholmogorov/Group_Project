@@ -15,7 +15,7 @@ public class Main {
 
     /** Данный бин служит для шифрования пароля */
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public BCryptPasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
     }

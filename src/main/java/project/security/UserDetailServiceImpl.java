@@ -1,28 +1,26 @@
 package project.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import project.models.Person;
-import project.repositories.PersonRepository;
 
+import project.services.PersonService;
+
+@Slf4j
 @Service
 public class UserDetailServiceImpl implements UserDetailsService
 {
-
     @Autowired
-    private PersonRepository personRepository;
-
-    @Autowired
-    public UserDetailServiceImpl(PersonRepository personRepository) {
-        this.personRepository = personRepository;
-    }
+    private PersonService personService;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Person person = personRepository.findPersonByEmail(email).get();
+        Person person = personService.findPersonByEmail(email);
+        log.info("Получили email - " +person.getEmail() + " в UserDetailsService");
         if(person != null){
             return person;
         }

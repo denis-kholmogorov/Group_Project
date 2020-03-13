@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -19,11 +20,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class SecurityConfig  extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private UserDetailServiceImpl userDetailService;
+    private UserDetailsService userDetailsService;
+
+    private TokenProvider tokenProvider;
 
     @Autowired
-    private TokenProvider tokenProvider;
+    public SecurityConfig(UserDetailsService userDetailsService, TokenProvider tokenProvider) {
+        this.userDetailsService = userDetailsService;
+        this.tokenProvider = tokenProvider;
+    }
 
     @Bean
     @Override
@@ -31,12 +36,10 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-
-
     /** настраиваю конфигурацию хранения Person для security*/
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception{
-        auth.userDetailsService(userDetailService);
+        auth.userDetailsService(userDetailsService);
     }
 
     @Override
@@ -44,11 +47,11 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
         http
                 .httpBasic().disable()
                 .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests().antMatchers("/api/auth/**").permitAll()
-                .and()
-                .authorizeRequests().antMatchers("/**").hasRole("USER")
+                .authorizeRequests().antMatchers("/api/auth").permitAll()
+                .antMatchers("/hello/user").hasRole("USER")
+                .antMatchers("/hello/admin").hasRole("ADMIN")
                 .and()
                 .apply(new TokenConfig(tokenProvider))
 
