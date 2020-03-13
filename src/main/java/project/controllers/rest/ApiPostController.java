@@ -1,11 +1,11 @@
-package project.controllers;
+package project.controllers.rest;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/api/friends/")
+@RequestMapping(value = "/api/post/")
 @AllArgsConstructor
-public class ApiFriendsController {
+public class ApiPostController {
 }

@@ -1,4 +1,4 @@
-package project.controllers;
+package project.controllers.rest;
 
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
