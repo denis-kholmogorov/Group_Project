@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/auth/")
 public class ApiAuthController {
 
 
@@ -30,20 +30,20 @@ public class ApiAuthController {
         this.personService = personService;
     }
 
-    @PostMapping(value = "/registration")
+    @PostMapping(value = "registration")
     @ResponseStatus(code = HttpStatus.CREATED)
     void registrations(@RequestBody RegistrationRequestDto dto){
         personService.registrationPerson(dto);
     }
 
-    @PostMapping(value = "/login")
+    @PostMapping(value = "login")
     ResponseEntity login(@RequestBody LoginRequestDto dto){
         LoginResponseDto response = personService.login(dto);
         if(response == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Пользователь не найден");
         return ResponseEntity.ok(response);//необходимо оставить
     }
 
-    @GetMapping(value = "/logout")
+    @GetMapping(value = "logout")
     ResponseEntity logout(HttpServletRequest request){
         return ResponseEntity.ok().body("Пользователь вышел");
     }
