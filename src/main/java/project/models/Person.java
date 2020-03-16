@@ -1,6 +1,7 @@
 package project.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.Type;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,7 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
-
+@Builder
 @Data
 @Entity
 @Table(name = "person")

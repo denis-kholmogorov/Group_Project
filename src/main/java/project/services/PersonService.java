@@ -2,6 +2,8 @@ package project.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +14,9 @@ import project.dto.RegistrationRequestDto;
 import project.models.Person;
 import project.repositories.PersonRepository;
 import project.security.TokenProvider;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -29,11 +34,22 @@ public class PersonService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    public ResponseEntity<Person> registrationPerson(RegistrationRequestDto dto){
+        Optional<Person> optional = personRepository.findPersonByEmail(dto.getEmail());
+        if (optional.isPresent()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 
-    public boolean registrationPerson(RegistrationRequestDto dto){
-        return false;
+        Person.PersonBuilder personBuilder = Person.builder()
+                .email(dto.getEmail())
+                .password(dto.getPassword())
+                .firstName(dto.getFirstName())
+                .lastName(dto.getLastName())
+                .regDate(LocalDateTime.now());
+        Person person = personRepository.save(personBuilder.build());
+
+        return ResponseEntity.ok(person);
 
     }
+
 
     public LoginResponseDto login(LoginRequestDto dto){
         String email = dto.getEmail();
