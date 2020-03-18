@@ -1,64 +1,78 @@
 package project.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.hibernate.annotations.Type;
 import project.models.enums.MessagesPermission;
 
 import javax.persistence.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Entity
 @Table(name = "person")
 public class Person {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
     @Column(name = "first_name")
+    @JsonProperty("first_name")
     private String firstName;
 
     @Column(name = "last_name")
+    @JsonProperty("last_name")
     private String lastName;
 
     @Column(updatable = false, name = "reg_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
-    private LocalDateTime regDate;
+    @JsonProperty("reg_date")
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
+    private Date regDate;
 
     @Column(name = "birth_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
-    private LocalDate birthDate;
+    @JsonProperty("birth_date")
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
+    private Date birthDate;
 
-    @Column(name = "e_mail")
     private String email;
 
     private String phone;
 
+    @JsonIgnore
     private String password;
 
     private String photo;
 
     private String about;
 
-    private String town;
+    private String city;
+
+    private String country;
 
     @Column(name = "confirmation_code")
+    @JsonIgnore
     private String confirmationCode;
 
     @Column(name = "is_approved")
     @Type(type = "yes_no")
+    @JsonIgnore
     private Boolean isApproved;
 
     @Column(name = "messages_permission")
     @Enumerated(EnumType.STRING)
-    private MessagesPermission messagePermission;
+    @JsonProperty("messages_permission")
+    private MessagesPermission messagesPermission;
 
     @Column(name = "last_online_time")
-    private LocalDateTime lastOnlineTime;
+    @JsonProperty("last_online_time")
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
+    private Date lastOnlineTime;
 
     @Column(name = "is_blocked")
     @Type(type = "yes_no")
+    @JsonProperty("is_blocked")
     private boolean isBlocked;
 }

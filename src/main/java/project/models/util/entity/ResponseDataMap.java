@@ -4,10 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import project.models.User;
 
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
@@ -17,7 +16,7 @@ public class ResponseDataMap extends Response {
     private final Map<String, ? super Object> data;
 
     public ResponseDataMap() {
-        this.data = new HashMap<>();
+        this.data = new LinkedHashMap<>();
     }
 
     public <T> Object put(String key, T value) {

@@ -1,18 +1,12 @@
 package project.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import project.models.User;
-import project.models.util.entity.ListResponse;
-import project.models.util.entity.ResponseDataMap;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import project.models.Person;
+import project.models.util.entity.PersonFactory;
+import project.models.util.entity.ResponseDataObject;
 
 //контроллер для тестирования
 @RestController
@@ -21,10 +15,9 @@ public class UserController {
 
     @GetMapping("/me")
     ResponseEntity<?> me() throws Exception {
-        ListResponse listResponse = new ListResponse();
-        listResponse.setTotal(100);
-        listResponse.setOffset(0);
-
-        return ResponseEntity.ok(listResponse);
+        PersonFactory personFactory = new PersonFactory();
+        ResponseDataObject<Person> response = new ResponseDataObject<>();
+        response.setData(personFactory.getPerson());
+        return ResponseEntity.ok(response);
     }
 }
