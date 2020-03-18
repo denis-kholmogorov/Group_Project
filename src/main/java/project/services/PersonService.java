@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +37,7 @@ public class PersonService {
         Optional<Person> personOptional = personRepository.findByEmail(email);
         if (personOptional.isPresent()){
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+            log.info(String.valueOf(SecurityContextHolder.getContext().getAuthentication().isAuthenticated()));
             return personOptional.get();
         }
         return null;
@@ -44,9 +46,11 @@ public class PersonService {
     public void registerPerson(@RequestBody RegistrationRequest request){
 
         Person person = new Person();
-        request.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
+        log.info("request: " + request.toString());
+        log.info(request.getPasswd1());
+        request.setPasswd1(bCryptPasswordEncoder.encode(request.getPasswd1()));
         person.setEmail(request.getEmail());
-        person.setPassword(request.getPassword());
+        person.setPassword(request.getPasswd1());
         person.setFirstName(request.getFirstName());
         person.setLastName(request.getLastName());
         personRepository.save(person);

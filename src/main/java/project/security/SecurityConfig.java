@@ -32,7 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.cors().and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/home", "/api/v1/auth/registration", "/api/v1/auth/login").permitAll()
+                .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new JwtTokenVerifyFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
@@ -44,6 +44,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         auth.userDetailsService(personDetailsService)
                 .passwordEncoder(bCryptPasswordEncoder());
+
+//        auth.inMemoryAuthentication()
+//                .withUser("lenin@yandex.ru")
+//                .password("11111111")
+//                .authorities("USER");
     }
 
     @Bean()

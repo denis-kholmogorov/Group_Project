@@ -10,6 +10,7 @@ import project.models.enums.MessagesPermission;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 
 
@@ -69,7 +70,7 @@ public class Person implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
