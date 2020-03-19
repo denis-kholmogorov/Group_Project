@@ -5,9 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import project.dto.LoginRequestDto;
-import project.dto.LoginResponseDto;
-import project.dto.RegistrationRequestDto;
+import project.dto.requestDto.LoginRequestDto;
+import project.dto.responseDto.LoginResponseDto;
 import project.services.PersonService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,12 +27,6 @@ public class ApiAuthController {
     @Autowired
     public ApiAuthController(PersonService personService) {
         this.personService = personService;
-    }
-
-    @PostMapping(value = "registration")
-    @ResponseStatus(code = HttpStatus.CREATED)
-    void registrations(@RequestBody RegistrationRequestDto dto){
-        personService.registrationPerson(dto);
     }
 
     @PostMapping(value = "login")

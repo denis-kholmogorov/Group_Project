@@ -12,6 +12,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+
 /**
  * Создаем фильтр, который будет проверять наш токен из заголовка запроса.
  * В TokenConfig.class мы его добавим в SecurityFilters */

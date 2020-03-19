@@ -1,4 +1,4 @@
-package project.dto;
+package project.dto.requestDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,4 +10,5 @@ public class LoginRequestDto
     String email;
 
     String password;
+
 }

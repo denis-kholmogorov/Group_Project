@@ -7,23 +7,30 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import project.models.Person;
-
 import project.services.PersonService;
 
 /** Используется для работы с Security, т.к. Security должен работать с UserDetails*/
+
 @Slf4j
 @Service
-public class UserDetailServiceImpl implements UserDetailsService
+public class JwtUserDetailService implements UserDetailsService
 {
+
+    private final PersonService personService;
+
     @Autowired
-    private PersonService personService;
+    public JwtUserDetailService(PersonService personService) {
+        this.personService = personService;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Person person = personService.findPersonByEmail(email);
         if(person != null){
-            return person;
+            throw new UsernameNotFoundException("Person with " + email + " not found");
         }
-        throw new UsernameNotFoundException("Person with " + email + " not found");
+        JwtUser jwtUser = JwtUserFactory.create(person);
+        log.info("In load by user with email " + jwtUser.getEmail());
+        return jwtUser;
     }
 }

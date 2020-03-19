@@ -9,15 +9,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+import project.models.Role;
 
 import javax.annotation.PostConstruct;
-import javax.management.relation.Role;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Date;
+import java.util.List;
+
 /**
  * Данный класс работает с нашим токеном*/
 @Slf4j
@@ -90,6 +91,15 @@ public class TokenProvider
         } catch (JwtException | IllegalArgumentException e) {
             throw new JwtAuthentificationExecption("JWT token is expired or invalid");
         }
+    }
+
+    public List<String> getRoleName(List<Role> personRole){
+        List<String> result = new ArrayList<>();
+
+        personRole.forEach(role -> {
+            result.add(role.getName());
+        });
+        return result;
     }
 
 }
