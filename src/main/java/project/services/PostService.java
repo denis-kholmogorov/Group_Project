@@ -8,4 +8,6 @@ import project.repositories.PostRepository;
 @AllArgsConstructor
 public class PostService {
     private PostRepository postRepository;
+
+
 }
