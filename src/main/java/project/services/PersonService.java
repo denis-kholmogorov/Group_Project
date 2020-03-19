@@ -8,9 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import project.dto.LoginRequestDto;
-import project.dto.LoginResponseDto;
-import project.dto.RegistrationRequestDto;
+import project.dto.*;
 import project.models.Person;
 import project.repositories.PersonRepository;
 import project.security.TokenProvider;
@@ -70,5 +68,20 @@ public class PersonService {
         return person;
     }
 
+    public PersonDto getPersonDtoById(Integer id){
+        Person personFromDb = personRepository.findById(id).orElse(null);
+        if(personFromDb != null) {
+            CityDto cityDto = new CityDto(123, personFromDb.getTown());
+            CountryDto countryDto = new CountryDto(213124, "Russia");
 
+            return new PersonDto(personFromDb.getId()
+                    , personFromDb.getFirstName(), personFromDb.getLastName()
+                    , personFromDb.getRegDate(), personFromDb.getBirthDate(),
+                    personFromDb.getEmail(), personFromDb.getPhone(),
+                    personFromDb.getPhoto(), personFromDb.getAbout(),
+                    cityDto, countryDto, personFromDb.getMessagePermission(),
+                    personFromDb.getLastOnlineTime(), personFromDb.isBlocked());
+        }
+        return null;
+    }
 }

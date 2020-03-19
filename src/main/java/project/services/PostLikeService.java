@@ -13,4 +13,8 @@ public class PostLikeService {
     public PostLikeService(PostLikeRepository postLikeRepository) {
         this.postLikeRepository = postLikeRepository;
     }
+
+    public Integer countLikesByPostId (Integer postId){
+        return postLikeRepository.countAllByPostId(postId);
+    }
 }

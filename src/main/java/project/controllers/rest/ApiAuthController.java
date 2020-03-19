@@ -48,7 +48,4 @@ public class ApiAuthController {
         return ResponseEntity.ok().body("Пользователь вышел");
     }
 
-
-
-
 }
