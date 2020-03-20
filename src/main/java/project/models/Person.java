@@ -3,12 +3,20 @@ package project.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.Type;
 import project.models.enums.MessagesPermission;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -37,6 +45,7 @@ public class Person {
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Date birthDate;
 
+    @Column(name = "e_mail")
     private String email;
 
     private String phone;
@@ -75,4 +84,14 @@ public class Person {
     @Type(type = "yes_no")
     @JsonProperty("is_blocked")
     private boolean isBlocked;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "token_id", referencedColumnName = "id")
+    private Token token;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_roles",
+    joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+    inverseJoinColumns =@JoinColumn(name = "role_id", referencedColumnName = "id"))
+    private Set<Role> roles = new HashSet<>();
 }

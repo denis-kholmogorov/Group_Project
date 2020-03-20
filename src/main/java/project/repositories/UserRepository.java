@@ -6,4 +6,5 @@ import project.models.User;
 
 @Repository
 public interface UserRepository extends CrudRepository<User, Integer> {
+    
 }
