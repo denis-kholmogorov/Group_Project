@@ -16,7 +16,6 @@ import java.util.Set;
 @Entity
 @Table(name = "person")
 public class Person {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
@@ -55,28 +54,28 @@ public class Person {
 
     private String country;
 
-    @Column(name = "confirmation_code")
     @JsonIgnore
+    @Column(name = "confirmation_code")
     private String confirmationCode;
 
+    @JsonIgnore
     @Column(name = "is_approved")
     @Type(type = "yes_no")
-    @JsonIgnore
     private Boolean isApproved;
 
+    @JsonProperty("messages_permission")
     @Column(name = "messages_permission")
     @Enumerated(EnumType.STRING)
-    @JsonProperty("messages_permission")
     private MessagesPermission messagesPermission;
 
-    @Column(name = "last_online_time")
     @JsonProperty("last_online_time")
+    @Column(name = "last_online_time")
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Date lastOnlineTime;
 
+    @JsonProperty("is_blocked")
     @Column(name = "is_blocked")
     @Type(type = "yes_no")
-    @JsonProperty("is_blocked")
     private boolean isBlocked;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -85,7 +84,37 @@ public class Person {
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles",
-    joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-    inverseJoinColumns =@JoinColumn(name = "role_id", referencedColumnName = "id"))
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns =@JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Set<Role> roles = new HashSet<>();
+
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        return Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
+//    }
+//
+//    @Override
+//    public String getUsername() {
+//        return email;
+//    }
+//
+//    @Override
+//    public boolean isAccountNonExpired() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean isAccountNonLocked() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean isCredentialsNonExpired() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean isEnabled() {
+//        return true;
+//    }
 }

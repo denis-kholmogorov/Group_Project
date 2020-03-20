@@ -1,5 +1,5 @@
 package project.handlerExceptions;
 
 /** ЕМАЙЛ уже есть БД*/
-public class EmailAlreadyRegisteredException extends RuntimeException{
+public class EmailAlreadyRegisteredException extends MainHandlerException {
 }
