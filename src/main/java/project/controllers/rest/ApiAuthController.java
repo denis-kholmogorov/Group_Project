@@ -46,7 +46,4 @@ public class ApiAuthController {
         return ResponseEntity.ok(new ResponseDto(new MessageResponseDto()));
     }
 
-
-
-
 }
