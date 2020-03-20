@@ -55,7 +55,7 @@ public class PersonService {
         person.setPassword(encoder.encode(dto.getPasswd1()));
         person.setFirstName(dto.getFirstName());
         person.setLastName(dto.getLastName());
-        person.setRegDate(LocalDateTime.now());
+        person.setRegDate(new Date());
         person.setRoles(Collections.singleton(role));
 
         personRepository.save(person);

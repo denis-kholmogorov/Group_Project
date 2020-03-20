@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
 @RestController
-@RequestMapping("/auth/")
+@RequestMapping("/api/v1/auth")
 public class ApiAuthController {
 
 
@@ -32,7 +32,7 @@ public class ApiAuthController {
         this.personService = personService;
     }
 
-    @PostMapping(value = "login")
+    @PostMapping(value = "/login")
     ResponseEntity login(@RequestBody LoginRequestDto loginRequestDto){
         ResponseDataObject responseDto = personService.login(loginRequestDto);
         if(responseDto == null) throw new EmailAlreadyRegisteredException();
@@ -40,7 +40,7 @@ public class ApiAuthController {
     }
 
 
-    @PostMapping(value = "logout")
+    @PostMapping(value = "/logout")
     ResponseEntity logout(HttpServletRequest request){
         Boolean result = personService.logout(request);
         return ResponseEntity.ok(new ResponseDataObject<>(new MessageResponseDto()));

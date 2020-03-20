@@ -18,7 +18,7 @@ import project.services.PersonService;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/account/")
+@RequestMapping(value = "/api/v1/account/")
 @AllArgsConstructor
 public class ApiAccountController {
 
@@ -28,7 +28,6 @@ public class ApiAccountController {
    @PostMapping(value = "register")
     public ResponseEntity<?> register(@RequestBody RegistrationRequestDto dto) {
         log.info("контроллер Register отработал");
-
         ResponseDataObject responseDto = personService.registrationPerson(dto);
         return ResponseEntity.ok(responseDto);
 

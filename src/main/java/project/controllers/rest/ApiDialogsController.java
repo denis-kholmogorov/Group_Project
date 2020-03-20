@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/dialogs/")
+@RequestMapping(value = "/api/v1/dialogs")
 @AllArgsConstructor
 public class ApiDialogsController {
 }
