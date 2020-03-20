@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import project.models.enums.MessagesPermission;
 
 import java.time.LocalDate;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class PersonDto {
     private Integer id;
 
@@ -36,9 +38,9 @@ public class PersonDto {
 
     private String about;
 
-    private CityDto city;
+    private String city;
 
-    private CountryDto country;
+    private String country;
 
     @JsonProperty("messages_permission")
     private MessagesPermission messagePermission;
@@ -47,6 +49,6 @@ public class PersonDto {
     private LocalDateTime lastOnlineTime;
 
     @JsonProperty("is_blocked")
-    private boolean isBlocked;
+    private Boolean isBlocked;
 
 }

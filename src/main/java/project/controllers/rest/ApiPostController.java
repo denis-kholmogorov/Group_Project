@@ -28,7 +28,7 @@ public class ApiPostController {
     private PostCommentsService postCommentsService;
 
     @GetMapping("{id}")
-    public ResponseEntity<ResponseDto> getPostById(@PathVariable Integer id){
+    public ResponseEntity<ResponseDto<PostDto>> getPostById(@PathVariable Integer id){
         Post post = postService.getPostById(id);
         PersonDto personDto = personService.getPersonDtoById(post.getAuthorId());
 
@@ -38,6 +38,7 @@ public class ApiPostController {
 
         PostDto postDto = new PostDto(post.getId(), post.getTime(), personDto, post.getTitle(), post.getPostText(),
                 post.getIsBlocked(), countLikes, comments);
-        return ResponseEntity.ok(new ResponseDto("", "123213241", postDto));
+        System.out.println();
+        return ResponseEntity.ok(new ResponseDto<>("", "123213241", postDto));
     }
 }

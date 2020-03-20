@@ -1,7 +1,6 @@
 package project.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.Type;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,7 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
-@Builder
+
 @Data
 @Entity
 @Table(name = "person")
@@ -50,6 +49,8 @@ public class Person implements UserDetails {
 
     private String town;
 
+    private String country;
+
     @Column(name = "confirmation_code")
     private String confirmationCode;
 
@@ -66,7 +67,7 @@ public class Person implements UserDetails {
 
     @Column(name = "is_blocked")
     @Type(type = "yes_no")
-    private boolean isBlocked;
+    private Boolean isBlocked;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
