@@ -1,6 +1,6 @@
 package project.models.enums;
 
-public enum Code {
+public enum FriendshipStatusCode {
     REQUEST,
     FRIEND,
     BLOCKED,
