@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 
 @Data
 @Builder
@@ -20,7 +21,7 @@ public class JwtUser implements UserDetails {
 
     private final String lastName;
 
-    private final LocalDateTime regDate;
+    private final Date regDate;
 
     private final String email;
 
