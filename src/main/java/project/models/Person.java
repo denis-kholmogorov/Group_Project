@@ -1,6 +1,7 @@
 package project.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.Type;
@@ -9,11 +10,13 @@ import project.models.enums.MessagesPermission;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
-@Builder
 @Table(name = "person")
 public class Person {
     @Id
@@ -65,9 +68,13 @@ public class Person {
     @Type(type = "yes_no")
     private boolean isBlocked;
 
-   @ManyToMany(fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "token_id", referencedColumnName = "id")
+    private Token token;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles",
     joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
     inverseJoinColumns =@JoinColumn(name = "role_id", referencedColumnName = "id"))
-    private List<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 }

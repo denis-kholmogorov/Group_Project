@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 /**
  * Основные конфигурации security находятся здесь*/
@@ -26,6 +27,11 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
     public SecurityConfig(UserDetailsService userDetailsService, TokenProvider tokenProvider) {
         this.userDetailsService = userDetailsService;
         this.tokenProvider = tokenProvider;
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler(){
+        return new CustomAccessDeniedHadler();
     }
 
     @Bean
@@ -50,7 +56,11 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests().antMatchers("/**").permitAll()
+                //.antMatchers("/account/").permitAll()
+                //.antMatchers("/users/**").hasRole("ADMIN")
                 .and()
+                /*.exceptionHandling().accessDeniedHandler(accessDeniedHandler())
+                .and()*/
                 .apply(new TokenConfig(tokenProvider));
     }
 

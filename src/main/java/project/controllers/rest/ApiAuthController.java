@@ -6,7 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.LoginRequestDto;
-import project.dto.responseDto.LoginResponseDto;
+import project.dto.responseDto.MessageResponseDto;
+import project.dto.responseDto.ResponseDataObject;
+import project.dto.responseDto.ResponseDto;
+import project.handlerExceptions.EmailAlreadyRegisteredException;
 import project.services.PersonService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,15 +33,17 @@ public class ApiAuthController {
     }
 
     @PostMapping(value = "login")
-    ResponseEntity login(@RequestBody LoginRequestDto dto){
-        LoginResponseDto response = personService.login(dto);
-        if(response == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Пользователь не найден");
-        return ResponseEntity.ok(response);//необходимо оставить
+    ResponseEntity login(@RequestBody LoginRequestDto loginRequestDto){
+        ResponseDataObject responseDto = personService.login(loginRequestDto);
+        if(responseDto == null) throw new EmailAlreadyRegisteredException();
+        return ResponseEntity.ok(responseDto);//необходимо оставить
     }
 
-    @GetMapping(value = "logout")
+
+    @PostMapping(value = "logout")
     ResponseEntity logout(HttpServletRequest request){
-        return ResponseEntity.ok().body("Пользователь вышел");
+        Boolean result = personService.logout(request);
+        return ResponseEntity.ok(new ResponseDataObject<>(new MessageResponseDto()));
     }
 
 

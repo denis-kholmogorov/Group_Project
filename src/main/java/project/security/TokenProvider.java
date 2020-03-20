@@ -11,20 +11,24 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import project.models.Role;
+import project.models.Token;
+import project.repositories.TokenRepository;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Данный класс работает с нашим токеном*/
+
+
 @Slf4j
 @Component
 public class TokenProvider
 {
+    @Autowired
+    TokenRepository tokenRepository;
+
     @Value("${jwt.token.secret}")
     private String secret; // секретное слово из application.yml
 
@@ -74,23 +78,30 @@ public class TokenProvider
     /** Получение токена из header запроса*/
     public String resolveToken(HttpServletRequest request){
         String bearerToken = request.getHeader("Authorization");
-        if(bearerToken != null && bearerToken.startsWith("Bearer_")){
-            return bearerToken.substring(7);
+        if(bearerToken != null){
+            return bearerToken;
         }
         return null;
     }
 
     /** Валидация токена*/
     public boolean validateToken(String token) {
-        try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
-            if (claims.getBody().getExpiration().before(new Date())) {
-                return false;
+        Optional<Token> optionalToken = tokenRepository.findByToken(token);
+        if (optionalToken.isPresent()) {
+            Token jwtToken = optionalToken.get();
+            Calendar date = jwtToken.getDateCreated();
+            date.add(Calendar.MONTH, 1);
+            if (Calendar.getInstance().before(date)) {
+                jwtToken.setDateCreated(Calendar.getInstance());
+                log.info("Валидация токена прошла!");
+                return true;
             }
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            throw new JwtAuthentificationExecption("JWT token is expired or invalid");
+            tokenRepository.delete(jwtToken);
+            log.info("Токен НЕ ВАЛИДЕН!");
+            return false;
         }
+        log.info("Токен НЕ найден в базе");
+        return false;
     }
 
     public List<String> getRoleName(List<Role> personRole){
