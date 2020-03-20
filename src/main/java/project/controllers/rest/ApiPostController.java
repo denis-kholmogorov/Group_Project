@@ -10,6 +10,7 @@ import project.dto.CommentDto;
 import project.dto.PersonDto;
 import project.dto.PostDto;
 import project.dto.ResponseDto;
+import project.models.Person;
 import project.models.Post;
 import project.services.PersonService;
 import project.services.PostCommentsService;
@@ -30,13 +31,13 @@ public class ApiPostController {
     @GetMapping("{id}")
     public ResponseEntity<ResponseDto<PostDto>> getPostById(@PathVariable Integer id){
         Post post = postService.getPostById(id);
-        PersonDto personDto = personService.getPersonDtoById(post.getAuthorId());
+        Person person = personService.findPersonById(post.getAuthorId());
 
         Integer countLikes = postLikeService.countLikesByPostId(post.getId());
 
         List<CommentDto> comments = postCommentsService.getListCommentsDto(post.getId());
 
-        PostDto postDto = new PostDto(post.getId(), post.getTime(), personDto, post.getTitle(), post.getPostText(),
+        PostDto postDto = new PostDto(post.getId(), post.getTime(), person, post.getTitle(), post.getPostText(),
                 post.getIsBlocked(), countLikes, comments);
         System.out.println();
         return ResponseEntity.ok(new ResponseDto<>("", "123213241", postDto));
