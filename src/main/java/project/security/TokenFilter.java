@@ -42,6 +42,6 @@ public class TokenFilter extends GenericFilterBean
                log.info("Ништяк токен в контексте");
            }
        }
-        filterChain.doFilter(servletRequest, servletResponse); // переводим запрос дальше(разрешаем доступ)
+       filterChain.doFilter(servletRequest, servletResponse); // переводим запрос дальше(разрешаем доступ)
     }
 }
