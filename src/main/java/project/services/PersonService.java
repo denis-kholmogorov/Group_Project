@@ -8,12 +8,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import project.dto.AuthRequest;
 import project.dto.RegistrationRequest;
 import project.models.Person;
+import project.models.VerificationToken;
 import project.repositories.PersonRepository;
+import project.util.EmailServiceImpl;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -22,12 +26,21 @@ public class PersonService {
     private PersonRepository personRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     private AuthenticationManager authenticationManager;
+    private EmailServiceImpl emailService;
+    private VerificationTokenService verificationTokenService;
 
     @Autowired
-    public PersonService(PersonRepository personRepository, BCryptPasswordEncoder bCryptPasswordEncoder, AuthenticationManager authenticationManager) {
+    public PersonService(PersonRepository personRepository, BCryptPasswordEncoder bCryptPasswordEncoder,
+                         AuthenticationManager authenticationManager, EmailServiceImpl emailService, VerificationTokenService verificationTokenService) {
         this.personRepository = personRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.authenticationManager = authenticationManager;
+        this.emailService = emailService;
+        this.verificationTokenService = verificationTokenService;
+    }
+
+    public Person findByEmail(String email){
+        return personRepository.findByEmail(email).orElse(null);
     }
 
     public Person loginPerson(@RequestBody AuthRequest authRequest){
@@ -46,13 +59,24 @@ public class PersonService {
     public void registerPerson(@RequestBody RegistrationRequest request){
 
         Person person = new Person();
-        log.info("request: " + request.toString());
-        log.info(request.getPasswd1());
         request.setPasswd1(bCryptPasswordEncoder.encode(request.getPasswd1()));
         person.setEmail(request.getEmail());
         person.setPassword(request.getPasswd1());
         person.setFirstName(request.getFirstName());
         person.setLastName(request.getLastName());
         personRepository.save(person);
+    }
+
+    public void sendRecoveryPasswordEmail(@RequestParam("email") String email) {
+
+        Person person = findByEmail(email);
+        if (person != null) {
+            String token = UUID.randomUUID().toString();
+            VerificationToken verificationToken = new VerificationToken(token, person.getId(), 20);
+            String link = "http://localhost:8080/account/password/set/" + token;
+            String message = String.format("Для восстановления пароля перейдите по ссылке %s", link );
+            verificationTokenService.save(verificationToken);
+            emailService.send(email, "Password recovery", message);
+        }
     }
 }

@@ -44,11 +44,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         auth.userDetailsService(personDetailsService)
                 .passwordEncoder(bCryptPasswordEncoder());
-
-//        auth.inMemoryAuthentication()
-//                .withUser("lenin@yandex.ru")
-//                .password("11111111")
-//                .authorities("USER");
     }
 
     @Bean()
