@@ -15,12 +15,13 @@ public class Token {
 
     String token;
 
+    @Column(name = "email_user")
+    String emailUser;
+
     @Column(name = "date_created")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
     Calendar dateCreated;
 
-    @OneToOne(mappedBy = "token")
-    private Person person;
 
 
 }

@@ -32,8 +32,6 @@ public class TokenProvider
     @Value("${jwt.token.secret}")
     private String secret; // секретное слово из application.yml
 
-    @Value("${jwt.token.expired}")
-    private long validityInMillis; // время действия из application.yml
 
     private UserDetailsService userDetailsService;
 
@@ -55,11 +53,9 @@ public class TokenProvider
 
         Claims claims = Jwts.claims().setSubject(email); //создаем клайм
         Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMillis);
         return Jwts.builder()       // создаем токен
                 .setClaims(claims)  // установка клайм
                 .setIssuedAt(now)   // установка даты создания
-                .setExpiration(validity) // установка действия создания
                 .signWith(SignatureAlgorithm.HS256, secret) //хэширование секретного кода
                 .compact();
     }
@@ -77,12 +73,8 @@ public class TokenProvider
 
     /** Получение токена из header запроса*/
     public String resolveToken(HttpServletRequest request){
-        String bearerToken = request.getHeader("Authorization");
-        if(bearerToken != null){
-            return bearerToken;
-        }
+        return request.getHeader("Authorization");
         //exc handler
-        return null;
     }
 
     /** Валидация токена*/
@@ -94,11 +86,10 @@ public class TokenProvider
             date.add(Calendar.MONTH, 1);
             if (Calendar.getInstance().before(date)) {
                 jwtToken.setDateCreated(Calendar.getInstance());
-                log.info("Валидация токена прошла!");
                 return true;
             }
             tokenRepository.delete(jwtToken);
-            log.info("Токен НЕ ВАЛИДЕН!");
+            log.info("УДАЛЕН ТОКЕН!");
             return false;
         }
         log.info("Токен НЕ найден в базе");
@@ -108,9 +99,7 @@ public class TokenProvider
     public List<String> getRoleName(List<Role> personRole){
         List<String> result = new ArrayList<>();
 
-        personRole.forEach(role -> {
-            result.add(role.getName());
-        });
+        personRole.forEach(role -> result.add(role.getName()));
         return result;
     }
 }
