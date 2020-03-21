@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import project.dto.CommentDto;
 import project.dto.PostDto;
-import project.dto.ResponseDto;
+import project.dto.responseDto.ResponseDto;
 import project.models.Person;
 import project.models.Post;
 import project.services.PersonService;
@@ -39,6 +39,6 @@ public class ApiPostController {
         PostDto postDto = new PostDto(post.getId(), post.getTime(), person, post.getTitle(), post.getPostText(),
                 post.getIsBlocked(), countLikes, comments);
         System.out.println();
-        return ResponseEntity.ok(new ResponseDto<>("", "123213241", postDto));
+        return ResponseEntity.ok(new ResponseDto(postDto));
     }
 }
