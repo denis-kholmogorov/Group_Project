@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.NewWallpostDto;
 import project.dto.responseDto.ResponseDto;
 import project.models.Person;
-import project.models.Post;
 import project.models.enums.MessagesPermission;
 import project.security.TokenProvider;
 import project.services.PersonService;
@@ -15,7 +14,6 @@ import project.services.PostService;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/users/")
@@ -52,9 +50,8 @@ public class ApiUsersController {
     }
 
     @GetMapping("{id}/wall")
-    public ResponseEntity<?> getWallPostsById(@PathVariable Integer id, Integer offset, Integer limit) {
-        List<Post> postList = postService.findAllByAuthorId(id, offset, limit);
-        return null;
+    public ResponseEntity<?> getWallPostsById(@PathVariable Integer id, Integer offsetParam, Integer limitParam) {
+        return ResponseEntity.ok(postService.findAllByAuthorId(id, offsetParam, limitParam));
     }
 
     @PostMapping("{id}/wall")

@@ -3,7 +3,6 @@ package project.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,7 @@ import project.models.VerificationToken;
 import project.repositories.PersonRepository;
 import project.repositories.TokenRepository;
 import project.security.TokenProvider;
-import project.util.EmailService;
+import project.services.email.EmailService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -85,7 +84,7 @@ public class PersonService {
     public ResponseDto<PersonDtoWithToken> login(LoginRequestDto dto){
         String email = dto.getEmail();
         String password = dto.getPassword();
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password)); //необходимо оставить
+        //authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password)); //необходимо оставить
         Person person = personRepository.findPersonByEmail(email).orElse(null);//необходимо оставить
         if (person == null) {
             throw new UsernameNotFoundException("User not found with email + " + email);
@@ -93,11 +92,24 @@ public class PersonService {
         Token jwtToken = new Token();
         String token = tokenProvider.createToken(email);//необходимо оставить
         PersonDtoWithToken personDto = new PersonDtoWithToken();
-        personDto.setPerson(person);
+        personDto.setId(person.getId());
+        personDto.setFirstName(person.getFirstName());
+        personDto.setLastName(person.getLastName());
+        personDto.setRegDate(person.getRegDate());
+        personDto.setBirthDate(person.getBirthDate());
+        personDto.setEmail(person.getEmail());
+        personDto.setPhone(person.getPhone());
+        personDto.setPhoto(person.getPhoto());
+        personDto.setAbout(person.getAbout());
+        personDto.setCity(person.getCity());
+        personDto.setCountry(person.getCountry());
+        personDto.setMessagesPermission(person.getMessagesPermission());
+        personDto.setLastOnlineTime(person.getLastOnlineTime());
+        personDto.setBlocked(person.isBlocked());
         personDto.setToken(token);
 
         jwtToken.setToken(token);
-        jwtToken.setDateCreated(Calendar.getInstance());//Calendar так и должен быть?
+        jwtToken.setDateCreated(Calendar.getInstance());
         jwtToken.setEmailUser(person.getEmail());
         tokenRepository.save(jwtToken);
 

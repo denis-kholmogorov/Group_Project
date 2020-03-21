@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +16,7 @@ public class CommentDto {
     @JsonProperty("post_id")
     private Integer postId;
 
-    private LocalDateTime time;
+    private Date time;
 
     @JsonProperty("author_id")
     private Integer authorId;

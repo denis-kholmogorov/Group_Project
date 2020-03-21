@@ -1,11 +1,11 @@
 package project.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Entity
@@ -17,8 +17,8 @@ public class PostComment {
     private Integer id;
 
     @Column(nullable = false)
-    @CreationTimestamp
-    private LocalDateTime time; //почему не Date?
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
+    private Date time;
 
     @Column(name = "post_id")
     private Integer postId;

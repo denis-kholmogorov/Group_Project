@@ -9,9 +9,8 @@ import project.models.Person;
 @NoArgsConstructor
 @AllArgsConstructor
 public
-class PersonDtoWithToken
+class PersonDtoWithToken extends Person
 {
-    private Person person;
     private String token;
 
 }

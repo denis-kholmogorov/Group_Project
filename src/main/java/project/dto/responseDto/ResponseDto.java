@@ -1,17 +1,12 @@
 package project.dto.responseDto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.Date;
+import lombok.EqualsAndHashCode;
+import project.models.ResponseModel;
 
 @Data
-@AllArgsConstructor
-public class ResponseDto<T> {
-
-    private String error = "";
-
-    private Long timestamp = new Date().getTime();
+@EqualsAndHashCode(callSuper = true)
+public class ResponseDto<T> extends ResponseModel {
 
     private T data;
 
