@@ -3,10 +3,7 @@ package project.controllers.rest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.RegistrationRequestDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
@@ -25,6 +22,11 @@ public class ApiAccountController {
         log.info("контроллер Register отработал");
         if (personService.registrationPerson(dto)) return ResponseEntity.ok(new ResponseDto(new MessageResponseDto()));
         else return ResponseEntity.status(400).body(null);
+    }
+
+    @PutMapping("password/recovery")
+    public void sendRecoveryEmail(@RequestParam("email") String email){
+        personService.sendRecoveryPasswordEmail(email);
     }
 
 }

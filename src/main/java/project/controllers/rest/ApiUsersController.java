@@ -64,13 +64,13 @@ public class ApiUsersController {
 
     @PutMapping("block/{id}")
     public ResponseEntity<?> blockPersonById(@PathVariable Integer id) {
-        if (personService.blockPersonById(id)) return ResponseEntity.ok(null);
+        if (personService.blockPersonById(id, true)) return ResponseEntity.ok(null);
         else return ResponseEntity.status(400).body(null); //нужна? обработка 400 и 401
     }
 
     @DeleteMapping("block/{id}")
     public ResponseEntity<?> unblockPersonById(@PathVariable Integer id) {
-        if (personService.unblockPersonById(id)) return ResponseEntity.ok(null);
+        if (personService.blockPersonById(id, false)) return ResponseEntity.ok(null);
         else return ResponseEntity.status(400).body(null); //нужна? обработка 400 и 401
     }
 

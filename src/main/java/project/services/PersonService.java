@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import project.dto.requestDto.LoginRequestDto;
 import project.dto.requestDto.RegistrationRequestDto;
 import project.dto.responseDto.PersonDtoWithToken;
@@ -14,15 +15,14 @@ import project.handlerExceptions.EmailAlreadyRegisteredException;
 import project.models.Person;
 import project.models.Role;
 import project.models.Token;
+import project.models.VerificationToken;
 import project.repositories.PersonRepository;
 import project.repositories.TokenRepository;
 import project.security.TokenProvider;
+import project.util.EmailService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -42,6 +42,14 @@ public class PersonService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    VerificationTokenService verificationTokenService;
+
+    @Autowired
+    EmailService emailService;
+
+
 
     //    @PostConstruct
 //    public void init() {
@@ -96,11 +104,11 @@ public class PersonService {
 
     public void sendRecoveryPasswordEmail(@RequestParam("email") String email) {
 
-        Person person = findByEmail(email);
+        Person person = findPersonByEmail(email);
         if (person != null) {
             String token = UUID.randomUUID().toString();
-            VerificationToken verificationToken = new VerificationToken(token, person.getId(), 20);
-            String link = "http://localhost:8080/account/password/set/" + token;
+            VerificationToken verificationToken = new VerificationToken(token, person.getId(), 20); //у нас же есть валидация токена? заменить
+            String link = "http://localhost:8080/account/password/set/" + token;    //какая должна быть ссылка
             String message = String.format("Для восстановления пароля перейдите по ссылке %s", link );
             verificationTokenService.save(verificationToken);
             emailService.send(email, "Password recovery", message);
@@ -125,24 +133,13 @@ public class PersonService {
         return optionalPerson.orElse(null);
     }
 
-    public boolean blockPersonById(Integer id) {
+    public boolean blockPersonById(Integer id, Boolean block) {
         Person person = findPersonById(id);
         if (person != null) {
-            person.setBlocked(true);
+            person.setBlocked(block);
             personRepository.save(person);
             return true;
         }
         return false;
     }
-
-    public boolean unblockPersonById(Integer id) {
-        Person person = findPersonById(id);
-        if (person != null) {
-            person.setBlocked(false);
-            personRepository.save(person);
-            return true;
-        }
-        return false;
-    }
-
 }
