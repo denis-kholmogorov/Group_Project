@@ -78,7 +78,7 @@ public class PersonService {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password)); //необходимо оставить
         Person person = personRepository.findPersonByEmail(email).orElse(null);//необходимо оставить
         if (person == null) {
-            //
+            //обработать
         }
         Token jwtToken = new Token();
         String token = tokenProvider.createToken(email);//необходимо оставить
@@ -87,7 +87,7 @@ public class PersonService {
         personDto.setToken(token);
 
         jwtToken.setToken(token);
-        jwtToken.setDateCreated(Calendar.getInstance());
+        jwtToken.setDateCreated(Calendar.getInstance());//Calendar так и должен быть?
         jwtToken.setPerson(person);
         Token t = tokenRepository.save(jwtToken);
         log.info(t.getPerson().getEmail());

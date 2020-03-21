@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "post_comments")
-public class PostComments {
+public class PostComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +18,7 @@ public class PostComments {
 
     @Column(nullable = false)
     @CreationTimestamp
-    private LocalDateTime time;
+    private LocalDateTime time; //почему не Date?
 
     @Column(name = "post_id")
     private Integer postId;

@@ -6,9 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import project.handlerExceptions.EntityValidationException;
 import project.models.util.entity.EntityViolation;
 import project.models.util.entity.FriendParams;
-import project.handlerExceptions.EntityValidationException;
 import project.repositories.FriendshipRepository;
 
 import javax.validation.ConstraintViolation;
@@ -18,7 +18,7 @@ import javax.validation.ValidatorFactory;
 import java.util.Set;
 
 @RestController
-@RequestMapping(value = "/api/vi/friends")
+@RequestMapping(value = "/api/vi/friends/")
 @AllArgsConstructor
 public class ApiFriendsController {
 

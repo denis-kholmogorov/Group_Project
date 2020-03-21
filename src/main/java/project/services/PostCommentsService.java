@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import project.dto.CommentDto;
 import project.dto.CommentModelDto;
-import project.models.PostComments;
+import project.models.PostComment;
 import project.repositories.PostCommentsRepository;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public class PostCommentsService {
     }
 
     public List<CommentDto> getListCommentsDto(Integer postId){
-        List<PostComments> postComments = postCommentsRepository.findAllByPostIdAndIsBlocked(postId, false);
+        List<PostComment> postComments = postCommentsRepository.findAllByPostIdAndIsBlocked(postId, false);
         return postComments.stream().map(comment ->{
             CommentModelDto commentModelDto = new CommentModelDto(comment.getParentId(), comment.getComment());
             return new CommentDto(commentModelDto, comment.getId(), comment.getPostId(),

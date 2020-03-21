@@ -36,14 +36,14 @@ public class ApiAuthController {
     @PostMapping(value = "login")
     ResponseEntity login(@RequestBody LoginRequestDto loginRequestDto) throws EmailAlreadyRegisteredException {
         ResponseDto responseDto = personService.login(loginRequestDto);
-        if(responseDto == null) throw new EmailAlreadyRegisteredException();
-        return ResponseEntity.ok(responseDto);//необходимо оставить
+        if(responseDto == null) throw new EmailAlreadyRegisteredException();//изменить ошибку
+        return ResponseEntity.ok(responseDto);//необходимо оставить, обработать еще ошибки
     }
 
     @PostMapping(value = "logout")
     ResponseEntity logout(HttpServletRequest request){
         Boolean result = personService.logout(request);
-        return ResponseEntity.ok(new ResponseDto(new MessageResponseDto()));
+        return ResponseEntity.ok(new ResponseDto(new MessageResponseDto()));//обработать еще ошибки
     }
 
 }

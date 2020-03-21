@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import project.dto.CommentDto;
-import project.dto.PersonDto;
 import project.dto.PostDto;
 import project.dto.ResponseDto;
 import project.models.Person;
@@ -20,7 +19,7 @@ import project.services.PostService;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/v1/post")
+@RequestMapping(value = "/api/v1/post/")
 @AllArgsConstructor
 public class ApiPostController {
     private PostService postService;
