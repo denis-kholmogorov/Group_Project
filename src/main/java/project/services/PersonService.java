@@ -94,6 +94,19 @@ public class PersonService {
         return new ResponseDto(personDto);
     }
 
+    public void sendRecoveryPasswordEmail(@RequestParam("email") String email) {
+
+        Person person = findByEmail(email);
+        if (person != null) {
+            String token = UUID.randomUUID().toString();
+            VerificationToken verificationToken = new VerificationToken(token, person.getId(), 20);
+            String link = "http://localhost:8080/account/password/set/" + token;
+            String message = String.format("Для восстановления пароля перейдите по ссылке %s", link );
+            verificationTokenService.save(verificationToken);
+            emailService.send(email, "Password recovery", message);
+        }
+    }
+
     public Person findPersonByEmail(String email){
         Person person = personRepository.findPersonByEmail(email).orElse(null);
 
