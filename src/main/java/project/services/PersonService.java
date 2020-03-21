@@ -78,6 +78,7 @@ public class PersonService {
         person.setLastName(dto.getLastName());
         person.setRegDate(new Date());
         person.setRoles(Collections.singleton(role));
+        personRepository.save(person);
         return true;
     }
 
