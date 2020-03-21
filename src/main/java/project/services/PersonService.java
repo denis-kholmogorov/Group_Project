@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -80,13 +81,13 @@ public class PersonService {
         return true;
     }
 
-    public ResponseDto login(LoginRequestDto dto){
+    public ResponseDto<PersonDtoWithToken> login(LoginRequestDto dto){
         String email = dto.getEmail();
         String password = dto.getPassword();
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password)); //необходимо оставить
         Person person = personRepository.findPersonByEmail(email).orElse(null);//необходимо оставить
         if (person == null) {
-            //обработать
+            throw new UsernameNotFoundException("User not found with email + " + email);
         }
         Token jwtToken = new Token();
         String token = tokenProvider.createToken(email);//необходимо оставить
@@ -96,10 +97,10 @@ public class PersonService {
 
         jwtToken.setToken(token);
         jwtToken.setDateCreated(Calendar.getInstance());//Calendar так и должен быть?
-        jwtToken.setPerson(person);
-        Token t = tokenRepository.save(jwtToken);
-        log.info(t.getPerson().getEmail());
-        return new ResponseDto(personDto);
+        jwtToken.setEmailUser(person.getEmail());
+        tokenRepository.save(jwtToken);
+
+        return new ResponseDto<>(personDto);
     }
 
     public void sendRecoveryPasswordEmail(@RequestParam("email") String email) {
@@ -116,10 +117,7 @@ public class PersonService {
     }
 
     public Person findPersonByEmail(String email){
-        Person person = personRepository.findPersonByEmail(email).orElse(null);
-
-        if(person == null){return null; }
-        return person;
+        return personRepository.findPersonByEmail(email).orElse(null);
     }
 
     public boolean logout(HttpServletRequest request){
