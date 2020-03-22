@@ -31,5 +31,10 @@ public class ApiAccountController {
         return ResponseEntity.ok(personService.sendRecoveryPasswordEmail(email.get("email")));
     }
 
+    @PutMapping("/password/set/{token}")
+    public void setNewPassword(@PathVariable String token, @RequestParam String password){
+
+        personService.setNewPassword(token, password);
+    }
 }
 

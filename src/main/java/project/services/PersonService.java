@@ -131,6 +131,25 @@ public class PersonService {
         return new ResponseDto<>(new MessageResponseDto());
     }
 
+    public void setNewPassword(String tokenFromEmail, String password){
+
+        log.info(tokenFromEmail);
+        VerificationToken verificationToken = verificationTokenService.findByUUID(tokenFromEmail);
+        log.info(String.valueOf(verificationToken == null));
+        if (verificationToken != null && (new Date().before(verificationToken.getExpirationDate()))) {
+            int personId = verificationToken.getUserId();
+            Person person = findPersonById(personId);
+            if (person != null){
+                log.info(person.toString());
+                log.info(password);
+                password = encoder.encode(password);
+                log.info(password);
+                person.setPassword(password);
+                personRepository.save(person);
+            }
+        }
+    }
+
     public Person findPersonByEmail(String email){
         return personRepository.findPersonByEmail(email).orElse(null);
     }
