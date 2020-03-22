@@ -14,7 +14,7 @@ public class VerificationTokenService {
     }
 
     public VerificationToken findByUUID(String token) {
-        return verificationTokenRepository.findByUuid(token).orElse(null);
+        return verificationTokenRepository.findByUUID(token).orElse(null);
     }
 
     public void save(VerificationToken token){
