@@ -3,7 +3,8 @@ package project.controllers.rest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import project.dto.requestDto.NewWallpostDto;
+import project.dto.requestDto.NewWallPostDto;
+import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.models.Person;
 import project.models.enums.MessagesPermission;
@@ -20,20 +21,19 @@ import java.util.Date;
 @AllArgsConstructor
 public class ApiUsersController {
 
-
     private PersonService personService;
     private PostService postService;
     private TokenProvider tokenProvider;
 
     @GetMapping("me")
-    public ResponseEntity<?> getAuthUser(ServletRequest servletRequest){
+    public ResponseEntity<?> getAuthUser(ServletRequest servletRequest){    //обработать 401
         String token = tokenProvider.resolveToken((HttpServletRequest) servletRequest);
         String email = tokenProvider.getUserEmail(token);
         Person person = personService.findPersonByEmail(email);
 
         person.setAbout("1");
         person.setPhone("1");
-        person.setPhoto("1");
+        person.setPhoto("resources/images/photo.jpg");
         person.setBirthDate(new Date());
         person.setLastOnlineTime(new Date());
         person.setRegDate(new Date());
@@ -44,31 +44,32 @@ public class ApiUsersController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getPersonById(@PathVariable Integer id) {
+    public ResponseEntity<?> getPersonById(@PathVariable Integer id) {  //обработать 401
         Person person = personService.findPersonById(id);
         return ResponseEntity.ok(new ResponseDto<>(person));
     }
 
     @GetMapping("{id}/wall")
-    public ResponseEntity<?> getWallPostsById(@PathVariable Integer id, Integer offsetParam, Integer limitParam) {
-        return ResponseEntity.ok(postService.findAllByAuthorId(id, offsetParam, limitParam));
+    public ResponseEntity<?> getWallPostsById(@PathVariable Integer id, @RequestParam(defaultValue = "0") Integer offset, @RequestParam(defaultValue = "20") Integer itemPerPage) {  //обработать 400 и 401
+        return ResponseEntity.ok(postService.findAllByAuthorId(id, offset, itemPerPage));
     }
 
     @PostMapping("{id}/wall")
-    public ResponseEntity<?> addWallPostById(@PathVariable Integer id, @RequestBody NewWallpostDto dto) {
+    public ResponseEntity<?> addWallPostById(@PathVariable Integer id, @RequestBody NewWallPostDto dto) {   //обработать 400 и 401
+
         return null;
     }
 
     @PutMapping("block/{id}")
-    public ResponseEntity<?> blockPersonById(@PathVariable Integer id) {
-        if (personService.blockPersonById(id, true)) return ResponseEntity.ok(null);
-        else return ResponseEntity.status(400).body(null); //нужна? обработка 400 и 401
+    public ResponseEntity<?> blockPersonById(@PathVariable Integer id) {    //обработать 400 и 401
+        personService.blockPersonById(id, true);
+        return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
     @DeleteMapping("block/{id}")
-    public ResponseEntity<?> unblockPersonById(@PathVariable Integer id) {
-        if (personService.blockPersonById(id, false)) return ResponseEntity.ok(null);
-        else return ResponseEntity.status(400).body(null); //нужна? обработка 400 и 401
+    public ResponseEntity<?> unblockPersonById(@PathVariable Integer id) { //обработать 400 и 401
+        personService.blockPersonById(id, false);
+        return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
 }

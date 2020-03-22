@@ -18,15 +18,15 @@ public class ApiAccountController {
     private PersonService personService;
 
     @PostMapping(value = "register")
-    public ResponseEntity<?> register(@RequestBody RegistrationRequestDto dto) throws EmailAlreadyRegisteredException {
+    public ResponseEntity<ResponseDto<MessageResponseDto>> register(@RequestBody RegistrationRequestDto dto) throws EmailAlreadyRegisteredException {
         log.info("контроллер Register отработал");
-        if (personService.registrationPerson(dto)) return ResponseEntity.ok(new ResponseDto(new MessageResponseDto()));
-        else return ResponseEntity.status(400).body(null);
+        personService.registrationPerson(dto);
+        return ResponseEntity.ok(new ResponseDto(new MessageResponseDto()));
     }
 
-    @PutMapping("password/recovery")
-    public void sendRecoveryEmail(@RequestParam("email") String email){
-        personService.sendRecoveryPasswordEmail(email);
+    @PutMapping(value = "password/recovery")
+    public ResponseEntity<ResponseDto<MessageResponseDto>> sendRecoveryEmail(@RequestBody String email){
+        return ResponseEntity.ok(personService.sendRecoveryPasswordEmail(email));
     }
 
 }

@@ -6,9 +6,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import project.dto.requestDto.LoginRequestDto;
 import project.dto.requestDto.RegistrationRequestDto;
+import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.PersonDtoWithToken;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.EmailAlreadyRegisteredException;
@@ -83,8 +83,6 @@ public class PersonService {
 
     public ResponseDto<PersonDtoWithToken> login(LoginRequestDto dto){
         String email = dto.getEmail();
-        String password = dto.getPassword();
-        //authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password)); //необходимо оставить
         Person person = personRepository.findPersonByEmail(email).orElse(null);//необходимо оставить
         if (person == null) {
             throw new UsernameNotFoundException("User not found with email + " + email);
@@ -116,17 +114,21 @@ public class PersonService {
         return new ResponseDto<>(personDto);
     }
 
-    public void sendRecoveryPasswordEmail(@RequestParam("email") String email) {
+    public ResponseDto<MessageResponseDto> sendRecoveryPasswordEmail(String email) {
 
         Person person = findPersonByEmail(email);
         if (person != null) {
             String token = UUID.randomUUID().toString();
             VerificationToken verificationToken = new VerificationToken(token, person.getId(), 20); //у нас же есть валидация токена? заменить
-            String link = "http://localhost:8080/account/password/set/" + token;    //какая должна быть ссылка
+            String link = "http://localhost:8086/account/password/set/" + token;    //какая должна быть ссылка
             String message = String.format("Для восстановления пароля перейдите по ссылке %s", link );
             verificationTokenService.save(verificationToken);
             emailService.send(email, "Password recovery", message);
+
+        } else {
+            //обработать
         }
+        return new ResponseDto<>(new MessageResponseDto());
     }
 
     public Person findPersonByEmail(String email){

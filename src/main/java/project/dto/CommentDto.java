@@ -9,6 +9,7 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 public class CommentDto {
+
     private CommentModelDto commentModel;
 
     private Integer id;

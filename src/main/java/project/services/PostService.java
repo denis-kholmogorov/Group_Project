@@ -6,11 +6,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import project.dto.PersonsWallPostDto;
+import project.dto.PostDto;
 import project.dto.responseDto.ListResponseDto;
 import project.models.Post;
+import project.models.ResponseModel;
+import project.models.enums.PostTypeEnum;
 import project.repositories.PersonRepository;
 import project.repositories.PostRepository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,18 +38,18 @@ public class PostService {
         Pageable pageable = PageRequest.of(offset, limit, sort);
         List<Post> wallPostList = postRepository.findAllByAuthorId(authorId, pageable);
         List<PersonsWallPostDto> personsWallPostDtoList = wallPostList.stream().map(wallPost -> {
-            PersonsWallPostDto personsWallPostDto = new PersonsWallPostDto();
-            personsWallPostDto.setId(wallPost.getId());
-            personsWallPostDto.setTime(wallPost.getTime());
-            personsWallPostDto.setAuthor(personRepository.findById(wallPost.getAuthorId()).orElse(null));
-            personsWallPostDto.setTitle(wallPost.getTitle());
-            personsWallPostDto.setPostText(wallPost.getPostText());
-            personsWallPostDto.setIsBlocked(wallPost.getIsBlocked());
-            personsWallPostDto.setLikes(postLikeService.countLikesByPostId(wallPost.getId()));
-            personsWallPostDto.setComments(postCommentsService.getListCommentsDto(wallPost.getId()));
-            return personsWallPostDto;
+            PostDto postDto = new PostDto();
+            postDto.setId(wallPost.getId());
+            postDto.setTime(wallPost.getTime());
+            postDto.setAuthor(personRepository.findById(wallPost.getAuthorId()).orElse(null));
+            postDto.setTitle(wallPost.getTitle());
+            postDto.setPostText(wallPost.getPostText());
+            postDto.setIsBlocked(wallPost.getIsBlocked());
+            postDto.setLikes(postLikeService.countLikesByPostId(wallPost.getId()));
+            postDto.setComments(postCommentsService.getListCommentsDto(wallPost.getId()));
+            return new PersonsWallPostDto(postDto, wallPost.getTime().before(new Date()) ? PostTypeEnum.POSTED.getType() : PostTypeEnum.QUEUED.getType());
         }).collect(toList());
 
-        return new ListResponseDto(personsWallPostDtoList.size(), offset, limit, personsWallPostDtoList);
+        return new ListResponseDto(new ResponseModel(), personsWallPostDtoList.size(), offset, limit, personsWallPostDtoList);
     }
 }

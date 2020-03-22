@@ -12,7 +12,6 @@ public
 class PersonDtoWithToken extends Person
 {
     private String token;
-
 }
 
 

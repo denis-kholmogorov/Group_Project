@@ -1,12 +1,14 @@
 package project.dto.responseDto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import project.models.ResponseModel;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class ResponseDto<T> extends ResponseModel {
+@AllArgsConstructor
+public class ResponseDto<T> {
+
+    private ResponseModel responseModel;
 
     private T data;
 
