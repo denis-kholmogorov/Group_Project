@@ -18,6 +18,7 @@ import project.models.Role;
 import project.models.Token;
 import project.models.VerificationToken;
 import project.repositories.PersonRepository;
+import project.repositories.RoleRepository;
 import project.repositories.TokenRepository;
 import project.security.TokenProvider;
 import project.services.email.EmailService;
@@ -50,6 +51,9 @@ public class PersonService {
     @Autowired
     EmailService emailService;
 
+    @Autowired
+    RoleRepository roleRepository;
+
 
 
     //    @PostConstruct
@@ -68,9 +72,16 @@ public class PersonService {
         Person exist = personRepository.findPersonByEmail(dto.getEmail()).orElse(null);
         if (exist != null) throw new EmailAlreadyRegisteredException();
         Person person = new Person();
-        Role role = new Role();
-        role.setId(1);
-        role.setName("ROLE_USER");
+        Optional<Role> optionalRole = roleRepository.findById(1);
+        Role role;
+        if (optionalRole == null) {
+            role = new Role();
+            role.setId(1);
+            role.setName("ROLE_USER");
+        }
+        else {
+            role = optionalRole.get();
+        }
 
         person.setEmail(dto.getEmail());
         person.setPassword(encoder.encode(dto.getPasswd1()));
@@ -121,7 +132,7 @@ public class PersonService {
         if (person != null) {
             String token = UUID.randomUUID().toString();
             VerificationToken verificationToken = new VerificationToken(token, person.getId(), 20);
-            String link = "http://localhost/change-password?" + token;
+            String link = "http://localhost/change-password?token=" + token;
             String message = String.format("Для восстановления пароля перейдите по ссылке %s", link );
             verificationTokenService.save(verificationToken);
             emailService.send(email, "Password recovery", message);
