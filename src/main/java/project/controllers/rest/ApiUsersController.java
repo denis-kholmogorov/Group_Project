@@ -7,7 +7,6 @@ import project.dto.requestDto.NewWallPostDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.models.Person;
-import project.models.enums.MessagesPermission;
 import project.security.TokenProvider;
 import project.services.PersonService;
 import project.services.PostService;
@@ -31,15 +30,7 @@ public class ApiUsersController {
         String email = tokenProvider.getUserEmail(token);
         Person person = personService.findPersonByEmail(email);
 
-        person.setAbout("1");
-        person.setPhone("1");
-        person.setPhoto("resources/images/photo.jpg");
-        person.setBirthDate(new Date());
         person.setLastOnlineTime(new Date());
-        person.setRegDate(new Date());
-        person.setMessagesPermission(MessagesPermission.ALL);
-        person.setCity("1");
-        person.setCountry("1");
         return ResponseEntity.ok(new ResponseDto<>(person));
     }
 
