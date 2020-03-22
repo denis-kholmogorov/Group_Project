@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import project.dto.requestDto.PasswordSetDto;
 import project.dto.requestDto.RegistrationRequestDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
@@ -31,10 +32,9 @@ public class ApiAccountController {
         return ResponseEntity.ok(personService.sendRecoveryPasswordEmail(email.get("email")));
     }
 
-    @PutMapping("/password/set/{token}")
-    public void setNewPassword(@PathVariable String token, @RequestParam String password){
-
-        personService.setNewPassword(token, password);
+    @PutMapping("password/set")
+    public ResponseEntity<ResponseDto<MessageResponseDto>> setNewPassword(@RequestBody PasswordSetDto passwordSetDto){
+        return ResponseEntity.ok(personService.setNewPassword(passwordSetDto));
     }
 }
 

@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import project.dto.requestDto.LoginRequestDto;
+import project.dto.requestDto.PasswordSetDto;
 import project.dto.requestDto.RegistrationRequestDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.PersonDtoWithToken;
@@ -131,10 +132,12 @@ public class PersonService {
         return new ResponseDto<>(new MessageResponseDto());
     }
 
-    public void setNewPassword(String tokenFromEmail, String password){
+    public ResponseDto<MessageResponseDto> setNewPassword(PasswordSetDto passwordSetDto){
 
-        log.info(tokenFromEmail);
-        VerificationToken verificationToken = verificationTokenService.findByUUID(tokenFromEmail);
+        String token = passwordSetDto.getToken();
+        String password = passwordSetDto.getPassword();
+        log.info(token);
+        VerificationToken verificationToken = verificationTokenService.findByUUID(token);
         log.info(String.valueOf(verificationToken == null));
         if (verificationToken != null && (new Date().before(verificationToken.getExpirationDate()))) {
             int personId = verificationToken.getUserId();
@@ -147,6 +150,12 @@ public class PersonService {
                 person.setPassword(password);
                 personRepository.save(person);
             }
+
+            return new ResponseDto<>(new MessageResponseDto());
+        }
+        else {
+            //обработать по нашему
+            return null;
         }
     }
 
