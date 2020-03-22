@@ -10,6 +10,8 @@ import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.EmailAlreadyRegisteredException;
 import project.services.PersonService;
 
+import java.util.Map;
+
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/account/")
@@ -25,8 +27,8 @@ public class ApiAccountController {
     }
 
     @PutMapping(value = "password/recovery")
-    public ResponseEntity<ResponseDto<MessageResponseDto>> sendRecoveryEmail(@RequestBody String email){
-        return ResponseEntity.ok(personService.sendRecoveryPasswordEmail(email));
+    public ResponseEntity<ResponseDto<MessageResponseDto>> sendRecoveryEmail(@RequestBody Map<String, String> email){
+        return ResponseEntity.ok(personService.sendRecoveryPasswordEmail(email.get("email")));
     }
 
 }
