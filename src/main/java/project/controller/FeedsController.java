@@ -26,6 +26,6 @@ public class FeedsController {
     @GetMapping
     public ResponseEntity<Iterable<Post>> feeds(){
         Iterable<Post> posts = postRepository.findAll();
-        return ResponseEntity.ok().body(posts);
+        return null;
     }
 }

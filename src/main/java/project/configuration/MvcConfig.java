@@ -1,3 +1,9 @@
+package project.configuration;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 //package project.configuration;
 //
 //import org.springframework.beans.factory.annotation.Value;
@@ -9,10 +15,10 @@
 //import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 //import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 //
-//@Configuration
-//public class MvcConfig implements WebMvcConfigurer {
+@Configuration
+public class MvcConfig implements WebMvcConfigurer {
 
-//    @Value("${spring.resources.static-locations}")
+    //    @Value("${spring.resources.static-locations}")
 //    String resourceLocations;
 //
 //    @Override
@@ -20,10 +26,8 @@
 //        registry.addResourceHandler("/static/**").addResourceLocations(resourceLocations);
 //    }
 //
-//    @Override
-//    public void addCorsMappings(CorsRegistry registry) {
-//        registry.addMapping("/**");
-//    }
-//
-//
-//}
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**");
+    }
+}

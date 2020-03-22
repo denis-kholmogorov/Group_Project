@@ -13,8 +13,8 @@ public class VerificationTokenService {
         this.verificationTokenRepository = verificationTokenRepository;
     }
 
-    public VerificationToken getById(int id){
-        return verificationTokenRepository.findById(id).orElse(null);
+    public VerificationToken findByUUID(String token) {
+        return verificationTokenRepository.findByUuid(token).orElse(null);
     }
 
     public void save(VerificationToken token){

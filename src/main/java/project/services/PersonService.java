@@ -8,7 +8,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import project.dto.AuthRequest;
 import project.dto.RegistrationRequest;
 import project.models.Person;
@@ -16,6 +15,7 @@ import project.models.VerificationToken;
 import project.repositories.PersonRepository;
 import project.util.EmailServiceImpl;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,6 +43,10 @@ public class PersonService {
         return personRepository.findByEmail(email).orElse(null);
     }
 
+    public Person findById(int id){
+        return personRepository.findById(id).orElse(null);
+    }
+
     public Person loginPerson(@RequestBody AuthRequest authRequest){
 
         String email = authRequest.getEmail();
@@ -56,7 +60,7 @@ public class PersonService {
         return null;
     }
 
-    public void registerPerson(@RequestBody RegistrationRequest request){
+    public void registerPerson(RegistrationRequest request){
 
         Person person = new Person();
         request.setPasswd1(bCryptPasswordEncoder.encode(request.getPasswd1()));
@@ -67,7 +71,7 @@ public class PersonService {
         personRepository.save(person);
     }
 
-    public void sendRecoveryPasswordEmail(@RequestParam("email") String email) {
+    public void sendRecoveryPasswordEmail(String email) {
 
         Person person = findByEmail(email);
         if (person != null) {
@@ -77,6 +81,21 @@ public class PersonService {
             String message = String.format("Для восстановления пароля перейдите по ссылке %s", link );
             verificationTokenService.save(verificationToken);
             emailService.send(email, "Password recovery", message);
+        }
+    }
+
+    public void setNewPassword(String tokenFromEmail, String password){
+
+        VerificationToken verificationToken = verificationTokenService.findByUUID(tokenFromEmail);
+        if (verificationToken != null && (new Date().before(verificationToken.getExpirationDate()))) {
+            int personId = verificationToken.getUserId();
+            Person person = findById(personId);
+            if (person != null){
+                password = bCryptPasswordEncoder.encode(password);
+                person.setPassword(password);
+                personRepository.save(person);
+            }
+
         }
     }
 }

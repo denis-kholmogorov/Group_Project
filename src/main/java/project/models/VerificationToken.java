@@ -19,7 +19,7 @@ public class VerificationToken {
     @Setter(AccessLevel.PRIVATE)
     private int id;
 
-    private String token;
+    private String uuid;
 
     private int userId;
 
@@ -28,8 +28,8 @@ public class VerificationToken {
     public VerificationToken() {
     }
 
-    public VerificationToken(String token, int userId, int expirationTimeMinutes) {
-        this.token = token;
+    public VerificationToken(String uuid, int userId, int expirationTimeMinutes) {
+        this.uuid = uuid;
         this.userId = userId;
         this.expirationDate = calculateExpiryDate(expirationTimeMinutes);
     }

@@ -11,7 +11,7 @@ jwt:
 
 spring.mail.host: smtp.yandex.ru
 spring.mail.username: email@yandex.ru
-spring.mail.password: password
+spring.mail.password: pass
 spring.mail.port: 465
 spring.mail.protocol: smtps
 mail.debug: true

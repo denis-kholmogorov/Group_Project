@@ -7,23 +7,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import project.dto.AuthRequest;
-import project.dto.RegistrationRequest;
 import project.dto.ResponseDTO;
 import project.models.Person;
-import project.repositories.PersonRepository;
 import project.security.JwtTokenProvider;
 import project.services.PersonService;
 
 import javax.servlet.http.HttpServletResponse;
-import java.sql.Timestamp;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Controller
 @Slf4j
 @RequestMapping("/auth")
-@CrossOrigin(origins="*")
+@CrossOrigin(origins="*", allowedHeaders = "*")
 public class AuthController {
 
     private PersonService personService;
@@ -39,23 +34,17 @@ public class AuthController {
     @ResponseBody
     public ResponseEntity<?> login(@RequestBody AuthRequest authRequest, HttpServletResponse res){
 
-        log.info("trig");
-        Person user = personService.loginPerson(authRequest);
-        if (user == null) {
+        Person data = personService.loginPerson(authRequest);
+        String token = "";
+        if (data == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Пользователя не существует");
         } else {
-            String token = jwtTokenProvider.createToken(user.getEmail());
-            res.addHeader(JwtTokenProvider.HEADER_STRING, token);
-            log.info(token);
+            token = jwtTokenProvider.createToken(data.getEmail());
+            //res.addHeader(JwtTokenProvider.HEADER_STRING, token);
+            data.setToken(token);
         }
-        ResponseDTO<Person> responseDTO = new ResponseDTO<>("", new Timestamp(new Date().getTime()), user);
+        ResponseDTO<Person> responseDTO = new ResponseDTO<>("", new Date().getTime(), data);
 
         return ResponseEntity.ok(responseDTO);
-    }
-
-    @GetMapping("/hello")
-    @ResponseBody
-    public String hello(){
-        return "hello!";
     }
 }

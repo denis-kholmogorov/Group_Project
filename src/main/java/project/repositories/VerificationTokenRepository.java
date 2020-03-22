@@ -9,6 +9,5 @@ import java.util.Optional;
 @Repository
 public interface VerificationTokenRepository extends CrudRepository<VerificationToken, Integer> {
 
-    Optional<VerificationToken> findByToken(String token);
-
+    Optional<VerificationToken> findByUuid(String token);
 }

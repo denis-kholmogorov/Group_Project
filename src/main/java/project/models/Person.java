@@ -2,6 +2,7 @@ package project.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import org.hibernate.annotations.ManyToAny;
 import org.hibernate.annotations.Type;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 
 @Data
@@ -29,12 +31,12 @@ public class Person implements UserDetails {
     private String lastName;
 
     @Column(updatable = false, name = "reg_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
-    private LocalDateTime regDate;
+    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
+    private long regDate;
 
     @Column(name = "birth_date")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
-    private LocalDate birthDate;
+    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy")
+    private long birthDate;
 
     @Column(name = "e_mail")
     private String email;
@@ -47,26 +49,31 @@ public class Person implements UserDetails {
 
     private String about;
 
-    private String town;
+    @OneToOne
+    private City city;
+
+    @OneToOne
+    private Country country;
 
     @Column(name = "confirmation_code")
     private String confirmationCode;
 
     @Column(name = "is_approved")
     @Type(type = "yes_no")
-    private Boolean isApproved;
+    private Boolean isApproved = true;
 
     @Column(name = "messages_permission")
     @Enumerated(EnumType.STRING)
     private MessagesPermission messagePermission;
 
     @Column(name = "last_online_time")
-    private LocalDateTime lastOnlineTime;
+    private LocalDateTime lastOnlineTime = LocalDateTime.now();
 
     @Column(name = "is_blocked")
     @Type(type = "yes_no")
-    private boolean isBlocked;
+    private boolean isBlocked = false;
 
+    private String token;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

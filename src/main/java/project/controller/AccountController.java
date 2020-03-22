@@ -6,11 +6,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.dto.RegistrationRequest;
+import project.dto.ResponseDTO;
 import project.models.Person;
+import project.models.VerificationToken;
 import project.services.PersonService;
 import project.util.EmailService;
 import project.util.EmailServiceImpl;
 
+import java.util.Date;
 import java.util.UUID;
 
 @RestController
@@ -34,8 +37,16 @@ public class AccountController {
     }
 
     @PutMapping("/password/recovery")
-    public void sendRecoveryEmail(@RequestParam("email") String email){
+    public ResponseDTO<String> sendRecoveryEmail(@RequestBody String email){
 
+        log.info("send");
         personService.sendRecoveryPasswordEmail(email);
+        return new ResponseDTO<>("", new Date().getTime(), "ok");
+    }
+
+    @PutMapping("/password/set/{token}")
+    public void setNewPassword(@PathVariable String token, @RequestParam String password){
+
+        personService.setNewPassword(token, password);
     }
 }
