@@ -1,4 +1,4 @@
-package project.models.util.entity;
+package project.dto.requestDto;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
 @Data
-public class FriendParams {
+public class FriendParamsDto {
 
     @Size(min = 2, max = 50)
     private String name;
