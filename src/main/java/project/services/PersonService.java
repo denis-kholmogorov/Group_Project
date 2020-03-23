@@ -143,9 +143,10 @@ public class PersonService {
         return new ResponseDto<>(new MessageResponseDto());
     }
 
-    public ResponseDto<MessageResponseDto> setNewPassword(PasswordSetDto passwordSetDto){
+    public ResponseDto<MessageResponseDto> setNewPassword(PasswordSetDto passwordSetDto, HttpServletRequest request){
 
-        String token = passwordSetDto.getToken();
+        String token = request.getHeader("referer");
+        token = token.substring(token.indexOf('=') + 1);
         String password = passwordSetDto.getPassword();
         log.info(token);
         VerificationToken verificationToken = verificationTokenService.findByUUID(token);

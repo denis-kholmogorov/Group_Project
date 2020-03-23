@@ -11,6 +11,7 @@ import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.EmailAlreadyRegisteredException;
 import project.services.PersonService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @Slf4j
@@ -33,8 +34,8 @@ public class ApiAccountController {
     }
 
     @PutMapping("password/set")
-    public ResponseEntity<ResponseDto<MessageResponseDto>> setNewPassword(@RequestBody PasswordSetDto passwordSetDto){
-        return ResponseEntity.ok(personService.setNewPassword(passwordSetDto));
+    public ResponseEntity<ResponseDto<MessageResponseDto>> setNewPassword(@RequestBody PasswordSetDto passwordSetDto, HttpServletRequest request){
+        return ResponseEntity.ok(personService.setNewPassword(passwordSetDto, request));
     }
 }
 
