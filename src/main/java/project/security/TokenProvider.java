@@ -86,6 +86,7 @@ public class TokenProvider
             date.add(Calendar.MONTH, 1);
             if (Calendar.getInstance().before(date)) {
                 jwtToken.setDateCreated(Calendar.getInstance());
+                tokenRepository.save(jwtToken);
                 return true;
             }
             tokenRepository.delete(jwtToken);

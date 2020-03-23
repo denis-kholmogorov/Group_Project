@@ -72,15 +72,16 @@ public class PersonService {
         Person exist = personRepository.findPersonByEmail(dto.getEmail()).orElse(null);
         if (exist != null) throw new EmailAlreadyRegisteredException();
         Person person = new Person();
-        Optional<Role> optionalRole = roleRepository.findById(1);
+        Boolean existsById = roleRepository.existsById(1);
+
         Role role;
-        if (optionalRole == null) {
+        if (!existsById) {
             role = new Role();
             role.setId(1);
             role.setName("ROLE_USER");
         }
         else {
-            role = optionalRole.get();
+            role = roleRepository.findById(1).get();
         }
 
         person.setEmail(dto.getEmail());
