@@ -12,8 +12,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import project.handlerExceptions.BadRequestException400;
+import project.models.Person;
 import project.models.Role;
 import project.models.Token;
+import project.repositories.PersonRepository;
 import project.repositories.TokenRepository;
 
 import javax.annotation.PostConstruct;
@@ -28,6 +31,9 @@ public class TokenProvider
 {
     @Autowired
     TokenRepository tokenRepository;
+
+    @Autowired
+    PersonRepository personRepository;
 
     @Value("${jwt.token.secret}")
     private String secret; // секретное слово из application.yml
@@ -75,6 +81,20 @@ public class TokenProvider
     public String resolveToken(HttpServletRequest request){
         return request.getHeader("Authorization");
         //exc handler
+    }
+
+    /** Получение емейла из запроса*/
+    public String getEmailByRequest(HttpServletRequest request){
+        return getUserEmail(resolveToken(request));
+    }
+
+    /** Получение Person по запросу*/
+    public Person getPersonByRequest(HttpServletRequest request) throws BadRequestException400 {
+        Optional<Person> person = personRepository.findByEmail(getEmailByRequest(request));
+        if(person.isPresent()){
+            return person.get();
+        }
+        throw new BadRequestException400();
     }
 
     /** Валидация токена*/

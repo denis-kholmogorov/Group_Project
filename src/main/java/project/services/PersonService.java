@@ -6,9 +6,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import project.dto.requestDto.LoginRequestDto;
 import project.dto.requestDto.PasswordSetDto;
 import project.dto.requestDto.RegistrationRequestDto;
+import project.dto.responseDto.FileUploadResponseDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.PersonDtoWithToken;
 import project.dto.responseDto.ResponseDto;
@@ -23,7 +25,12 @@ import project.repositories.TokenRepository;
 import project.security.TokenProvider;
 import project.services.email.EmailService;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 @Slf4j
@@ -195,5 +202,43 @@ public class PersonService {
             return true;
         }
         return false;
+
+    }
+
+    public FileUploadResponseDto downloadImage(String type, MultipartFile file, HttpServletRequest request) throws BadRequestException400 {
+
+        Person person = tokenProvider.getPersonByRequest(request);
+        int index = file.getContentType().indexOf("/") + 1;
+        String typeImage = file.getContentType().substring(index);
+        log.info(typeImage + " тип изображения");
+        if(!file.isEmpty()){
+            String path = "src/main/resources/images/";
+            String fileName = UUID.randomUUID().toString();
+            String pathImage = path + fileName + "." + typeImage ;
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(file.getBytes());
+            BufferedImage bi = ImageIO.read(bais);
+            ImageIO.write(bi, typeImage,new File(pathImage));
+            log.info("Сохраненный файл " + pathImage);
+            person.setPhoto(pathImage);
+            personRepository.save(person);
+
+            return FileUploadResponseDto.builder()
+                    .id(person.getId().toString())
+                    .ownerId(person.getId())
+                    .fileName(fileName)
+                    .bytes(file.getBytes().length)
+                    .fileFormat(typeImage)
+                    .createdAt(new Date().getTime())
+                    .fileType(type)
+                    .rawFileURL(pathImage)
+                    .relativeFilePath(pathImage)
+                    .build();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+        return null;
     }
 }

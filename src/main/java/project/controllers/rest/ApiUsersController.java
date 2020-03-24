@@ -1,6 +1,7 @@
 package project.controllers.rest;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.PostRequestBodyDto;
@@ -15,6 +16,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/users/")
 @AllArgsConstructor
@@ -32,6 +34,18 @@ public class ApiUsersController {
 
         person.setLastOnlineTime(new Date());
         return ResponseEntity.ok(new ResponseDto<>(person));
+    }
+
+    @PutMapping("me")
+    public ResponseEntity<?> changeUser(ServletRequest servletRequest){
+        log.info("Put отработал");
+       /* String token = tokenProvider.resolveToken((HttpServletRequest) servletRequest);
+        String email = tokenProvider.getUserEmail(token);
+        Person person = personService.findPersonByEmail(email);
+
+        person.setLastOnlineTime(new Date());
+        return ResponseEntity.ok(new ResponseDto<>(person));*/
+        return ResponseEntity.ok("Все ок");
     }
 
     @GetMapping("{id}")
