@@ -7,10 +7,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class NewWallPostDto {
-    private Integer id;
-
-    @JsonProperty("publish_date")
-    private Long publishDate;
 
     private String title;
 
