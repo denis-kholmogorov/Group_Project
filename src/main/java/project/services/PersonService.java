@@ -12,7 +12,7 @@ import project.dto.requestDto.RegistrationRequestDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.PersonDtoWithToken;
 import project.dto.responseDto.ResponseDto;
-import project.handlerExceptions.EmailAlreadyRegisteredException;
+import project.handlerExceptions.BadRequestException400;
 import project.models.Person;
 import project.models.Role;
 import project.models.Token;
@@ -68,9 +68,9 @@ public class PersonService {
 //        personRepository.save(person);
 //
 //    }
-    public boolean registrationPerson(RegistrationRequestDto dto) throws EmailAlreadyRegisteredException {
+    public boolean registrationPerson(RegistrationRequestDto dto) throws BadRequestException400 {
         Person exist = personRepository.findPersonByEmail(dto.getEmail()).orElse(null);
-        if (exist != null) throw new EmailAlreadyRegisteredException();
+        if (exist != null) throw new BadRequestException400();
         Person person = new Person();
         Boolean existsById = roleRepository.existsById(1);
 

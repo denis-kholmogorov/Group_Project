@@ -8,7 +8,7 @@ import project.dto.requestDto.PasswordSetDto;
 import project.dto.requestDto.RegistrationRequestDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
-import project.handlerExceptions.EmailAlreadyRegisteredException;
+import project.handlerExceptions.BadRequestException400;
 import project.services.PersonService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +22,7 @@ public class ApiAccountController {
     private PersonService personService;
 
     @PostMapping(value = "register")
-    public ResponseEntity<ResponseDto<MessageResponseDto>> register(@RequestBody RegistrationRequestDto dto) throws EmailAlreadyRegisteredException {
+    public ResponseEntity<ResponseDto<MessageResponseDto>> register(@RequestBody RegistrationRequestDto dto) throws BadRequestException400 {
         log.info("контроллер Register отработал");
         personService.registrationPerson(dto);
         return ResponseEntity.ok(new ResponseDto(new MessageResponseDto()));

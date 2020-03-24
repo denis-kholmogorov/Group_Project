@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import project.dto.requestDto.LoginRequestDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
-import project.handlerExceptions.EmailAlreadyRegisteredException;
+import project.handlerExceptions.BadRequestException400;
 import project.services.PersonService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,9 +34,9 @@ public class ApiAuthController {
     }
 
     @PostMapping(value = "login")
-    ResponseEntity login(@RequestBody LoginRequestDto loginRequestDto) throws EmailAlreadyRegisteredException {
+    ResponseEntity login(@RequestBody LoginRequestDto loginRequestDto) throws BadRequestException400 {
         ResponseDto responseDto = personService.login(loginRequestDto);
-        if(responseDto == null) throw new EmailAlreadyRegisteredException();//изменить ошибку
+        if(responseDto == null) throw new BadRequestException400();//изменить ошибку
         return ResponseEntity.ok(responseDto);//необходимо оставить, обработать еще ошибки
     }
 
