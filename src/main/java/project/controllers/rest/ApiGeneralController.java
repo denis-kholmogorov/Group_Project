@@ -36,7 +36,6 @@ public class ApiGeneralController {
     public ResponseEntity<FileUploadResponseDto> downloadImage(@RequestParam("type") String type, @RequestParam("file") MultipartFile file,
                                            HttpServletRequest request) throws BadRequestException400 {
 
-
         FileUploadResponseDto responseDto = personService.downloadImage(type, file, request);
 
         return ResponseEntity.ok().body(responseDto);

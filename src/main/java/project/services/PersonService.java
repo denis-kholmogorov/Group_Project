@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import project.dto.requestDto.LoginRequestDto;
 import project.dto.requestDto.PasswordSetDto;
 import project.dto.requestDto.RegistrationRequestDto;
+import project.dto.requestDto.UpdatePersonDto;
 import project.dto.responseDto.FileUploadResponseDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.PersonDtoWithToken;
@@ -79,7 +80,7 @@ public class PersonService {
         Person exist = personRepository.findPersonByEmail(dto.getEmail()).orElse(null);
         if (exist != null) throw new BadRequestException400();
         Person person = new Person();
-        Boolean existsById = roleRepository.existsById(1);
+        boolean existsById = roleRepository.existsById(1);
 
         Role role;
         if (!existsById) {
@@ -213,6 +214,7 @@ public class PersonService {
         log.info(typeImage + " тип изображения");
         if(!file.isEmpty()){
             String path = "src/main/resources/images/";
+            //String pathUri = "http://localhost:8086/src/main/resources/images/";
             String fileName = UUID.randomUUID().toString();
             String pathImage = path + fileName + "." + typeImage ;
         try {
@@ -220,8 +222,8 @@ public class PersonService {
             BufferedImage bi = ImageIO.read(bais);
             ImageIO.write(bi, typeImage,new File(pathImage));
             log.info("Сохраненный файл " + pathImage);
-            person.setPhoto(pathImage);
-            personRepository.save(person);
+            //person.setPhoto(pathImage);
+            //personRepository.save(person);
 
             return FileUploadResponseDto.builder()
                     .id(person.getId().toString())
@@ -240,5 +242,20 @@ public class PersonService {
         }
     }
         return null;
+    }
+
+    public Person editBody(UpdatePersonDto dto, HttpServletRequest request) throws BadRequestException400 {
+        Person person = tokenProvider.getPersonByRequest(request);
+        person.setFirstName(dto.getFirstName());
+        person.setLastName(dto.getLastName());
+        person.setBirthDate(dto.getBirthDate());
+        person.setPhone(dto.getPhone());
+        person.setPhoto(dto.getPhoto());
+        person.setAbout(dto.getAbout());
+        person.setCity(dto.getCity());
+        person.setCountry(dto.getCountry());
+        person.setMessagesPermission(dto.getMessagePermission());
+        personRepository.save(person);
+        return person;
     }
 }

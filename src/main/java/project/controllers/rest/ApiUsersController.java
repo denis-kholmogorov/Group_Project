@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.PostRequestBodyDto;
+import project.dto.requestDto.UpdatePersonDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
+import project.handlerExceptions.BadRequestException400;
 import project.models.Person;
 import project.security.TokenProvider;
 import project.services.PersonService;
@@ -37,15 +39,12 @@ public class ApiUsersController {
     }
 
     @PutMapping("me")
-    public ResponseEntity<?> changeUser(ServletRequest servletRequest){
-        log.info("Put отработал");
-       /* String token = tokenProvider.resolveToken((HttpServletRequest) servletRequest);
-        String email = tokenProvider.getUserEmail(token);
-        Person person = personService.findPersonByEmail(email);
-
+    public ResponseEntity<?> personEditBody(@RequestBody UpdatePersonDto updatePersonDto,
+                                                 HttpServletRequest request) throws BadRequestException400
+    {
+        Person person = personService.editBody(updatePersonDto, request);
         person.setLastOnlineTime(new Date());
-        return ResponseEntity.ok(new ResponseDto<>(person));*/
-        return ResponseEntity.ok("Все ок");
+        return ResponseEntity.ok(new ResponseDto<>(person));
     }
 
     @GetMapping("{id}")
