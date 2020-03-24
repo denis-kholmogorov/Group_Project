@@ -1,6 +1,7 @@
 package project.services;
 
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,6 +15,10 @@ import project.models.enums.PostTypeEnum;
 import project.repositories.PersonRepository;
 import project.repositories.PostRepository;
 
+import javax.annotation.PostConstruct;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +33,7 @@ public class PostService {
     private PostLikeService postLikeService;
     PostCommentsService postCommentsService;
 
-    public Post getPostById(Integer id){
+    public Post getPostById(Integer id) {
         Optional<Post> optionalPost = postRepository.findById(id);
         return optionalPost.orElse(null);
     }
@@ -51,5 +56,53 @@ public class PostService {
         }).collect(toList());
 
         return new ListResponseDto(new ResponseModel(), personsWallPostDtoList.size(), offset, limit, personsWallPostDtoList);
+    }
+
+    @SneakyThrows
+    public List<Post> getPostsByTitleAndDate(String title, String dateFrom, String dateTo, Integer offset, Integer limit){
+        Pageable pageable = PageRequest.of(offset, limit);
+
+        Date startDate = getDateFromLong(dateFrom);
+        Date endDate = getDateFromLong(dateTo);
+
+        if(!title.isEmpty() && startDate != null && endDate != null){
+            return postRepository.findAllByTitleContainingAndTimeBetween(title, startDate, endDate, pageable);
+        }
+
+        if(!title.isEmpty() && startDate != null){
+            return postRepository.findAllByTitleContainingAndTimeAfter(title, startDate, pageable);
+        }
+
+        if(!title.isEmpty() && endDate != null){
+            return postRepository.findAllByTitleContainingAndTimeBefore(title, endDate, pageable);
+        }
+
+        if(!title.isEmpty()){
+            return postRepository.findAllByTitleContaining(title, pageable);
+        }
+
+        if(startDate != null && endDate != null){
+            return postRepository.findAllByTimeBetween(startDate, endDate, pageable);
+        }
+
+        if(startDate != null){
+            return postRepository.findAllByTimeAfter(startDate, pageable);
+        }
+
+        if(endDate != null){
+            return postRepository.findAllByTimeBefore(endDate, pageable);
+        }
+
+        return postRepository.findAll(pageable);
+    }
+
+    public Date getDateFromLong(String date){
+        if(!date.isEmpty()){
+            Calendar calendar = Calendar.getInstance();
+            long dateLong = Long.parseLong(date);
+            calendar.setTimeInMillis(dateLong);
+            return calendar.getTime();
+        }
+        return null;
     }
 }
