@@ -4,12 +4,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
-public class NewWallPostDto {
+public class PostRequestBodyDto {
 
     private String title;
 
     @JsonProperty("post_text")
     private String postText;
+
+    private List<String> tags;
 }

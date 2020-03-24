@@ -8,16 +8,19 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import project.dto.PersonsWallPostDto;
 import project.dto.PostDto;
+import project.dto.requestDto.PostRequestBodyDto;
 import project.dto.responseDto.ListResponseDto;
+import project.dto.responseDto.ResponseDto;
 import project.models.Post;
+import project.models.Post2Tag;
 import project.models.ResponseModel;
+import project.models.Tag;
 import project.models.enums.PostTypeEnum;
 import project.repositories.PersonRepository;
+import project.repositories.Post2TagRepository;
 import project.repositories.PostRepository;
+import project.repositories.TagRepository;
 
-import javax.annotation.PostConstruct;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -30,12 +33,40 @@ import static java.util.stream.Collectors.toList;
 public class PostService {
     private PostRepository postRepository;
     private PersonRepository personRepository;
+    private TagRepository tagRepository;
+    private Post2TagRepository post2TagRepository;
     private PostLikeService postLikeService;
     PostCommentsService postCommentsService;
 
     public Post getPostById(Integer id) {
         Optional<Post> optionalPost = postRepository.findById(id);
         return optionalPost.orElse(null);
+    }
+
+
+    public ResponseDto addNewWallPostByAuthorId(Integer authorId, Long publishDate, PostRequestBodyDto dto) {
+        Post post = new Post();
+        post.setAuthorId(authorId);
+        post.setTime(publishDate == null ? new Date() : getDateFromLong(publishDate + ""));
+        post.setTitle(dto.getTitle());
+        post.setPostText(dto.getPostText());
+        post.setIsBlocked(false);
+        int postId = postRepository.save(post).getId();
+
+        List<String> tags = dto.getTags();
+        if (tags.size() > 0) {
+            tags.stream().forEach(tag -> {
+                Tag tag2DB = new Tag();
+                tag2DB.setTag(tag);
+                int tagId = tagRepository.save(tag2DB).getId();
+                Post2Tag post2Tag = new Post2Tag();
+                post2Tag.setPostId(postId);
+                post2Tag.setTagId(tagId);
+                post2TagRepository.save(post2Tag);
+            });
+        }
+
+        return new ResponseDto(post);
     }
 
     public ListResponseDto findAllByAuthorId(Integer authorId, Integer offset, Integer limit) {
