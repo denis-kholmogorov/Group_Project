@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class ListResponseDto {
+public class ListResponseDto<T> {
 
     private ResponseModel responseModel;
 
@@ -19,5 +19,5 @@ public class ListResponseDto {
 
     private Integer perPage;
 
-    private List<PersonsWallPostDto> data;
+    private List<T> data;
 }
