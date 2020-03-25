@@ -23,6 +23,7 @@ import project.repositories.TokenRepository;
 import project.security.TokenProvider;
 import project.services.email.EmailService;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
@@ -195,5 +196,20 @@ public class PersonService {
             return true;
         }
         return false;
+    }
+
+    public boolean deletePersonByEmail(String email){
+        Person person = findPersonByEmail(email);
+        if(person != null){
+            personRepository.deleteByEmail(email);
+            return true;
+        }
+        return false;
+    }
+
+    public Person getPersonByToken(ServletRequest servletRequest){
+        String token = tokenProvider.resolveToken((HttpServletRequest) servletRequest);
+        String email = tokenProvider.getUserEmail(token);
+        return findPersonByEmail(email);
     }
 }

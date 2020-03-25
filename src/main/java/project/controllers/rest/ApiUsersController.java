@@ -7,12 +7,12 @@ import project.dto.requestDto.NewWallPostDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.models.Person;
+import project.models.ResponseModel;
 import project.security.TokenProvider;
 import project.services.PersonService;
 import project.services.PostService;
 
 import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 @RestController
@@ -26,12 +26,16 @@ public class ApiUsersController {
 
     @GetMapping("me")
     public ResponseEntity<?> getAuthUser(ServletRequest servletRequest){    //обработать 401
-        String token = tokenProvider.resolveToken((HttpServletRequest) servletRequest);
-        String email = tokenProvider.getUserEmail(token);
-        Person person = personService.findPersonByEmail(email);
-
+        Person person = personService.getPersonByToken(servletRequest);
         person.setLastOnlineTime(new Date());
         return ResponseEntity.ok(new ResponseDto<>(person));
+    }
+
+    @DeleteMapping("me")
+    public ResponseEntity<?> deleteUser(ServletRequest servletRequest){
+        Person person = personService.getPersonByToken(servletRequest);
+        Boolean isPersonDeleted = personService.deletePersonByEmail(person.getEmail());
+        return ResponseEntity.ok(new ResponseDto<>(new ResponseModel(), isPersonDeleted));
     }
 
     @GetMapping("{id}")

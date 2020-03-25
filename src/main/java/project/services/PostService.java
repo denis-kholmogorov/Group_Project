@@ -15,9 +15,6 @@ import project.models.enums.PostTypeEnum;
 import project.repositories.PersonRepository;
 import project.repositories.PostRepository;
 
-import javax.annotation.PostConstruct;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -31,7 +28,7 @@ public class PostService {
     private PostRepository postRepository;
     private PersonRepository personRepository;
     private PostLikeService postLikeService;
-    PostCommentsService postCommentsService;
+    private PostCommentsService postCommentsService;
 
     public Post getPostById(Integer id) {
         Optional<Post> optionalPost = postRepository.findById(id);
