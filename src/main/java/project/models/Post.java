@@ -15,7 +15,6 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Column(updatable = false)
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Date time;
 

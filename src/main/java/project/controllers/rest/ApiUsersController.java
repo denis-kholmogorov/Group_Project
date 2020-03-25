@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import project.dto.requestDto.PostRequestBodyTagsDto;
 import project.dto.requestDto.PostRequestBodyDto;
 import project.dto.requestDto.UpdatePersonDto;
 import project.dto.responseDto.MessageResponseDto;
@@ -54,12 +55,14 @@ public class ApiUsersController {
     }
 
     @GetMapping("{id}/wall")
-    public ResponseEntity<?> getWallPostsById(@PathVariable Integer id, @RequestParam(defaultValue = "0") Integer offset, @RequestParam(defaultValue = "20") Integer itemPerPage) {  //обработать 400 и 401
+    public ResponseEntity<?> getWallPostsById(
+            @PathVariable Integer id, @RequestParam(defaultValue = "0") Integer offset, @RequestParam(defaultValue = "20") Integer itemPerPage) {  //обработать 400 и 401
         return ResponseEntity.ok(postService.findAllByAuthorId(id, offset, itemPerPage));
     }
 
     @PostMapping("{id}/wall")
-    public ResponseEntity<?> addWallPostById(@PathVariable Integer id, @RequestParam(value = "publish_date", required = false) Long publishDate, @RequestBody PostRequestBodyDto dto) {   //обработать 400 и 401
+    public ResponseEntity<?> addWallPostById(
+            @PathVariable Integer id, @RequestParam(value = "publish_date", required = false) Long publishDate, @RequestBody PostRequestBodyTagsDto dto) {   //обработать 400 и 401
         return ResponseEntity.ok(postService.addNewWallPostByAuthorId(id, publishDate, dto));
     }
 

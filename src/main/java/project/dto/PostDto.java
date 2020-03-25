@@ -23,6 +23,7 @@ public class PostDto {
 
     private String title;
 
+    @JsonProperty("post_text")
     private String postText;
 
     @JsonProperty("is_blocked")

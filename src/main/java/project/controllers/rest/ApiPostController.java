@@ -3,20 +3,14 @@ package project.controllers.rest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import project.dto.CommentDto;
 import project.dto.PostDto;
+import project.dto.requestDto.PostRequestBodyDto;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
-import project.models.Person;
 import project.models.Post;
-import project.models.ResponseModel;
-import project.services.PersonService;
-import project.services.PostCommentsService;
-import project.services.PostLikeService;
 import project.services.PostService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -25,14 +19,22 @@ import static java.util.stream.Collectors.toList;
 @AllArgsConstructor
 public class ApiPostController {
     private PostService postService;
-    private PersonService personService;
-    private PostLikeService postLikeService;
-    private PostCommentsService postCommentsService;
 
     @GetMapping("{id}")
     public ResponseEntity<ResponseDto<PostDto>> getPostById(@PathVariable Integer id){
-        PostDto postDto = getPostDtoById(id);
+        PostDto postDto = postService.getPostDtoById(id);
         return ResponseEntity.ok(new ResponseDto<>(postDto));
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<ResponseDto<PostDto>> editPostById(
+            @PathVariable Integer id, @RequestParam(value = "publish_date", required = false) Long publishDate, @RequestBody PostRequestBodyDto dto) {
+        return ResponseEntity.ok(postService.editPostById(id, publishDate, dto));
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<ResponseDto<Integer>> deletePostById(@PathVariable Integer id) {
+        return ResponseEntity.ok(postService.deletePostById(id));
     }
 
     @GetMapping
@@ -45,23 +47,13 @@ public class ApiPostController {
 
         List<Post> posts = postService.getPostsByTitleAndDate(text, dateFrom, dateTo, offsetParam, limitParam);
         List<ResponseDto<PostDto>> listPostsDto = posts.stream().map(post -> {
-            PostDto postDto = getPostDtoById(post.getId());
+            PostDto postDto = postService.getPostDtoById(post.getId());
             return new ResponseDto<>(postDto);
         }).collect(toList());
 
-        return ResponseEntity.ok(new ListResponseDto<>(new ResponseModel(), posts.size(),
+        return ResponseEntity.ok(new ListResponseDto<>(posts.size(),
                 offsetParam, limitParam, listPostsDto));
     }
 
-    private PostDto getPostDtoById(Integer id) {
-        Post post = postService.getPostById(id);
-        Person person = personService.findPersonById(post.getAuthorId());
 
-        Integer countLikes = postLikeService.countLikesByPostId(post.getId());
-
-        List<CommentDto> comments = postCommentsService.getListCommentsDto(post.getId());
-
-        return new PostDto(post.getId(), post.getTime(), person, post.getTitle(),
-                post.getPostText(), post.getIsBlocked(), countLikes, comments);
-    }
 }
