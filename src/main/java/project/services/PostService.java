@@ -41,7 +41,11 @@ public class PostService {
     public ListResponseDto<PostDto> findAllPosts(String name, Integer offset, Integer itemPerPage) {
         Sort sort = Sort.by(Sort.Direction.DESC, name == null ? "time" : "title");
         Pageable pageable = PageRequest.of(offset, itemPerPage, sort);
-        List<Post> postList = postRepository.findAll(pageable);
+        List<Post> postList = name != null ?
+                postRepository.findAllByTitleContainingAndTimeBeforeAndIsBlocked(
+                        name, new Date(), false, pageable)
+                :
+                postRepository.findAllByTimeBeforeAndIsBlocked(new Date(), false, pageable);
         List<PostDto> postDtoList = postList.stream().map(post -> getPostDtoById(null, post)).collect(toList());
 
         return new ListResponseDto(postDtoList.size(), offset, itemPerPage, postDtoList);

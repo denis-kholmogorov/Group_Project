@@ -38,14 +38,15 @@ public class ApiPostController {
     }
 
     @GetMapping
-    public ResponseEntity<ListResponseDto<ResponseDto<PostDto>>>
-    findPostsByTitleAndDate(@RequestParam String text,
-                            @RequestParam String dateFrom,
-                            @RequestParam String dateTo,
-                            @RequestParam Integer offsetParam,
-                            @RequestParam Integer limitParam){
+    public ResponseEntity<ListResponseDto<ResponseDto<PostDto>>> findPostsByTitleAndDate(
+            @RequestParam String text,
+            @RequestParam(required = false) Long dateFrom,
+            @RequestParam(required = false) Long dateTo,
+            @RequestParam(required = false) Integer offsetParam,
+            @RequestParam(required = false) Integer limitParam){
 
-        List<Post> posts = postService.getPostsByTitleAndDate(text, dateFrom, dateTo, offsetParam, limitParam);
+        List<Post> posts = postService.getPostsByTitleAndDate(
+                text, dateFrom + "", dateTo + "", offsetParam, limitParam);
         List<ResponseDto<PostDto>> listPostsDto = posts.stream().map(post -> {
             PostDto postDto = postService.getPostDtoById(post.getId(), null);
             return new ResponseDto<>(postDto);
