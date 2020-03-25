@@ -207,7 +207,7 @@ public class PersonService {
     }
 
     @SneakyThrows
-    public FileUploadResponseDto downloadImage(String type, MultipartFile file, HttpServletRequest request) throws BadRequestException400 {
+    public FileUploadResponseDto downloadImage(String type, MultipartFile file, HttpServletRequest request) {
 
         Person person = tokenProvider.getPersonByRequest(request);
         int index = file.getContentType().indexOf("/") + 1;
