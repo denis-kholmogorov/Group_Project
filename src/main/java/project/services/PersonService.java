@@ -1,5 +1,6 @@
 package project.services;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -206,6 +207,7 @@ public class PersonService {
 
     }
 
+    @SneakyThrows
     public FileUploadResponseDto downloadImage(String type, MultipartFile file, HttpServletRequest request) throws BadRequestException400 {
 
         Person person = tokenProvider.getPersonByRequest(request);
@@ -213,17 +215,19 @@ public class PersonService {
         String typeImage = file.getContentType().substring(index);
         log.info(typeImage + " тип изображения");
         if(!file.isEmpty()){
-            String path = "src/main/resources/images/";
-            //String pathUri = "http://localhost:8086/src/main/resources/images/";
+            String rawPath = "C:/NGiNX/nginx-1.17.9/html/static/img/";
             String fileName = UUID.randomUUID().toString();
-            String pathImage = path + fileName + "." + typeImage ;
-        try {
-            ByteArrayInputStream bais = new ByteArrayInputStream(file.getBytes());
-            BufferedImage bi = ImageIO.read(bais);
+            String pathImage = rawPath + fileName + "." + typeImage ;
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(file.getBytes());// получаем байты из изображения
+            BufferedImage bi = ImageIO.read(bais); // собираем байты в картинку
             ImageIO.write(bi, typeImage,new File(pathImage));
             log.info("Сохраненный файл " + pathImage);
-            //person.setPhoto(pathImage);
-            //personRepository.save(person);
+
+            int indexPhoto = pathImage.indexOf("static")-1;
+            String pathPhoto = pathImage.substring(indexPhoto);
+            person.setPhoto(pathPhoto);
+            personRepository.save(person);
 
             return FileUploadResponseDto.builder()
                     .id(person.getId().toString())
@@ -234,13 +238,9 @@ public class PersonService {
                     .createdAt(new Date().getTime())
                     .fileType(type)
                     .rawFileURL(pathImage)
-                    .relativeFilePath(pathImage)
+                    .relativeFilePath(pathPhoto)
                     .build();
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-    }
         return null;
     }
 
@@ -250,7 +250,6 @@ public class PersonService {
         person.setLastName(dto.getLastName());
         person.setBirthDate(dto.getBirthDate());
         person.setPhone(dto.getPhone());
-        person.setPhoto(dto.getPhoto());
         person.setAbout(dto.getAbout());
         person.setCity(dto.getCity());
         person.setCountry(dto.getCountry());
