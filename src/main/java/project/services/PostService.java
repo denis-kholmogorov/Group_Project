@@ -13,7 +13,6 @@ import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.models.Post;
 import project.models.Post2Tag;
-import project.models.ResponseModel;
 import project.models.Tag;
 import project.models.enums.PostTypeEnum;
 import project.repositories.PersonRepository;
@@ -44,7 +43,7 @@ public class PostService {
     }
 
 
-    public ResponseDto addNewWallPostByAuthorId(Integer authorId, Long publishDate, PostRequestBodyDto dto) {
+    public ResponseDto<Post> addNewWallPostByAuthorId(Integer authorId, Long publishDate, PostRequestBodyDto dto) {
         Post post = new Post();
         post.setAuthorId(authorId);
         post.setTime(publishDate == null ? new Date() : getDateFromLong(publishDate + ""));
@@ -66,10 +65,10 @@ public class PostService {
             });
         }
 
-        return new ResponseDto(post);
+        return new ResponseDto<>(post);
     }
 
-    public ListResponseDto findAllByAuthorId(Integer authorId, Integer offset, Integer limit) {
+    public ListResponseDto<PersonsWallPostDto> findAllByAuthorId(Integer authorId, Integer offset, Integer limit) {
         Sort sort = Sort.by(Sort.Direction.DESC, "time");
         Pageable pageable = PageRequest.of(offset, limit, sort);
         List<Post> wallPostList = postRepository.findAllByAuthorId(authorId, pageable);
@@ -86,7 +85,7 @@ public class PostService {
             return new PersonsWallPostDto(postDto, wallPost.getTime().before(new Date()) ? PostTypeEnum.POSTED.getType() : PostTypeEnum.QUEUED.getType());
         }).collect(toList());
 
-        return new ListResponseDto(new ResponseModel(), personsWallPostDtoList.size(), offset, limit, personsWallPostDtoList);
+        return new ListResponseDto<>(personsWallPostDtoList.size(), offset, limit, personsWallPostDtoList);
     }
 
     @SneakyThrows

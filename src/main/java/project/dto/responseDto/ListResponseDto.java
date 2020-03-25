@@ -2,16 +2,15 @@ package project.dto.responseDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import project.dto.PersonsWallPostDto;
+import lombok.EqualsAndHashCode;
 import project.models.ResponseModel;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class ListResponseDto<T> {
-
-    private ResponseModel responseModel;
+@EqualsAndHashCode(callSuper = true)
+public class ListResponseDto<T> extends ResponseModel {
 
     private Integer total;
 
