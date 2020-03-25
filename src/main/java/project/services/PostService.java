@@ -19,10 +19,7 @@ import project.models.Post;
 import project.models.Post2Tag;
 import project.models.Tag;
 import project.models.enums.PostTypeEnum;
-import project.repositories.PersonRepository;
-import project.repositories.Post2TagRepository;
 import project.repositories.PostRepository;
-import project.repositories.TagRepository;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -35,9 +32,8 @@ import static java.util.stream.Collectors.toList;
 @AllArgsConstructor
 public class PostService {
     private PostRepository postRepository;
-    private PersonRepository personRepository;
-    private TagRepository tagRepository;
-    private Post2TagRepository post2TagRepository;
+    private TagService tagService;
+    private Post2TagService post2TagService;
     private PostLikeService postLikeService;
     private PersonService personService;
     private PostCommentsService postCommentsService;
@@ -48,13 +44,12 @@ public class PostService {
     }
 
     public ResponseDto<PostDto> editPostById(Integer id, Long publishDate, PostRequestBodyDto dto) {
-        Post post = postRepository.findById(id).orElse(null);
+        Post post = getPostById(id);
         if (post != null) {
             post.setTitle(dto.getTitle());
             post.setTime(publishDate == null ? new Date() : getDateFromLong(publishDate + ""));
             post.setPostText(dto.getPostText());
             Post postDB = postRepository.save(post);
-
 
             return new ResponseDto<>(getPostDtoById(postDB.getId()));
         }
@@ -93,11 +88,11 @@ public class PostService {
             tags.stream().forEach(tag -> {
                 Tag tag2DB = new Tag();
                 tag2DB.setTag(tag);
-                int tagId = tagRepository.save(tag2DB).getId();
+                int tagId = tagService.addNewTag(tag2DB).getId();
                 Post2Tag post2Tag = new Post2Tag();
                 post2Tag.setPostId(finalPost.getId());
                 post2Tag.setTagId(tagId);
-                post2TagRepository.save(post2Tag);
+                post2TagService.addNewPost2Tag(post2Tag);
             });
         }
 
@@ -112,7 +107,7 @@ public class PostService {
             PersonsWallPostDto personsWallPostDto = new PersonsWallPostDto();
             personsWallPostDto.setId(wallPost.getId());
             personsWallPostDto.setTime(wallPost.getTime());
-            personsWallPostDto.setAuthor(personRepository.findById(wallPost.getAuthorId()).orElse(null));
+            personsWallPostDto.setAuthor(personService.findPersonById(wallPost.getAuthorId()));
             personsWallPostDto.setTitle(wallPost.getTitle());
             personsWallPostDto.setPostText(wallPost.getPostText());
             personsWallPostDto.setIsBlocked(wallPost.getIsBlocked());

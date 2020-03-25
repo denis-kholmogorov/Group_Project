@@ -8,9 +8,6 @@ import project.dto.requestDto.PostRequestBodyDto;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.models.Post;
-import project.services.PersonService;
-import project.services.PostCommentsService;
-import project.services.PostLikeService;
 import project.services.PostService;
 
 import java.util.List;
@@ -22,9 +19,6 @@ import static java.util.stream.Collectors.toList;
 @AllArgsConstructor
 public class ApiPostController {
     private PostService postService;
-    private PersonService personService;
-    private PostLikeService postLikeService;
-    private PostCommentsService postCommentsService;
 
     @GetMapping("{id}")
     public ResponseEntity<ResponseDto<PostDto>> getPostById(@PathVariable Integer id){
