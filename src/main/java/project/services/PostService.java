@@ -47,7 +47,7 @@ public class PostService {
         return optionalPost.orElse(null);
     }
 
-    public ResponseDto editPostById(Integer id, Long publishDate, PostRequestBodyDto dto) {
+    public ResponseDto<PostDto> editPostById(Integer id, Long publishDate, PostRequestBodyDto dto) {
         Post post = postRepository.findById(id).orElse(null);
         if (post != null) {
             post.setTitle(dto.getTitle());
@@ -55,14 +55,14 @@ public class PostService {
             post.setPostText(dto.getPostText());
             int postId = postRepository.save(post).getId();
 
-            return new ResponseDto(getPostDtoById(postId));
+            return new ResponseDto<>(getPostDtoById(postId));
         }
         return null;
     }
 
-    public ResponseDto deletePostById(@PathVariable Integer id) {
+    public ResponseDto<Integer> deletePostById(@PathVariable Integer id) {
         postRepository.deleteById(id);
-        return new ResponseDto(id);
+        return new ResponseDto<>(id);
     }
 
     public PostDto getPostDtoById(Integer id) {
@@ -78,7 +78,7 @@ public class PostService {
     }
 
 
-    public ResponseDto addNewWallPostByAuthorId(Integer authorId, Long publishDate, PostRequestBodyTagsDto dto) {
+    public ResponseDto<PostDto> addNewWallPostByAuthorId(Integer authorId, Long publishDate, PostRequestBodyTagsDto dto) {
         Post post = new Post();
         post.setAuthorId(authorId);
         post.setTime(publishDate == null ? new Date() : getDateFromLong(publishDate + ""));
@@ -100,7 +100,7 @@ public class PostService {
             });
         }
 
-        return new ResponseDto(finalPost);
+        return new ResponseDto<>(getPostDtoById(finalPost.getId()));
     }
 
     public ListResponseDto findAllByAuthorId(Integer authorId, Integer offset, Integer limit) {
