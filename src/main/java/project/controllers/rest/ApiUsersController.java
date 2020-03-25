@@ -3,7 +3,7 @@ package project.controllers.rest;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import project.dto.requestDto.PostRequestBodyDto;
+import project.dto.requestDto.PostRequestBodyTagsDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.models.Person;
@@ -46,7 +46,7 @@ public class ApiUsersController {
     }
 
     @PostMapping("{id}/wall")
-    public ResponseEntity<?> addWallPostById(@PathVariable Integer id, @RequestParam(value = "publish_date", required = false) Long publishDate, @RequestBody PostRequestBodyDto dto) {   //обработать 400 и 401
+    public ResponseEntity<?> addWallPostById(@PathVariable Integer id, @RequestParam(value = "publish_date", required = false) Long publishDate, @RequestBody PostRequestBodyTagsDto dto) {   //обработать 400 и 401
         return ResponseEntity.ok(postService.addNewWallPostByAuthorId(id, publishDate, dto));
     }
 
