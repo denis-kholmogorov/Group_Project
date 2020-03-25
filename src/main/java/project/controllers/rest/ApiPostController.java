@@ -22,7 +22,7 @@ public class ApiPostController {
 
     @GetMapping("{id}")
     public ResponseEntity<ResponseDto<PostDto>> getPostById(@PathVariable Integer id){
-        PostDto postDto = postService.getPostDtoById(id);
+        PostDto postDto = postService.getPostDtoById(id, null);
         return ResponseEntity.ok(new ResponseDto<>(postDto));
     }
 
@@ -47,7 +47,7 @@ public class ApiPostController {
 
         List<Post> posts = postService.getPostsByTitleAndDate(text, dateFrom, dateTo, offsetParam, limitParam);
         List<ResponseDto<PostDto>> listPostsDto = posts.stream().map(post -> {
-            PostDto postDto = postService.getPostDtoById(post.getId());
+            PostDto postDto = postService.getPostDtoById(post.getId(), null);
             return new ResponseDto<>(postDto);
         }).collect(toList());
 

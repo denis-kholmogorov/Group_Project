@@ -68,6 +68,9 @@ public class PersonService {
 //        personRepository.save(person);
 //
 //    }
+
+
+
     public boolean registrationPerson(RegistrationRequestDto dto) throws BadRequestException400 {
         Person exist = personRepository.findPersonByEmail(dto.getEmail()).orElse(null);
         if (exist != null) throw new BadRequestException400();

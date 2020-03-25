@@ -38,6 +38,15 @@ public class PostService {
     private PersonService personService;
     private PostCommentsService postCommentsService;
 
+    public ListResponseDto<PostDto> findAllPosts(String name, Integer offset, Integer itemPerPage) {
+        Sort sort = Sort.by(Sort.Direction.DESC, name == null ? "time" : "title");
+        Pageable pageable = PageRequest.of(offset, itemPerPage, sort);
+        List<Post> postList = postRepository.findAll(pageable);
+        List<PostDto> postDtoList = postList.stream().map(post -> getPostDtoById(null, post)).collect(toList());
+
+        return new ListResponseDto(postDtoList.size(), offset, itemPerPage, postDtoList);
+    }
+
     public Post getPostById(Integer id) {
         Optional<Post> optionalPost = postRepository.findById(id);
         return optionalPost.orElse(null);
@@ -51,7 +60,7 @@ public class PostService {
             post.setPostText(dto.getPostText());
             Post postDB = postRepository.save(post);
 
-            return new ResponseDto<>(getPostDtoById(postDB.getId()));
+            return new ResponseDto<>(getPostDtoById(null, postDB));
         }
         return null;
     }
@@ -61,8 +70,8 @@ public class PostService {
         return new ResponseDto<>(id);
     }
 
-    public PostDto getPostDtoById(Integer id) {
-        Post post = getPostById(id);
+    public PostDto getPostDtoById(Integer id, Post post2Dto) {
+        Post post = post2Dto == null ? getPostById(id) : post2Dto;
         Person person = personService.findPersonById(post.getAuthorId());
 
         Integer countLikes = postLikeService.countLikesByPostId(post.getId());
@@ -74,7 +83,9 @@ public class PostService {
     }
 
 
-    public ResponseDto<PostDto> addNewWallPostByAuthorId(Integer authorId, Long publishDate, PostRequestBodyTagsDto dto) {
+    public ResponseDto<PostDto> addNewWallPostByAuthorId(Integer authorId,
+                                                         Long publishDate,
+                                                         PostRequestBodyTagsDto dto) {
         Post post = new Post();
         post.setAuthorId(authorId);
         post.setTime(publishDate == null ? new Date() : getDateFromLong(publishDate + ""));
@@ -96,7 +107,7 @@ public class PostService {
             });
         }
 
-        return new ResponseDto<>(getPostDtoById(finalPost.getId()));
+        return new ResponseDto<>(getPostDtoById(null, finalPost));
     }
 
     public ListResponseDto findAllByAuthorId(Integer authorId, Integer offset, Integer limit) {
@@ -113,7 +124,8 @@ public class PostService {
             personsWallPostDto.setIsBlocked(wallPost.getIsBlocked());
             personsWallPostDto.setLikes(postLikeService.countLikesByPostId(wallPost.getId()));
             personsWallPostDto.setComments(postCommentsService.getListCommentsDto(wallPost.getId()));
-            personsWallPostDto.setType(wallPost.getTime().before(new Date()) ? PostTypeEnum.POSTED.getType() : PostTypeEnum.QUEUED.getType());
+            personsWallPostDto.setType(wallPost.getTime().before(new Date()) ? PostTypeEnum.POSTED.getType()
+                    : PostTypeEnum.QUEUED.getType());
             return personsWallPostDto;
         }).collect(toList());
 
@@ -121,7 +133,8 @@ public class PostService {
     }
 
     @SneakyThrows
-    public List<Post> getPostsByTitleAndDate(String title, String dateFrom, String dateTo, Integer offset, Integer limit){
+    public List<Post> getPostsByTitleAndDate(String title, String dateFrom, String dateTo, Integer offset,
+                                             Integer limit){
         Pageable pageable = PageRequest.of(offset, limit);
 
         Date startDate = getDateFromLong(dateFrom);
