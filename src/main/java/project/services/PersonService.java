@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 @Slf4j
@@ -215,7 +214,7 @@ public class PersonService {
         String typeImage = file.getContentType().substring(index);
         log.info(typeImage + " тип изображения");
         if(!file.isEmpty()){
-            String rawPath = "C:/NGiNX/nginx-1.17.9/html/static/img/";
+            String rawPath = "C:\\Users\\Nortoza Forhnis\\Downloads\\nginx-1.17.9\\nginx-1.17.9\\html\\static\\img";
             String fileName = UUID.randomUUID().toString();
             String pathImage = rawPath + fileName + "." + typeImage ;
 
