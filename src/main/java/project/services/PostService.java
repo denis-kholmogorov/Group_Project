@@ -133,46 +133,48 @@ public class PostService {
     }
 
     @SneakyThrows
-    public List<Post> getPostsByTitleAndDate(String title, String dateFrom, String dateTo, Integer offset,
-                                             Integer limit){
+    public List<Post> getPostsByTitleAndDate(String title, String dateFrom, String dateTo, Integer offset, Integer limit) {
         Pageable pageable = PageRequest.of(offset, limit);
 
         Date startDate = getDateFromLong(dateFrom);
         Date endDate = getDateFromLong(dateTo);
 
-        if(!title.isEmpty() && startDate != null && endDate != null){
-            return postRepository.findAllByTitleContainingAndTimeBetween(title, startDate, endDate, pageable);
+        if (!title.isEmpty() && startDate != null && endDate != null) {
+            return postRepository.findAllByTitleContainingAndTimeBetweenAndIsBlocked(title, startDate,
+                    endDate, false, pageable);
         }
 
-        if(!title.isEmpty() && startDate != null){
-            return postRepository.findAllByTitleContainingAndTimeAfter(title, startDate, pageable);
+        if (!title.isEmpty() && startDate != null) {
+            return postRepository
+                    .findAllByTitleContainingAndTimeAfterAndIsBlocked(title, startDate, false, pageable);
         }
 
-        if(!title.isEmpty() && endDate != null){
-            return postRepository.findAllByTitleContainingAndTimeBefore(title, endDate, pageable);
+        if (!title.isEmpty() && endDate != null) {
+            return postRepository
+                    .findAllByTitleContainingAndTimeBeforeAndIsBlocked(title, endDate, false, pageable);
         }
 
-        if(!title.isEmpty()){
-            return postRepository.findAllByTitleContaining(title, pageable);
+        if (!title.isEmpty()) {
+            return postRepository.findAllByTitleContainingAndIsBlocked(title, false, pageable);
         }
 
-        if(startDate != null && endDate != null){
-            return postRepository.findAllByTimeBetween(startDate, endDate, pageable);
+        if (startDate != null && endDate != null) {
+            return postRepository.findAllByTimeBetweenAndIsBlocked(startDate, endDate, false, pageable);
         }
 
-        if(startDate != null){
-            return postRepository.findAllByTimeAfter(startDate, pageable);
+        if (startDate != null) {
+            return postRepository.findAllByTimeAfterAndIsBlocked(startDate, false, pageable);
         }
 
-        if(endDate != null){
-            return postRepository.findAllByTimeBefore(endDate, pageable);
+        if (endDate != null) {
+            return postRepository.findAllByTimeBeforeAndIsBlocked(endDate, false, pageable);
         }
 
-        return postRepository.findAll(pageable);
+        return postRepository.findAllByIsBlocked(false, pageable);
     }
 
-    public Date getDateFromLong(String date){
-        if(!date.isEmpty()){
+    public Date getDateFromLong(String date) {
+        if (!date.isEmpty()) {
             Calendar calendar = Calendar.getInstance();
             long dateLong = Long.parseLong(date);
             calendar.setTimeInMillis(dateLong);
