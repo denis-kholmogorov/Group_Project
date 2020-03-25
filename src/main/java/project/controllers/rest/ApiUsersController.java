@@ -1,11 +1,15 @@
 package project.controllers.rest;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.PostRequestBodyTagsDto;
+import project.dto.requestDto.PostRequestBodyDto;
+import project.dto.requestDto.UpdatePersonDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
+import project.handlerExceptions.BadRequestException400;
 import project.models.Person;
 import project.security.TokenProvider;
 import project.services.PersonService;
@@ -15,6 +19,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/users/")
 @AllArgsConstructor
@@ -30,6 +35,15 @@ public class ApiUsersController {
         String email = tokenProvider.getUserEmail(token);
         Person person = personService.findPersonByEmail(email);
 
+        person.setLastOnlineTime(new Date());
+        return ResponseEntity.ok(new ResponseDto<>(person));
+    }
+
+    @PutMapping("me")
+    public ResponseEntity<?> personEditBody(@RequestBody UpdatePersonDto updatePersonDto,
+                                                 HttpServletRequest request) throws BadRequestException400
+    {
+        Person person = personService.editBody(updatePersonDto, request);
         person.setLastOnlineTime(new Date());
         return ResponseEntity.ok(new ResponseDto<>(person));
     }

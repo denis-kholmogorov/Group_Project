@@ -1,7 +1,6 @@
 package project.dto.error.enums;
 
 public enum ErrorEnum {
-
     INVALID_REQUEST("invalid_request"),
     UNAUTHORIZED("unauthorized");
 
