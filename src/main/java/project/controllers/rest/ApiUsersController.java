@@ -41,12 +41,14 @@ public class ApiUsersController {
     }
 
     @GetMapping("{id}/wall")
-    public ResponseEntity<?> getWallPostsById(@PathVariable Integer id, @RequestParam(defaultValue = "0") Integer offset, @RequestParam(defaultValue = "20") Integer itemPerPage) {  //обработать 400 и 401
+    public ResponseEntity<?> getWallPostsById(
+            @PathVariable Integer id, @RequestParam(defaultValue = "0") Integer offset, @RequestParam(defaultValue = "20") Integer itemPerPage) {  //обработать 400 и 401
         return ResponseEntity.ok(postService.findAllByAuthorId(id, offset, itemPerPage));
     }
 
     @PostMapping("{id}/wall")
-    public ResponseEntity<?> addWallPostById(@PathVariable Integer id, @RequestParam(value = "publish_date", required = false) Long publishDate, @RequestBody PostRequestBodyTagsDto dto) {   //обработать 400 и 401
+    public ResponseEntity<?> addWallPostById(
+            @PathVariable Integer id, @RequestParam(value = "publish_date", required = false) Long publishDate, @RequestBody PostRequestBodyTagsDto dto) {   //обработать 400 и 401
         return ResponseEntity.ok(postService.addNewWallPostByAuthorId(id, publishDate, dto));
     }
 

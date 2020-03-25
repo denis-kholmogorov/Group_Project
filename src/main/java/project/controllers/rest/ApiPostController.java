@@ -34,12 +34,12 @@ public class ApiPostController {
 
     @PutMapping("{id}")
     public ResponseEntity<ResponseDto<PostDto>> editPostById(
-            @PathVariable Integer id, @RequestParam("publish_date") Long publishDate, @RequestBody PostRequestBodyDto dto) {
+            @PathVariable Integer id, @RequestParam(value = "publish_date", required = false) Long publishDate, @RequestBody PostRequestBodyDto dto) {
         return ResponseEntity.ok(postService.editPostById(id, publishDate, dto));
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<ResponseDto<PostDto>> deletePostById(@PathVariable Integer id) {
+    public ResponseEntity<ResponseDto<Integer>> deletePostById(@PathVariable Integer id) {
         return ResponseEntity.ok(postService.deletePostById(id));
     }
 

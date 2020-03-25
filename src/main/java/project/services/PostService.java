@@ -51,11 +51,12 @@ public class PostService {
         Post post = postRepository.findById(id).orElse(null);
         if (post != null) {
             post.setTitle(dto.getTitle());
-            post.setTime(getDateFromLong(publishDate + ""));
+            post.setTime(publishDate == null ? new Date() : getDateFromLong(publishDate + ""));
             post.setPostText(dto.getPostText());
-            int postId = postRepository.save(post).getId();
+            Post postDB = postRepository.save(post);
 
-            return new ResponseDto<>(getPostDtoById(postId));
+
+            return new ResponseDto<>(getPostDtoById(postDB.getId()));
         }
         return null;
     }
