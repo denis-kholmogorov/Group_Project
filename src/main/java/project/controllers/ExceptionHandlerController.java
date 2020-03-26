@@ -28,6 +28,8 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(401).body(error);
     }
 
+
+
 /*    *//** контроллер отлавливает ошибку 404*//*
     @ExceptionHandler(NotFoundException404.class)
     public ResponseEntity<?> notFound(){

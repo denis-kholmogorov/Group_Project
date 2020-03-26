@@ -21,6 +21,7 @@ import project.models.Person;
 import project.models.Role;
 import project.models.Token;
 import project.models.VerificationToken;
+import project.models.enums.MessagesPermission;
 import project.repositories.PersonRepository;
 import project.repositories.RoleRepository;
 import project.repositories.TokenRepository;
@@ -215,7 +216,7 @@ public class PersonService {
         String typeImage = file.getContentType().substring(index);
         log.info(typeImage + " тип изображения");
         if(!file.isEmpty()){
-            String rawPath = "C:/NGiNX/nginx-1.17.9/html/static/img/";
+            String rawPath = "/usr/share/nginx/html/static/img/";
             String fileName = UUID.randomUUID().toString();
             String pathImage = rawPath + fileName + "." + typeImage ;
 
@@ -253,7 +254,8 @@ public class PersonService {
         person.setAbout(dto.getAbout());
         person.setCity(dto.getCity());
         person.setCountry(dto.getCountry());
-        person.setMessagesPermission(dto.getMessagePermission());
+        person.setMessagesPermission(MessagesPermission.ALL);
+       // person.setMessagesPermission(dto.getMessagePermission());
         personRepository.save(person);
         return person;
     }

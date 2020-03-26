@@ -3,6 +3,8 @@ package project.controllers.rest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.PostRequestBodyTagsDto;
 import project.dto.requestDto.PostRequestBodyDto;
@@ -10,6 +12,7 @@ import project.dto.requestDto.UpdatePersonDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
+import project.handlerExceptions.UnauthorizationException401;
 import project.models.Person;
 import project.security.TokenProvider;
 import project.services.PersonService;
@@ -29,6 +32,7 @@ public class ApiUsersController {
     private PostService postService;
     private TokenProvider tokenProvider;
 
+    @Secured({"ROLE_USER","ROLE_ADMIN"})
     @GetMapping("me")
     public ResponseEntity<?> getAuthUser(ServletRequest servletRequest){    //обработать 401
         String token = tokenProvider.resolveToken((HttpServletRequest) servletRequest);
@@ -39,6 +43,7 @@ public class ApiUsersController {
         return ResponseEntity.ok(new ResponseDto<>(person));
     }
 
+    @Secured({"ROLE_USER","ROLE_ADMIN"})
     @PutMapping("me")
     public ResponseEntity<?> personEditBody(@RequestBody UpdatePersonDto updatePersonDto,
                                                  HttpServletRequest request) throws BadRequestException400

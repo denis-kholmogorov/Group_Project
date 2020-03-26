@@ -5,18 +5,21 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import project.handlerExceptions.CustomAccessDeniedHandler;
 
 /**
  * Основные конфигурации security находятся здесь*/
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig  extends WebSecurityConfigurerAdapter {
 
     private UserDetailsService userDetailsService;
@@ -31,7 +34,7 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler(){
-        return new CustomAccessDeniedHadler();
+        return new CustomAccessDeniedHandler();
     }
 
     @Bean
@@ -55,12 +58,11 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests().antMatchers("/**").permitAll()
-                //.antMatchers("/account/").permitAll()
-                //.antMatchers("/users/**").hasRole("ADMIN")
+                .authorizeRequests()
+                .antMatchers("/**").permitAll()
                 .and()
-                /*.exceptionHandling().accessDeniedHandler(accessDeniedHandler())
-                .and()*/
+                .exceptionHandling().accessDeniedHandler(accessDeniedHandler())
+                .and()
                 .apply(new TokenConfig(tokenProvider));
     }
 
