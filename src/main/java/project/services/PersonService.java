@@ -3,6 +3,7 @@ package project.services;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,6 +39,12 @@ import java.util.*;
 @Slf4j
 @Service
 public class PersonService {
+
+    @Value("${response.host}")
+    private String host;
+
+    @Value("${response.port}")
+    private String port;
 
     @Autowired
     private PersonRepository personRepository;
@@ -256,5 +263,11 @@ public class PersonService {
         person.setMessagesPermission(dto.getMessagePermission());
         personRepository.save(person);
         return person;
+    }
+
+    public void updatePersonImage(HttpServletRequest request, String id) throws BadRequestException400 {
+        Person person = tokenProvider.getPersonByRequest(request);
+        person.setPhoto("http://" + host + ":" + port + "/api/v1/storage/" + id);
+        personRepository.save(person);
     }
 }
