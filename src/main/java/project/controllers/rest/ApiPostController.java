@@ -51,7 +51,7 @@ public class ApiPostController {
             return new ResponseDto<>(postDto);
         }).collect(toList());
 
-        return ResponseEntity.ok(new ListResponseDto<>(posts.size(),
+        return ResponseEntity.ok(new ListResponseDto<>((long) posts.size(),
                 offsetParam, limitParam, listPostsDto));
     }
 

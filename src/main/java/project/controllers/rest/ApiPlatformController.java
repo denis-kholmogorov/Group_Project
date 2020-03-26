@@ -38,6 +38,6 @@ public class ApiPlatformController {
             list = platformService.getLanguages(name, offset, itemPerPage);
         }
 
-        return ResponseEntity.ok(new ListResponseDto<>(Long.valueOf(total).intValue(), offset, itemPerPage, list));
+        return ResponseEntity.ok(new ListResponseDto<>(total, offset, itemPerPage, list));
     }
 }
