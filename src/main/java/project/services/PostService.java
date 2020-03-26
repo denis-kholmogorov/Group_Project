@@ -14,6 +14,7 @@ import project.dto.requestDto.PostRequestBodyDto;
 import project.dto.requestDto.PostRequestBodyTagsDto;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
+import project.handlerExceptions.BadRequestException400;
 import project.models.Person;
 import project.models.Post;
 import project.models.Post2Tag;
@@ -38,7 +39,7 @@ public class PostService {
     private PersonService personService;
     private PostCommentsService postCommentsService;
 
-    public ListResponseDto<PostDto> findAllPosts(String name, Integer offset, Integer itemPerPage) {
+    public ListResponseDto<PostDto> findAllPosts(String name, Integer offset, Integer itemPerPage) throws BadRequestException400 {
         Sort sort = Sort.by(Sort.Direction.DESC, name == null ? "time" : "title");
         Pageable pageable = PageRequest.of(offset, itemPerPage, sort);
         List<Post> postList = name != null ?
@@ -46,36 +47,39 @@ public class PostService {
                         name, new Date(), false, pageable)
                 :
                 postRepository.findAllByTimeBeforeAndIsBlocked(new Date(), false, pageable);
+        if (postList == null) throw new BadRequestException400();
         List<PostDto> postDtoList = postList.stream().map(post -> getPostDtoById(null, post)).collect(toList());
 
         return new ListResponseDto(postDtoList.size(), offset, itemPerPage, postDtoList);
     }
 
-    public Post getPostById(Integer id) {
+    public Post getPostById(Integer id) throws BadRequestException400 {
         Optional<Post> optionalPost = postRepository.findById(id);
+        if (!optionalPost.isPresent()) throw new BadRequestException400();
         return optionalPost.orElse(null);
     }
 
-    public ResponseDto<PostDto> editPostById(Integer id, Long publishDate, PostRequestBodyDto dto) {
+    public ResponseDto<PostDto> editPostById(Integer id, Long publishDate, PostRequestBodyDto dto)
+            throws BadRequestException400 {
         Post post = getPostById(id);
-        if (post != null) {
-            post.setTitle(dto.getTitle());
-            post.setTime(publishDate == null ? new Date() : getDateFromLong(publishDate + ""));
-            post.setPostText(dto.getPostText());
-            Post postDB = postRepository.save(post);
+        if (post == null) throw new BadRequestException400();
+        post.setTitle(dto.getTitle());
+        post.setTime(publishDate == null ? new Date() : getDateFromLong(publishDate + ""));
+        post.setPostText(dto.getPostText());
+        Post postDB = postRepository.save(post);
 
-            return new ResponseDto<>(getPostDtoById(null, postDB));
-        }
-        return null;
+        return new ResponseDto<>(getPostDtoById(null, postDB));
     }
 
     public ResponseDto<Integer> deletePostById(@PathVariable Integer id) {
-        postRepository.deleteById(id);
+        postRepository.deleteById(id);  //как правильно обработать 400?
         return new ResponseDto<>(id);
     }
 
+    @SneakyThrows
     public PostDto getPostDtoById(Integer id, Post post2Dto) {
         Post post = post2Dto == null ? getPostById(id) : post2Dto;
+        if (post == null) throw new BadRequestException400();
         Person person = personService.findPersonById(post.getAuthorId());
 
         Integer countLikes = postLikeService.countLikesByPostId(post.getId());
@@ -89,7 +93,7 @@ public class PostService {
 
     public ResponseDto<PostDto> addNewWallPostByAuthorId(Integer authorId,
                                                          Long publishDate,
-                                                         PostRequestBodyTagsDto dto) {
+                                                         PostRequestBodyTagsDto dto) throws BadRequestException400 {
         Post post = new Post();
         post.setAuthorId(authorId);
         post.setTime(publishDate == null ? new Date() : getDateFromLong(publishDate + ""));
@@ -97,6 +101,7 @@ public class PostService {
         post.setPostText(dto.getPostText());
         post.setIsBlocked(false);
         Post finalPost = postRepository.save(post);
+        if (finalPost == null) throw new BadRequestException400();
 
         List<String> tags = dto.getTags();
         if (tags.size() > 0) {
@@ -114,10 +119,12 @@ public class PostService {
         return new ResponseDto<>(getPostDtoById(null, finalPost));
     }
 
-    public ListResponseDto findAllByAuthorId(Integer authorId, Integer offset, Integer limit) {
+    public ListResponseDto findAllByAuthorId(Integer authorId, Integer offset, Integer limit) throws BadRequestException400 {
         Sort sort = Sort.by(Sort.Direction.DESC, "time");
         Pageable pageable = PageRequest.of(offset, limit, sort);
         List<Post> wallPostList = postRepository.findAllByAuthorId(authorId, pageable);
+        if (wallPostList == null) throw new BadRequestException400();
+
         List<PersonsWallPostDto> personsWallPostDtoList = wallPostList.stream().map(wallPost -> {
             PersonsWallPostDto personsWallPostDto = new PersonsWallPostDto();
             personsWallPostDto.setId(wallPost.getId());
@@ -137,7 +144,8 @@ public class PostService {
     }
 
     @SneakyThrows
-    public List<Post> getPostsByTitleAndDate(String title, String dateFrom, String dateTo, Integer offset, Integer limit) {
+    public List<Post> getPostsByTitleAndDate(
+            String title, String dateFrom, String dateTo, Integer offset, Integer limit) {  //как тут обрабоать ошибку я не понял)
         Pageable pageable = PageRequest.of(offset, limit);
 
         Date startDate = getDateFromLong(dateFrom);

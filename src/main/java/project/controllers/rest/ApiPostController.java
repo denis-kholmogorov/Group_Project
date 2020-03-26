@@ -7,6 +7,7 @@ import project.dto.PostDto;
 import project.dto.requestDto.PostRequestBodyDto;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
+import project.handlerExceptions.BadRequestException400;
 import project.models.Post;
 import project.services.PostService;
 
@@ -21,14 +22,15 @@ public class ApiPostController {
     private PostService postService;
 
     @GetMapping("{id}")
-    public ResponseEntity<ResponseDto<PostDto>> getPostById(@PathVariable Integer id){
+    public ResponseEntity<ResponseDto<PostDto>> getPostById(@PathVariable Integer id) throws BadRequestException400 {
         PostDto postDto = postService.getPostDtoById(id, null);
         return ResponseEntity.ok(new ResponseDto<>(postDto));
     }
 
     @PutMapping("{id}")
     public ResponseEntity<ResponseDto<PostDto>> editPostById(
-            @PathVariable Integer id, @RequestParam(value = "publish_date", required = false) Long publishDate, @RequestBody PostRequestBodyDto dto) {
+            @PathVariable Integer id, @RequestParam(value = "publish_date", required = false) Long publishDate,
+            @RequestBody PostRequestBodyDto dto) throws BadRequestException400 {
         return ResponseEntity.ok(postService.editPostById(id, publishDate, dto));
     }
 
@@ -43,17 +45,15 @@ public class ApiPostController {
             @RequestParam(required = false) Long dateFrom,
             @RequestParam(required = false) Long dateTo,
             @RequestParam(required = false) Integer offsetParam,
-            @RequestParam(required = false) Integer limitParam){
+            @RequestParam(required = false) Integer limitParam) throws BadRequestException400 {
 
         List<Post> posts = postService.getPostsByTitleAndDate(
                 text, dateFrom + "", dateTo + "", offsetParam, limitParam);
-        List<ResponseDto<PostDto>> listPostsDto = posts.stream().map(post -> {
-            PostDto postDto = postService.getPostDtoById(post.getId(), null);
-            return new ResponseDto<>(postDto);
-        }).collect(toList());
+        if (posts == null) throw new BadRequestException400();
+        List<ResponseDto<PostDto>> listPostsDto = posts.stream().map(post ->
+                new ResponseDto<>(postService.getPostDtoById(post.getId(), null))).collect(toList());
 
-        return ResponseEntity.ok(new ListResponseDto<>(posts.size(),
-                offsetParam, limitParam, listPostsDto));
+        return ResponseEntity.ok(new ListResponseDto<>(posts.size(), offsetParam, limitParam, listPostsDto));
     }
 
 

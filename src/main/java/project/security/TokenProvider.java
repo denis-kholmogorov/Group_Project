@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-import project.handlerExceptions.BadRequestException400;
+import project.handlerExceptions.UnauthorizationException401;
 import project.models.Person;
 import project.models.Role;
 import project.models.Token;
@@ -80,7 +80,6 @@ public class TokenProvider
     /** Получение токена из header запроса*/
     public String resolveToken(HttpServletRequest request){
         return request.getHeader("Authorization");
-        //exc handler
     }
 
     /** Получение емейла из запроса*/
@@ -89,12 +88,13 @@ public class TokenProvider
     }
 
     /** Получение Person по запросу*/
-    public Person getPersonByRequest(HttpServletRequest request) throws BadRequestException400 {
+    public Person getPersonByRequest(HttpServletRequest request) throws UnauthorizationException401
+    {
         Optional<Person> person = personRepository.findByEmail(getEmailByRequest(request));
         if(person.isPresent()){
             return person.get();
         }
-        throw new BadRequestException400();
+        throw new UnauthorizationException401();
     }
 
     /** Валидация токена*/

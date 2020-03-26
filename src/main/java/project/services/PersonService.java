@@ -4,7 +4,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +16,7 @@ import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.PersonDtoWithToken;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
+import project.handlerExceptions.UnauthorizationException401;
 import project.models.Person;
 import project.models.Role;
 import project.models.Token;
@@ -78,7 +78,6 @@ public class PersonService {
 //    }
 
 
-
     public boolean registrationPerson(RegistrationRequestDto dto) throws BadRequestException400 {
         Person exist = personRepository.findPersonByEmail(dto.getEmail()).orElse(null);
         if (exist != null) throw new BadRequestException400();
@@ -105,11 +104,11 @@ public class PersonService {
         return true;
     }
 
-    public ResponseDto<PersonDtoWithToken> login(LoginRequestDto dto){
+    public ResponseDto<PersonDtoWithToken> login(LoginRequestDto dto) throws BadRequestException400 {
         String email = dto.getEmail();
         Person person = personRepository.findPersonByEmail(email).orElse(null);//необходимо оставить
         if (person == null) {
-            throw new UsernameNotFoundException("User not found with email + " + email);
+            throw new BadRequestException400();
         }
         Token jwtToken = new Token();
         String token = tokenProvider.createToken(email);//необходимо оставить
@@ -138,7 +137,7 @@ public class PersonService {
         return new ResponseDto<>(personDto);
     }
 
-    public ResponseDto<MessageResponseDto> sendRecoveryPasswordEmail(String email) {
+    public ResponseDto<MessageResponseDto> sendRecoveryPasswordEmail(String email) throws BadRequestException400 {
 
         Person person = findPersonByEmail(email);
         if (person != null) {
@@ -150,12 +149,12 @@ public class PersonService {
             emailService.send(email, "Password recovery", message);
 
         } else {
-            //обработать
+            throw new BadRequestException400();
         }
         return new ResponseDto<>(new MessageResponseDto());
     }
 
-    public ResponseDto<MessageResponseDto> setNewPassword(PasswordSetDto passwordSetDto, HttpServletRequest request){
+    public ResponseDto<MessageResponseDto> setNewPassword(PasswordSetDto passwordSetDto, HttpServletRequest request) throws BadRequestException400 {
 
         String token = request.getHeader("referer");
         token = token.substring(token.indexOf('=') + 1);
@@ -178,8 +177,7 @@ public class PersonService {
             return new ResponseDto<>(new MessageResponseDto());
         }
         else {
-            //обработать по нашему
-            return null;
+            throw new BadRequestException400();
         }
     }
 
@@ -187,8 +185,9 @@ public class PersonService {
         return personRepository.findPersonByEmail(email).orElse(null);
     }
 
-    public boolean logout(HttpServletRequest request){
+    public boolean logout(HttpServletRequest request) throws BadRequestException400 {
         String token = tokenProvider.resolveToken(request);
+        if (token == null) throw new BadRequestException400();
         tokenRepository.deleteByToken(token);
         return true;
     }
@@ -198,15 +197,12 @@ public class PersonService {
         return optionalPerson.orElse(null);
     }
 
-    public boolean blockPersonById(Integer id, Boolean block) {
+    public boolean blockPersonById(Integer id, Boolean block) throws BadRequestException400 {
         Person person = findPersonById(id);
-        if (person != null) {
-            person.setBlocked(block);
-            personRepository.save(person);
-            return true;
-        }
-        return false;
-
+        if (person == null) throw new BadRequestException400();
+        person.setBlocked(block);
+        personRepository.save(person);
+        return true;
     }
 
     @SneakyThrows
@@ -246,7 +242,8 @@ public class PersonService {
         return null;
     }
 
-    public Person editBody(UpdatePersonDto dto, HttpServletRequest request) throws BadRequestException400 {
+    public Person editBody(UpdatePersonDto dto, HttpServletRequest request) throws UnauthorizationException401
+    {
         Person person = tokenProvider.getPersonByRequest(request);
         person.setFirstName(dto.getFirstName());
         person.setLastName(dto.getLastName());

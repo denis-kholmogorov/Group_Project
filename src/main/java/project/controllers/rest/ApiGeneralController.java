@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import project.dto.PostDto;
 import project.dto.responseDto.FileUploadResponseDto;
 import project.dto.responseDto.ListResponseDto;
+import project.handlerExceptions.BadRequestException400;
 import project.services.PersonService;
 import project.services.PostService;
 
@@ -24,9 +25,11 @@ public class ApiGeneralController {
     private PersonService personService;
 
     @GetMapping("feeds")
-    public ResponseEntity<ListResponseDto<PostDto>> feeds(@RequestParam(required = false) String name,
-                                                          @RequestParam(defaultValue = "0") Integer offset,
-                                                          @RequestParam(defaultValue = "20") Integer itemPerPage) {
+    public ResponseEntity<ListResponseDto<PostDto>> feeds(
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "0") Integer offset,
+            @RequestParam(defaultValue = "20") Integer itemPerPage)
+            throws BadRequestException400 {
         return ResponseEntity.ok(postService.findAllPosts(name, offset, itemPerPage));
     }
 
