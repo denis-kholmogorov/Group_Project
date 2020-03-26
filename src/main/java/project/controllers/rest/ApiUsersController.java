@@ -1,7 +1,6 @@
 package project.controllers.rest;
 
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.PostRequestBodyTagsDto;
@@ -11,12 +10,12 @@ import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
 import project.handlerExceptions.UnauthorizationException401;
 import project.models.Person;
+import project.models.ResponseModel;
 import project.security.TokenProvider;
 import project.services.PersonService;
 import project.services.PostService;
 
 import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 @Slf4j
@@ -44,6 +43,13 @@ public class ApiUsersController {
         Person person = personService.editBody(updatePersonDto, request);
         person.setLastOnlineTime(new Date());
         return ResponseEntity.ok(new ResponseDto<>(person));
+    }
+
+    @DeleteMapping("me")
+    public ResponseEntity<?> deleteUser(ServletRequest servletRequest){
+        Person person = personService.getPersonByToken(servletRequest);
+        Boolean isPersonDeleted = personService.deletePersonByEmail(person.getEmail());
+        return ResponseEntity.ok(new ResponseDto<>(new ResponseModel(), isPersonDeleted));
     }
 
     @GetMapping("{id}")

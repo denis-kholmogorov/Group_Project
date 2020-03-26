@@ -28,6 +28,7 @@ import project.security.TokenProvider;
 import project.services.email.EmailService;
 
 import javax.imageio.ImageIO;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -78,11 +79,11 @@ public class PersonService {
 //    }
 
 
-    public boolean registrationPerson(RegistrationRequestDto dto) throws BadRequestException400 {
+    public Boolean registrationPerson(RegistrationRequestDto dto) throws BadRequestException400 {
         Person exist = personRepository.findPersonByEmail(dto.getEmail()).orElse(null);
         if (exist != null) throw new BadRequestException400();
         Person person = new Person();
-        boolean existsById = roleRepository.existsById(1);
+        Boolean existsById = roleRepository.existsById(1);
 
         Role role;
         if (!existsById) {
@@ -239,7 +240,22 @@ public class PersonService {
                     .relativeFilePath(pathPhoto)
                     .build();
         }
-        return null;
+        return false;
+    }
+
+    public boolean deletePersonByEmail(String email){
+        Person person = findPersonByEmail(email);
+        if(person != null){
+            personRepository.deleteByEmail(email);
+            return true;
+        }
+        return false;
+    }
+
+    public Person getPersonByToken(ServletRequest servletRequest){
+        String token = tokenProvider.resolveToken((HttpServletRequest) servletRequest);
+        String email = tokenProvider.getUserEmail(token);
+        return findPersonByEmail(email);
     }
 
     public Person editBody(UpdatePersonDto dto, HttpServletRequest request) throws UnauthorizationException401
