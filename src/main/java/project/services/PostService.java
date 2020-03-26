@@ -50,7 +50,7 @@ public class PostService {
         if (postList == null) throw new BadRequestException400();
         List<PostDto> postDtoList = postList.stream().map(post -> getPostDtoById(null, post)).collect(toList());
 
-        return new ListResponseDto(postDtoList.size(), offset, itemPerPage, postDtoList);
+        return new ListResponseDto((long) postDtoList.size(), offset, itemPerPage, postDtoList);
     }
 
     public Post getPostById(Integer id) throws BadRequestException400 {

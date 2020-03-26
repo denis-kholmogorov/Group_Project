@@ -53,7 +53,7 @@ public class ApiPostController {
         List<ResponseDto<PostDto>> listPostsDto = posts.stream().map(post ->
                 new ResponseDto<>(postService.getPostDtoById(post.getId(), null))).collect(toList());
 
-        return ResponseEntity.ok(new ListResponseDto<>(posts.size(), offsetParam, limitParam, listPostsDto));
+        return ResponseEntity.ok(new ListResponseDto<>((long) posts.size(), offsetParam, limitParam, listPostsDto));
     }
 
 
