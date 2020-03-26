@@ -50,6 +50,7 @@ public class ApiUsersController {
     public ResponseEntity<?> deleteUser(ServletRequest servletRequest){
         Person person = personService.getPersonByToken(servletRequest);
         personService.deletePersonByEmail(person.getEmail());
+        postService.deleteAllPostsByAuthorId(person.getId());
         return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
@@ -62,8 +63,9 @@ public class ApiUsersController {
     @GetMapping("{id}/wall")
     public ResponseEntity<?> getWallPostsById(
             @PathVariable Integer id, @RequestParam(defaultValue = "0") Integer offset,
-            @RequestParam(defaultValue = "20") Integer itemPerPage) throws BadRequestException400 {
-        return ResponseEntity.ok(postService.findAllByAuthorId(id, offset, itemPerPage));
+            @RequestParam(defaultValue = "20") Integer itemPerPage, ServletRequest servletRequest) throws BadRequestException400 {
+        int compareId = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest).getId();
+        return ResponseEntity.ok(postService.findAllByAuthorId(id, offset, itemPerPage, compareId));
     }
 
     @PostMapping("{id}/wall")

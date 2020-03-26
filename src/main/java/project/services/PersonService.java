@@ -246,8 +246,8 @@ public class PersonService {
     public void deletePersonByEmail(String email){
         Person person = findPersonByEmail(email);
         if(person != null){
-                personRepository.deleteByEmail(email);
-                tokenRepository.deleteByEmailUser(email);
+            tokenRepository.deleteByEmailUser(email);
+            personRepository.deleteByEmail(email);
         }
     }
 

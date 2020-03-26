@@ -119,10 +119,16 @@ public class PostService {
         return new ResponseDto<>(getPostDtoById(null, finalPost));
     }
 
-    public ListResponseDto findAllByAuthorId(Integer authorId, Integer offset, Integer limit) throws BadRequestException400 {
+    public ListResponseDto findAllByAuthorId(
+            Integer authorId, Integer offset, Integer limit, Integer compareId)
+            throws BadRequestException400 {
         Sort sort = Sort.by(Sort.Direction.DESC, "time");
         Pageable pageable = PageRequest.of(offset, limit, sort);
-        List<Post> wallPostList = postRepository.findAllByAuthorId(authorId, pageable);
+        List<Post> wallPostList = !authorId.equals(compareId) ?
+                postRepository.findAllByAuthorIdAndTimeBeforeAndIsBlocked(
+                        authorId, new Date(), false, pageable)
+                :
+                postRepository.findAllByAuthorIdAndIsBlocked(authorId, false, pageable);
         if (wallPostList == null) throw new BadRequestException400();
 
         List<PersonsWallPostDto> personsWallPostDtoList = wallPostList.stream().map(wallPost -> {
@@ -183,6 +189,10 @@ public class PostService {
         }
 
         return postRepository.findAllByIsBlocked(false, pageable);
+    }
+
+    public void deleteAllPostsByAuthorId(Integer id) {
+        postRepository.deleteAllByAuthorId(id);
     }
 
     public Date getDateFromLong(String date) {
