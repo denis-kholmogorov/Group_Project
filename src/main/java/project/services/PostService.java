@@ -140,7 +140,7 @@ public class PostService {
             return personsWallPostDto;
         }).collect(toList());
 
-        return new ListResponseDto(personsWallPostDtoList.size(), offset, limit, personsWallPostDtoList);
+        return new ListResponseDto((long) personsWallPostDtoList.size(), offset, limit, personsWallPostDtoList);
     }
 
     @SneakyThrows
