@@ -240,14 +240,18 @@ public class PersonService {
                     .relativeFilePath(pathPhoto)
                     .build();
         }
-        return false;
+        return null;
     }
 
-    public boolean deletePersonByEmail(String email){
+    public boolean deletePersonById(String email){
         Person person = findPersonByEmail(email);
         if(person != null){
-            personRepository.deleteByEmail(email);
-            return true;
+            try {
+                personRepository.deleteByEmail(email);
+                return true;
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }
         }
         return false;
     }
