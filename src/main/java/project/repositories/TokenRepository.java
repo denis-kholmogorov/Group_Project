@@ -12,4 +12,7 @@ public interface TokenRepository extends CrudRepository<Token, Integer> {
 
     @Transactional
     void deleteByToken(String token);
+
+    @Transactional
+    void deleteByEmailUser(String email);
 }

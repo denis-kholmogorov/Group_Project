@@ -4,7 +4,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +16,7 @@ import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.PersonDtoWithToken;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
+import project.handlerExceptions.UnauthorizationException401;
 import project.models.Person;
 import project.models.Role;
 import project.models.Token;
@@ -29,6 +29,7 @@ import project.security.TokenProvider;
 import project.services.email.EmailService;
 
 import javax.imageio.ImageIO;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -78,11 +79,13 @@ public class PersonService {
 //        personRepository.save(person);
 //
 //    }
-    public boolean registrationPerson(RegistrationRequestDto dto) throws BadRequestException400 {
+
+
+    public Boolean registrationPerson(RegistrationRequestDto dto) throws BadRequestException400 {
         Person exist = personRepository.findPersonByEmail(dto.getEmail()).orElse(null);
         if (exist != null) throw new BadRequestException400();
         Person person = new Person();
-        boolean existsById = roleRepository.existsById(1);
+        Boolean existsById = roleRepository.existsById(1);
 
         Role role;
         if (!existsById) {
@@ -108,7 +111,7 @@ public class PersonService {
         String email = dto.getEmail();
         Person person = personRepository.findPersonByEmail(email).orElse(null);//необходимо оставить
         if (person == null) {
-            throw new UsernameNotFoundException("User not found with email + " + email);
+            throw new BadRequestException400();
         }
         Token jwtToken = new Token();
         String token = tokenProvider.createToken(email);//необходимо оставить
@@ -137,7 +140,7 @@ public class PersonService {
         return new ResponseDto<>(personDto);
     }
 
-    public ResponseDto<MessageResponseDto> sendRecoveryPasswordEmail(String email) {
+    public ResponseDto<MessageResponseDto> sendRecoveryPasswordEmail(String email) throws BadRequestException400 {
 
         Person person = findPersonByEmail(email);
         if (person != null) {
@@ -149,12 +152,12 @@ public class PersonService {
             emailService.send(email, "Password recovery", message);
 
         } else {
-            //обработать
+            throw new BadRequestException400();
         }
         return new ResponseDto<>(new MessageResponseDto());
     }
 
-    public ResponseDto<MessageResponseDto> setNewPassword(PasswordSetDto passwordSetDto, HttpServletRequest request){
+    public ResponseDto<MessageResponseDto> setNewPassword(PasswordSetDto passwordSetDto, HttpServletRequest request) throws BadRequestException400 {
 
         String token = request.getHeader("referer");
         token = token.substring(token.indexOf('=') + 1);
@@ -177,8 +180,7 @@ public class PersonService {
             return new ResponseDto<>(new MessageResponseDto());
         }
         else {
-            //обработать по нашему
-            return null;
+            throw new BadRequestException400();
         }
     }
 
@@ -186,7 +188,7 @@ public class PersonService {
         return personRepository.findPersonByEmail(email).orElse(null);
     }
 
-    public boolean logout(HttpServletRequest request){
+    public boolean logout(HttpServletRequest request) throws BadRequestException400 {
         String token = tokenProvider.resolveToken(request);
         tokenRepository.deleteByToken(token);
         return true;
@@ -197,15 +199,12 @@ public class PersonService {
         return optionalPerson.orElse(null);
     }
 
-    public boolean blockPersonById(Integer id, Boolean block) {
+    public boolean blockPersonById(Integer id, Boolean block) throws BadRequestException400 {
         Person person = findPersonById(id);
-        if (person != null) {
-            person.setBlocked(block);
-            personRepository.save(person);
-            return true;
-        }
-        return false;
-
+        if (person == null) throw new BadRequestException400();
+        person.setBlocked(block);
+        personRepository.save(person);
+        return true;
     }
 
     @SneakyThrows
@@ -216,7 +215,7 @@ public class PersonService {
         String typeImage = file.getContentType().substring(index);
         log.info(typeImage + " тип изображения");
         if(!file.isEmpty()){
-            String rawPath = "/usr/share/nginx/html/static/img/";
+            String rawPath = "C:\\Users\\Nortoza Forhnis\\Downloads\\nginx-1.17.9\\nginx-1.17.9\\html\\static\\img";
             String fileName = UUID.randomUUID().toString();
             String pathImage = rawPath + fileName + "." + typeImage ;
 
@@ -245,7 +244,22 @@ public class PersonService {
         return null;
     }
 
-    public Person editBody(UpdatePersonDto dto, HttpServletRequest request) throws BadRequestException400 {
+    public void deletePersonByEmail(String email){
+        Person person = findPersonByEmail(email);
+        if(person != null){
+            tokenRepository.deleteByEmailUser(email);
+            personRepository.deleteByEmail(email);
+        }
+    }
+
+    public Person getPersonByToken(ServletRequest servletRequest){
+        String token = tokenProvider.resolveToken((HttpServletRequest) servletRequest);
+        String email = tokenProvider.getUserEmail(token);
+        return findPersonByEmail(email);
+    }
+
+    public Person editBody(UpdatePersonDto dto, HttpServletRequest request) throws UnauthorizationException401
+    {
         Person person = tokenProvider.getPersonByRequest(request);
         person.setFirstName(dto.getFirstName());
         person.setLastName(dto.getLastName());

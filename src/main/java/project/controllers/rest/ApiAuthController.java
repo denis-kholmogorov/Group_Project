@@ -39,7 +39,7 @@ public class ApiAuthController {
     }
 
     @PostMapping(value = "logout")
-    ResponseEntity logout(HttpServletRequest request){
+    ResponseEntity logout(HttpServletRequest request) throws BadRequestException400 {
         Boolean result = personService.logout(request);
         return ResponseEntity.ok(new ResponseDto(new MessageResponseDto()));//обработать еще ошибки
     }

@@ -12,7 +12,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class ListResponseDto<T> extends ResponseModel {
 
-    private Integer total;
+    private Long total;
 
     private Integer offset;
 

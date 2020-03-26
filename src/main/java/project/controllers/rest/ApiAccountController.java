@@ -31,12 +31,12 @@ public class ApiAccountController {
     }
 
     @PutMapping(value = "password/recovery")
-    public ResponseEntity<ResponseDto<MessageResponseDto>> sendRecoveryEmail(@RequestBody Map<String, String> email){
+    public ResponseEntity<ResponseDto<MessageResponseDto>> sendRecoveryEmail(@RequestBody Map<String, String> email) throws BadRequestException400 {
         return ResponseEntity.ok(personService.sendRecoveryPasswordEmail(email.get("email")));
     }
 
     @PutMapping("password/set")
-    public ResponseEntity<ResponseDto<MessageResponseDto>> setNewPassword(@RequestBody PasswordSetDto passwordSetDto, HttpServletRequest request){
+    public ResponseEntity<ResponseDto<MessageResponseDto>> setNewPassword(@RequestBody PasswordSetDto passwordSetDto, HttpServletRequest request) throws BadRequestException400 {
         return ResponseEntity.ok(personService.setNewPassword(passwordSetDto, request));
     }
 }

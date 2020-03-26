@@ -7,7 +7,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.PostRequestBodyTagsDto;
-import project.dto.requestDto.PostRequestBodyDto;
 import project.dto.requestDto.UpdatePersonDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
@@ -34,10 +33,8 @@ public class ApiUsersController {
 
     @Secured({"ROLE_USER","ROLE_ADMIN"})
     @GetMapping("me")
-    public ResponseEntity<?> getAuthUser(ServletRequest servletRequest){    //обработать 401
-        String token = tokenProvider.resolveToken((HttpServletRequest) servletRequest);
-        String email = tokenProvider.getUserEmail(token);
-        Person person = personService.findPersonByEmail(email);
+    public ResponseEntity<?> getAuthUser(ServletRequest servletRequest) throws UnauthorizationException401 {
+        Person person = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest);
 
         person.setLastOnlineTime(new Date());
         return ResponseEntity.ok(new ResponseDto<>(person));
@@ -46,39 +43,50 @@ public class ApiUsersController {
     @Secured({"ROLE_USER","ROLE_ADMIN"})
     @PutMapping("me")
     public ResponseEntity<?> personEditBody(@RequestBody UpdatePersonDto updatePersonDto,
-                                                 HttpServletRequest request) throws BadRequestException400
+                                                 HttpServletRequest request) throws UnauthorizationException401
     {
         Person person = personService.editBody(updatePersonDto, request);
         person.setLastOnlineTime(new Date());
         return ResponseEntity.ok(new ResponseDto<>(person));
     }
 
+    @DeleteMapping("me")
+    public ResponseEntity<?> deleteUser(ServletRequest servletRequest){
+        Person person = personService.getPersonByToken(servletRequest);
+        personService.deletePersonByEmail(person.getEmail());
+        postService.deleteAllPostsByAuthorId(person.getId());
+        return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
+    }
+
     @GetMapping("{id}")
-    public ResponseEntity<?> getPersonById(@PathVariable Integer id) {  //обработать 401
+    public ResponseEntity<?> getPersonById(@PathVariable Integer id) {
         Person person = personService.findPersonById(id);
         return ResponseEntity.ok(new ResponseDto<>(person));
     }
 
     @GetMapping("{id}/wall")
     public ResponseEntity<?> getWallPostsById(
-            @PathVariable Integer id, @RequestParam(defaultValue = "0") Integer offset, @RequestParam(defaultValue = "20") Integer itemPerPage) {  //обработать 400 и 401
-        return ResponseEntity.ok(postService.findAllByAuthorId(id, offset, itemPerPage));
+            @PathVariable Integer id, @RequestParam(defaultValue = "0") Integer offset,
+            @RequestParam(defaultValue = "20") Integer itemPerPage, ServletRequest servletRequest) throws BadRequestException400 {
+        int compareId = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest).getId();
+        return ResponseEntity.ok(postService.findAllByAuthorId(id, offset, itemPerPage, compareId));
     }
 
     @PostMapping("{id}/wall")
     public ResponseEntity<?> addWallPostById(
-            @PathVariable Integer id, @RequestParam(value = "publish_date", required = false) Long publishDate, @RequestBody PostRequestBodyTagsDto dto) {   //обработать 400 и 401
+            @PathVariable Integer id, @RequestParam(value = "publish_date", required = false) Long publishDate,
+            @RequestBody PostRequestBodyTagsDto dto) throws BadRequestException400 {
         return ResponseEntity.ok(postService.addNewWallPostByAuthorId(id, publishDate, dto));
     }
 
     @PutMapping("block/{id}")
-    public ResponseEntity<?> blockPersonById(@PathVariable Integer id) {    //обработать 400 и 401
+    public ResponseEntity<?> blockPersonById(@PathVariable Integer id) throws BadRequestException400 {    //обработать 400 и 401
         personService.blockPersonById(id, true);
         return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
     @DeleteMapping("block/{id}")
-    public ResponseEntity<?> unblockPersonById(@PathVariable Integer id) { //обработать 400 и 401
+    public ResponseEntity<?> unblockPersonById(@PathVariable Integer id) throws BadRequestException400 { //обработать 400 и 401
         personService.blockPersonById(id, false);
         return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
