@@ -31,7 +31,7 @@ public class ApiUsersController {
     private PostService postService;
     private TokenProvider tokenProvider;
 
-    @Secured({"ROLE_USER","ROLE_ADMIN"})
+    @Secured("ROLE_USER")
     @GetMapping("me")
     public ResponseEntity<?> getAuthUser(ServletRequest servletRequest) throws UnauthorizationException401 {
         Person person = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest);
@@ -40,7 +40,7 @@ public class ApiUsersController {
         return ResponseEntity.ok(new ResponseDto<>(person));
     }
 
-    @Secured({"ROLE_USER","ROLE_ADMIN"})
+    @Secured("ROLE_USER")
     @PutMapping("me")
     public ResponseEntity<?> personEditBody(@RequestBody UpdatePersonDto updatePersonDto,
                                                  HttpServletRequest request) throws UnauthorizationException401
@@ -50,6 +50,7 @@ public class ApiUsersController {
         return ResponseEntity.ok(new ResponseDto<>(person));
     }
 
+    @Secured("ROLE_USER")
     @DeleteMapping("me")
     public ResponseEntity<?> deleteUser(ServletRequest servletRequest){
         Person person = personService.getPersonByToken(servletRequest);
@@ -58,12 +59,14 @@ public class ApiUsersController {
         return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
+    @Secured("ROLE_USER")
     @GetMapping("{id}")
     public ResponseEntity<?> getPersonById(@PathVariable Integer id) {
         Person person = personService.findPersonById(id);
         return ResponseEntity.ok(new ResponseDto<>(person));
     }
 
+    @Secured("ROLE_USER")
     @GetMapping("{id}/wall")
     public ResponseEntity<?> getWallPostsById(
             @PathVariable Integer id, @RequestParam(defaultValue = "0") Integer offset,

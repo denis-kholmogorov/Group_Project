@@ -85,4 +85,8 @@ public class Person {
             inverseJoinColumns =@JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Set<Role> roles = new HashSet<>();
 
+    @PreRemove
+    public void removeUser() {
+        roles.forEach(role -> role.getUsers().remove(this));
+    }
 }
