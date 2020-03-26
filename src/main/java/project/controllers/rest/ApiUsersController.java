@@ -49,7 +49,7 @@ public class ApiUsersController {
     @DeleteMapping("me")
     public ResponseEntity<?> deleteUser(ServletRequest servletRequest){
         Person person = personService.getPersonByToken(servletRequest);
-        Boolean isPersonDeleted = personService.deletePersonById(person.getEmail());
+        personService.deletePersonByEmail(person.getEmail());
         return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 

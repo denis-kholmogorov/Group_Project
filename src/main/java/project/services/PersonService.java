@@ -243,17 +243,12 @@ public class PersonService {
         return null;
     }
 
-    public boolean deletePersonById(String email){
+    public void deletePersonByEmail(String email){
         Person person = findPersonByEmail(email);
         if(person != null){
-            try {
                 personRepository.deleteByEmail(email);
-                return true;
-            } catch(Exception ex) {
-                ex.printStackTrace();
-            }
+                tokenRepository.deleteByEmailUser(email);
         }
-        return false;
     }
 
     public Person getPersonByToken(ServletRequest servletRequest){
