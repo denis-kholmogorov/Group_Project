@@ -1,34 +1,62 @@
 package project.services;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.dto.responseDto.ListResponseDto;
+import project.handlerExceptions.BadRequestException400;
+import project.models.Friendship;
+import project.models.Person;
 import project.repositories.FriendshipRepository;
+
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @AllArgsConstructor
 public class FriendshipService {
     private FriendshipRepository friendshipRepository;
+    private PersonService personService;
 
-    public ListResponseDto getFriendList(String name, Integer offset, Integer itemPerPage) {
-        /*//Sort sort = Sort.by(Sort.Direction.DESC, "time");
+//    @PostConstruct
+//    public void init() {
+//        Friendship friendship = new Friendship();
+//        friendship.setStatusId(14);
+//        friendship.setPersonIdWhoSendFriendship(2);
+//        friendship.setPersonIdWhoTakeFriendship(4);
+//
+//        friendshipRepository.save(friendship);
+//
+//        Friendship friendship1 = new Friendship();
+//        friendship1.setStatusId(15);
+//        friendship1.setPersonIdWhoSendFriendship(16);
+//        friendship1.setPersonIdWhoTakeFriendship(2);
+//
+//        friendshipRepository.save(friendship1);
+//    }
+
+    public ListResponseDto getFriendList(String name, Integer offset, Integer itemPerPage, Person person) {
+        //Sort sort = Sort.by(Sort.Direction.DESC, "time");
         Pageable pageable = PageRequest.of(offset, itemPerPage);
-        List<Friendship> friendshipList = friendshipRepository.(authorId, pageable);
-        List<PersonsWallPostDto> personsWallPostDtoList = wallPostList.stream().map(wallPost -> {
-            PersonsWallPostDto personsWallPostDto = new PersonsWallPostDto();
-            personsWallPostDto.setId(wallPost.getId());
-            personsWallPostDto.setTime(wallPost.getTime());
-            personsWallPostDto.setAuthor(personRepository.findById(wallPost.getAuthorId()).orElse(null));
-            personsWallPostDto.setTitle(wallPost.getTitle());
-            personsWallPostDto.setPostText(wallPost.getPostText());
-            personsWallPostDto.setIsBlocked(wallPost.getIsBlocked());
-            personsWallPostDto.setLikes(postLikeService.countLikesByPostId(wallPost.getId()));
-            personsWallPostDto.setComments(postCommentsService.getListCommentsDto(wallPost.getId()));
-            personsWallPostDto.setType(wallPost.getTime().before(new Date()) ? PostTypeEnum.POSTED.getType() : PostTypeEnum.QUEUED.getType());
-            return personsWallPostDto;
+        int personId = person.getId();
+        List<Friendship> friendshipList =
+                friendshipRepository.findAllByPersonIdWhoSendFriendshipOrPersonIdWhoTakeFriendshipAndStatus(
+                        personId, pageable);
+
+        List<Person> personFriendList = friendshipList.stream().map(friendship -> {
+            Person personFriend;
+            if (friendship.getPersonIdWhoSendFriendship() != personId) {
+                personFriend = personService.findPersonById(friendship.getPersonIdWhoSendFriendship());
+            }
+            else if (friendship.getPersonIdWhoTakeFriendship() != personId) {
+                personFriend = personService.findPersonById(friendship.getPersonIdWhoTakeFriendship());
+            }
+            else throw new BadRequestException400();
+            return personFriend;
         }).collect(toList());
 
-        return new ListResponseDto(personsWallPostDtoList.size(), offset, limit, personsWallPostDtoList);*/
-        return null;
+        return new ListResponseDto((long) personFriendList.size(), offset, itemPerPage, personFriendList);
     }
 }

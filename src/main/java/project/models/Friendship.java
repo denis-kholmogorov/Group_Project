@@ -12,13 +12,14 @@ public class Friendship {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "status_id")
-    private FriendshipStatus statusId;
+    //@OneToOne(cascade = CascadeType.ALL)
+    //@JoinColumn(name = "status_id")
+    @Column(name = "status_id")
+    private Integer statusId;
 
     @Column(name = "src_person_id")
-    private Integer PersonIdWhoTakeFriendship;
+    private Integer personIdWhoSendFriendship;
 
     @Column(name = "dst_person_id")
-    private Integer PersonIdWhoSendFriendship;
+    private Integer personIdWhoTakeFriendship;
 }

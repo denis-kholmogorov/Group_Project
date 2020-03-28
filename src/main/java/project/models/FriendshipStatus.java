@@ -23,6 +23,6 @@ public class FriendshipStatus {
     @Enumerated(EnumType.STRING)
     private FriendshipStatusCode code;
 
-    @OneToOne(mappedBy = "statusId")
-    private Friendship friendship;
+//    @OneToOne(mappedBy = "statusId")
+//    private Friendship friendship;
 }
