@@ -66,7 +66,7 @@ public class ApiDialogsController {
         message.setAuthorId(1);
         message.setId(1);
         message.setMessageText("Hello world");
-        message.setReadStatus(ReadStatus.SEND);
+        message.setReadStatus(ReadStatus.SENT);
         message.setRecipientId(1);
         message.setTime(Calendar.getInstance().getTime().getTime());
         List<MessageDto> messages = new ArrayList<>();

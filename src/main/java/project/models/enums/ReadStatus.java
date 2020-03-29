@@ -1,6 +1,6 @@
 package project.models.enums;
 
 public enum ReadStatus {
-    SEND,
+    SENT,
     READ
 }

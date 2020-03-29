@@ -5,6 +5,8 @@ import lombok.Data;
 import project.dto.responseDto.ResponseDto;
 import project.models.ResponseModel;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 public class DialogsResponseDto<T> extends ResponseModel
@@ -14,6 +16,8 @@ public class DialogsResponseDto<T> extends ResponseModel
     private Integer total = 20;
 
     private Integer perPage = 10;
+
+    private Long last_online_time = new Date().getTime();
 
     private T data;
 

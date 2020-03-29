@@ -60,7 +60,7 @@ public class MessageService {
         message.setAuthorId(person.getId());
         message.setId(1);
         message.setMessageText("Hellow workd");
-        message.setReadStatus(ReadStatus.SEND);
+        message.setReadStatus(ReadStatus.SENT);
         message.setRecipientId(2);
         message.setTime(Calendar.getInstance().getTime().getTime());
         List<DialogDto> dialogs = new ArrayList<>();

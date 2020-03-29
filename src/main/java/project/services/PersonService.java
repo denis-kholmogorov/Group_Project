@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 import project.dto.requestDto.LoginRequestDto;
 import project.dto.requestDto.PasswordSetDto;
@@ -103,6 +104,7 @@ public class PersonService {
         person.setLastName(dto.getLastName());
         person.setRegDate(new Date());
         person.setRoles(Collections.singleton(role));
+        person.setMessagesPermission(MessagesPermission.ALL);
         personRepository.save(person);
         return true;
     }
@@ -113,6 +115,11 @@ public class PersonService {
         if (person == null) {
             throw new BadRequestException400();
         }
+        if(!encoder.matches(dto.getPassword(), person.getPassword())){
+            throw new BadRequestException400();
+        }
+        person.setLastOnlineTime(new Date());
+        personRepository.save(person);
         Token jwtToken = new Token();
         String token = tokenProvider.createToken(email);//необходимо оставить
         PersonDtoWithToken personDto = new PersonDtoWithToken();
@@ -191,6 +198,9 @@ public class PersonService {
     public boolean logout(HttpServletRequest request) throws BadRequestException400 {
         String token = tokenProvider.resolveToken(request);
         tokenRepository.deleteByToken(token);
+        Person person = tokenProvider.getPersonByRequest(request);
+        person.setLastOnlineTime(new Date());
+        personRepository.save(person);
         return true;
     }
 
