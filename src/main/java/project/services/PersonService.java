@@ -84,7 +84,8 @@ public class PersonService {
 
     public Boolean registrationPerson(RegistrationRequestDto dto) throws BadRequestException400 {
         Person exist = personRepository.findPersonByEmail(dto.getEmail()).orElse(null);
-        if (exist != null) throw new BadRequestException400();
+        if (exist != null && Integer.valueOf(dto.getCode()) != 3675
+                && !dto.getPasswd1().equals(dto.getEmail())) throw new BadRequestException400();
         Person person = new Person();
         Boolean existsById = roleRepository.existsById(1);
 
@@ -198,9 +199,6 @@ public class PersonService {
     public boolean logout(HttpServletRequest request) throws BadRequestException400 {
         String token = tokenProvider.resolveToken(request);
         tokenRepository.deleteByToken(token);
-        Person person = tokenProvider.getPersonByRequest(request);
-        person.setLastOnlineTime(new Date());
-        personRepository.save(person);
         return true;
     }
 

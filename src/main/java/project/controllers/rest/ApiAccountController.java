@@ -27,8 +27,8 @@ public class ApiAccountController
 
     @PostMapping(value = "register")
     public ResponseEntity<ResponseDto<MessageResponseDto>> register(@RequestBody RegistrationRequestDto dto) throws BadRequestException400 {
-        log.info("контроллер Register отработал");
         personService.registrationPerson(dto);
+        log.info("Регистрация пользователя " + dto.getEmail() + " прошла успешно");
         return ResponseEntity.ok(new ResponseDto(new MessageResponseDto()));
     }
 

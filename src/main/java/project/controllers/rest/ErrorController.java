@@ -15,7 +15,7 @@ public class ErrorController {
 
     @GetMapping("/error")
     public ResponseEntity<?> getError(){
-        log.info("Срабатывает здесь");
+        log.info("Срабатывает в контроллере ошибок");
         return ResponseEntity.ok(new Error(ErrorEnum.UNAUTHORIZED.getError(), ErrorDescriptionEnum.UNAUTHORIZED.getError()));
     }
 }

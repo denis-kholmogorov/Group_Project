@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
 import project.models.enums.MessagesPermission;
 
@@ -14,6 +16,8 @@ import java.util.Set;
 
 @Data
 @Entity
+@EqualsAndHashCode(exclude="dialogs")
+@ToString(exclude = "dialogs")
 @Table(name = "person")
 public class Person {
     @Id
