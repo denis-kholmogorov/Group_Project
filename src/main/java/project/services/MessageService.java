@@ -8,9 +8,11 @@ import org.springframework.stereotype.Service;
 import project.dto.dialog.request.DialogUserShortList;
 import project.dto.dialog.response.DialogDto;
 import project.dto.dialog.response.DialogResponseDto;
+import project.dto.dialog.response.MessageDto;
 import project.dto.responseDto.ListResponseDto;
 import project.handlerExceptions.BadRequestException400;
 import project.models.Dialog;
+import project.models.Message;
 import project.models.Person;
 import project.repositories.DialogRepository;
 import project.repositories.MessageRepository;
@@ -30,6 +32,8 @@ public class MessageService {
 
     private TokenProvider tokenProvider;
 
+    private PersonService personService;
+
     private PersonRepository personRepository;
 
     private DialogRepository dialogRepository;
@@ -37,10 +41,12 @@ public class MessageService {
     @Autowired
     public MessageService(MessageRepository messageRepository,
                           TokenProvider tokenProvider,
+                          PersonService personService,
                           PersonRepository personRepository,
                           DialogRepository dialogRepository) {
         this.messageRepository = messageRepository;
         this.tokenProvider = tokenProvider;
+        this.personService = personService;
         this.personRepository = personRepository;
         this.dialogRepository = dialogRepository;
     }
@@ -56,23 +62,20 @@ public class MessageService {
             DialogDto dialogDto = new DialogDto();
             dialogDto.setId(dialog.getId());
             dialogDto.setUnreadCount(dialog.getUnread().size());
-            dialogDto.setMessage(dialog.getListMessage().get(0));
+            Message message = dialog.getListMessage().get(0);
+            MessageDto messageDto = new MessageDto();
+            messageDto.setId(message.getId());
+            messageDto.setAuthorId(message.getAuthorId());
+            messageDto.setMessageText(message.getMessageText());
+            messageDto.setTime(message.getTime());
+            messageDto.setReadStatus(message.getReadStatus());
+            Person person = personService.findPersonById(message.getRecipientId());
+            messageDto.setRecipient(person);
+            dialogDto.setMessage(messageDto);
             dialogDtoList.add(dialogDto);
         });
 
         return new ListResponseDto((long) dialogDtoList.size(), offset, itemPerPage, dialogDtoList);
-//        List<Message> messageList = messageRepository.findAllByAuthorIdOrRecipientId(person.getId(), paging);
-//        MessageDto message = new MessageDto();
-//        message.setAuthorId(person.getId());
-//        message.setId(1);
-//        message.setMessageText("Hellow workd");
-//        message.setReadStatus(ReadStatus.SENT);
-//        message.setRecipientId(2);
-//        message.setTime(Calendar.getInstance().getTime().getTime());
-//        List<DialogDto> dialogs = new ArrayList<>();
-//        DialogDto dialogDto = new DialogDto(message);
-//        dialogs.add(dialogDto);
-//        return new DialogsResponseDto(dialogs);
     }
 
     public DialogResponseDto createDialog(HttpServletRequest request, DialogUserShortList userIds) throws BadRequestException400 {
@@ -88,4 +91,10 @@ public class MessageService {
         return new DialogResponseDto(id);
     }
 
+    public ListResponseDto getDialogMessages(
+            Dialog dialog, Integer offset, Integer itemPerPage, HttpServletRequest servletRequest) {
+
+
+        return null;
+    }
 }

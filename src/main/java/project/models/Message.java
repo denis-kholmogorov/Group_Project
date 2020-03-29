@@ -3,6 +3,7 @@ package project.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.ToString;
 import project.models.enums.ReadStatus;
 
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import java.util.Date;
 
 @Data
 @Entity
+@ToString(exclude = "dialog")
 @Table(name = "message")
 public class Message {
     @Id

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import project.models.Message;
 
 
 @Data
@@ -18,9 +17,9 @@ public class DialogDto {
     Integer unreadCount;
 
     @JsonProperty(value = "last_message")
-    Message message;
+    MessageDto message;
 
-    public DialogDto(Message message) {
+    public DialogDto(MessageDto message) {
         this.message = message;
     }
 }

@@ -13,15 +13,15 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
-public class MessageDto
+public class MessageDto2
 {
     private Integer id;
 
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Date time;
 
-    @JsonProperty(value = "author_id")
-    private Integer authorId;
+    @JsonProperty(value = "author")
+    private Person author;
 
     @JsonProperty(value = "recipient")
     private Person recipient;
