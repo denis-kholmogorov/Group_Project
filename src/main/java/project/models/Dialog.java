@@ -2,6 +2,7 @@ package project.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -12,6 +13,7 @@ import java.util.Set;
 
 @Data
 @Entity
+@ToString(exclude = "listMessage")
 @Table(name = "dialog")
 public class Dialog
 {
