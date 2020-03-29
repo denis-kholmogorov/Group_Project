@@ -1,7 +1,6 @@
 package project.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.hibernate.annotations.Where;
 
@@ -35,8 +34,11 @@ public class Dialog
     @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)   //example
     @JoinColumn(name = "dialog_id")
-    @Where(clause = "read_status = 'SEND'")
+    @Where(clause = "read_status = 'SENT'")
     private List<Message> unread = new ArrayList<>();
+
+    //@JsonIgnore
+    //Comparator<Message> comparator = Comparator.comparing(m -> m.getTime().getTime());
 
     @JsonIgnore
     @OneToMany(mappedBy = "dialog", fetch = FetchType.EAGER, cascade = CascadeType.ALL)

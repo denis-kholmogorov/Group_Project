@@ -12,15 +12,15 @@ import project.models.Message;
 @AllArgsConstructor
 public class DialogDto {
 
-    Integer id = 1;
+    Integer id;
 
     @JsonProperty(value = "unread_count")
-    Integer unreadCount = 12;
+    Integer unreadCount;
 
     @JsonProperty(value = "last_message")
-    MessageDto message;
+    Message message;
 
-    public DialogDto(MessageDto message) {
+    public DialogDto(Message message) {
         this.message = message;
     }
 }

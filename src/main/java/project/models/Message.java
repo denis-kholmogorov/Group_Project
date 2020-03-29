@@ -6,7 +6,7 @@ import lombok.Data;
 import project.models.enums.ReadStatus;
 
 import javax.persistence.*;
-import java.util.Calendar;
+import java.util.Date;
 
 @Data
 @Entity
@@ -17,10 +17,10 @@ public class Message {
     private Integer id;
 
     @Column(updatable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
-    private Calendar time;
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
+    private Date time;
 
-    @Column(name = "autor_id")
+    @Column(name = "author_id")
     private Integer authorId;
 
     @Column(name = "recipient_id")

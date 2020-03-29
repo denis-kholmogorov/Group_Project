@@ -7,13 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import project.dto.dialog.request.DialogUserShortList;
-import project.dto.dialog.response.DialogDto;
 import project.dto.dialog.response.DialogResponseDto;
 import project.dto.dialog.response.DialogsResponseDto;
 import project.dto.dialog.response.MessageDto;
+import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
-import project.models.Message;
 import project.models.enums.ReadStatus;
 import project.services.MessageService;
 
@@ -36,16 +35,12 @@ public class ApiDialogsController {
     public ResponseEntity<?> getAllDialogs(@RequestParam(name = "query",required = false) String query,
                                            @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset,
                                            @RequestParam(name = "itemPerPage", required = false, defaultValue = "20") Integer itemPerPage,
-                                           HttpServletRequest request)
-    {DialogsResponseDto answer = null;
-        try {
-            answer = messageService.getAllMessages(query, offset, itemPerPage, request);
-        }catch (BadRequestException400 e){
-            log.info("400");
-        }
+                                           HttpServletRequest request) {
+        ListResponseDto answer = messageService.getAllMessages(query, offset, itemPerPage, request);
+
 
         log.info(query + " Параметр query в контроллере Dialog");
-        return ResponseEntity.ok().body(answer);
+        return ResponseEntity.ok(answer);
     }
 
     @Secured("ROLE_USER")
