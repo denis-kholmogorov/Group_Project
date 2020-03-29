@@ -20,7 +20,9 @@ import java.util.Map;
 @RestController
 @RequestMapping(value = "/api/v1/account/")
 @AllArgsConstructor
-public class ApiAccountController {
+public class ApiAccountController
+{
+
     private PersonService personService;
 
     @PostMapping(value = "register")

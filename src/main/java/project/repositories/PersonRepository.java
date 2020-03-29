@@ -11,10 +11,13 @@ import java.util.Optional;
 @Repository
 public interface PersonRepository extends CrudRepository<Person, Integer> {
 
+    @Transactional
     Optional<Person> findByEmail(String email);
 
+    @Transactional
     Optional<Person> findById(int id);
 
+     @Transactional
      @Query("Select p from Person p where p.email = :email")
      Optional<Person> findPersonByEmail(String email);
 

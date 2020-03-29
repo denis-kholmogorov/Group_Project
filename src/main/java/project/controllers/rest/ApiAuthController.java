@@ -44,9 +44,4 @@ public class ApiAuthController {
         return ResponseEntity.ok(new ResponseDto(new MessageResponseDto()));//обработать еще ошибки
     }
 
-    @GetMapping("error")
-    ResponseEntity error401(){
-        throw new UnauthorizationException401();
-    }
-
 }

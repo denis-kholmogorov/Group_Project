@@ -1,6 +1,7 @@
 package project.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import project.models.enums.ReadStatus;
 
@@ -31,4 +32,9 @@ public class Message {
     @Column(name = "read_status")
     @Enumerated(EnumType.STRING)
     private ReadStatus readStatus;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "dialog_id", nullable = false)
+    private Dialog dialog;
 }

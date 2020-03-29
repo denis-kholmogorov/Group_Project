@@ -3,6 +3,7 @@ package project.controllers.rest;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,6 +36,7 @@ public class ApiFriendsController {
 //            return ResponseEntity.ok().build();
 //        }
 
+    @Secured("ROLE_USER")
     @GetMapping
     public ResponseEntity<ListResponseDto> getFriendList(
             @RequestParam String name, @RequestParam(defaultValue = "0") Integer offset, @RequestParam(defaultValue = "20") Integer itemPerPage) {

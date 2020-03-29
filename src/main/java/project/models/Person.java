@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 import project.models.enums.MessagesPermission;
 
@@ -84,6 +86,9 @@ public class Person {
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns =@JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Set<Role> roles = new HashSet<>();
+
+    @ManyToMany(mappedBy = "persons", fetch = FetchType.LAZY)
+    private Set<Dialog> dialogs;
 
     @PreRemove
     public void removeUser() {

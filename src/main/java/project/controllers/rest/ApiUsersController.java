@@ -5,6 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.PostRequestBodyTagsDto;
 import project.dto.requestDto.UpdatePersonDto;
@@ -31,16 +34,17 @@ public class ApiUsersController {
     private PostService postService;
     private TokenProvider tokenProvider;
 
-    @Secured("ROLE_USER")
+    @Secured("ROLE_ADMIN")
     @GetMapping("me")
     public ResponseEntity<?> getAuthUser(ServletRequest servletRequest) throws UnauthorizationException401 {
-        Person person = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest);
 
+        Person person = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest);
+        log.warn("Есть аутентификации");
         person.setLastOnlineTime(new Date());
         return ResponseEntity.ok(new ResponseDto<>(person));
     }
 
-    @Secured("ROLE_USER")
+    @Secured("ROLE_ADMIN")
     @PutMapping("me")
     public ResponseEntity<?> personEditBody(@RequestBody UpdatePersonDto updatePersonDto,
                                                  HttpServletRequest request) throws UnauthorizationException401
