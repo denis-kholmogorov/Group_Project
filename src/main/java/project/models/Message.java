@@ -7,6 +7,7 @@ import project.models.enums.ReadStatus;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Calendar;
 
 @Data
 @Entity
@@ -18,7 +19,7 @@ public class Message {
 
     @Column(updatable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
-    private LocalDateTime time;
+    private Calendar time;
 
     @Column(name = "autor_id")
     private Integer authorId;

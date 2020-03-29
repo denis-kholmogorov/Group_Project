@@ -18,5 +18,9 @@ public class DialogDto {
     Integer unreadCount = 12;
 
     @JsonProperty(value = "last_message")
-    Message message;
+    MessageDto message;
+
+    public DialogDto(MessageDto message) {
+        this.message = message;
+    }
 }

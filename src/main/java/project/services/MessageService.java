@@ -8,8 +8,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.dto.dialog.request.DialogUserShortList;
+import project.dto.dialog.response.DialogDto;
 import project.dto.dialog.response.DialogResponseDto;
 import project.dto.dialog.response.DialogsResponseDto;
+import project.dto.dialog.response.MessageDto;
 import project.dto.requestDto.OffsetLimitDto;
 import project.handlerExceptions.BadRequestException400;
 import project.models.Dialog;
@@ -23,10 +25,7 @@ import project.security.TokenProvider;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -57,20 +56,16 @@ public class MessageService {
         Pageable paging = PageRequest.of((offset / itemPerPage), itemPerPage);
         Person person = tokenProvider.getPersonByRequest(request);
         List<Message> messageList = messageRepository.findAllByAuthorIdOrRecipientId(person.getId(), paging);
-        Dialog dialog = new Dialog();
-        dialog.setId(1);
-        dialog.getPersons().add(person);
-        Message message = new Message();
+        MessageDto message = new MessageDto();
         message.setAuthorId(person.getId());
         message.setId(1);
         message.setMessageText("Hellow workd");
-        message.setReadStatus(ReadStatus.READ);
+        message.setReadStatus(ReadStatus.SEND);
         message.setRecipientId(2);
-        message.setTime(LocalDateTime.now());
-        message.setDialog(dialog);
-        List<Dialog> dialogs = new ArrayList<>();
-        dialog.getListMessage().add(message);
-        dialogs.add(dialog);
+        message.setTime(Calendar.getInstance().getTime().getTime());
+        List<DialogDto> dialogs = new ArrayList<>();
+        DialogDto dialogDto = new DialogDto(message);
+        dialogs.add(dialogDto);
         return new DialogsResponseDto(dialogs);
     }
 

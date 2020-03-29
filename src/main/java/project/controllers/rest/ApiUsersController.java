@@ -34,7 +34,7 @@ public class ApiUsersController {
     private PostService postService;
     private TokenProvider tokenProvider;
 
-    @Secured("ROLE_ADMIN")
+    @Secured("ROLE_USER")
     @GetMapping("me")
     public ResponseEntity<?> getAuthUser(ServletRequest servletRequest) throws UnauthorizationException401 {
 
@@ -44,7 +44,7 @@ public class ApiUsersController {
         return ResponseEntity.ok(new ResponseDto<>(person));
     }
 
-    @Secured("ROLE_ADMIN")
+    @Secured("ROLE_USER")
     @PutMapping("me")
     public ResponseEntity<?> personEditBody(@RequestBody UpdatePersonDto updatePersonDto,
                                                  HttpServletRequest request) throws UnauthorizationException401
@@ -79,6 +79,7 @@ public class ApiUsersController {
         return ResponseEntity.ok(postService.findAllByAuthorId(id, offset, itemPerPage, compareId));
     }
 
+    @Secured("ROLE_USER")
     @PostMapping("{id}/wall")
     public ResponseEntity<?> addWallPostById(
             @PathVariable Integer id, @RequestParam(value = "publish_date", required = false) Long publishDate,
@@ -86,12 +87,14 @@ public class ApiUsersController {
         return ResponseEntity.ok(postService.addNewWallPostByAuthorId(id, publishDate, dto));
     }
 
+    @Secured("ROLE_USER")
     @PutMapping("block/{id}")
     public ResponseEntity<?> blockPersonById(@PathVariable Integer id) throws BadRequestException400 {    //обработать 400 и 401
         personService.blockPersonById(id, true);
         return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
+    @Secured("ROLE_USER")
     @DeleteMapping("block/{id}")
     public ResponseEntity<?> unblockPersonById(@PathVariable Integer id) throws BadRequestException400 { //обработать 400 и 401
         personService.blockPersonById(id, false);

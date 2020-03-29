@@ -7,14 +7,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import project.dto.dialog.request.DialogUserShortList;
+import project.dto.dialog.response.DialogDto;
 import project.dto.dialog.response.DialogResponseDto;
 import project.dto.dialog.response.DialogsResponseDto;
+import project.dto.dialog.response.MessageDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
 import project.models.Message;
+import project.models.enums.ReadStatus;
 import project.services.MessageService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -42,11 +48,30 @@ public class ApiDialogsController {
         return ResponseEntity.ok().body(answer);
     }
 
+    @Secured("ROLE_USER")
     @PostMapping()
-    public ResponseEntity<?> wcreationDialogue (HttpServletRequest request, @RequestBody DialogUserShortList dialogUserShortList) throws BadRequestException400 {
+    public ResponseEntity<?> creationDialogue (HttpServletRequest request, @RequestBody DialogUserShortList dialogUserShortList) throws BadRequestException400 {
         DialogResponseDto dialogResponseDto = messageService.createDialog(request, dialogUserShortList);
         return ResponseEntity.ok(new ResponseDto<>(dialogResponseDto));
     }
 
+    @Secured("ROLE_USER")
+    @GetMapping("/{id}/messages")
+    public ResponseEntity<?> getMessage(@PathVariable("id") Integer id,
+                                        @RequestParam(name = "query",required = false) String query,
+                                        @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset,
+                                        @RequestParam(name = "itemPerPage", required = false, defaultValue = "20") Integer itemPerPage,
+                                        HttpServletRequest request){
+        MessageDto message = new MessageDto();
+        message.setAuthorId(1);
+        message.setId(1);
+        message.setMessageText("Hello world");
+        message.setReadStatus(ReadStatus.SEND);
+        message.setRecipientId(1);
+        message.setTime(Calendar.getInstance().getTime().getTime());
+        List<MessageDto> messages = new ArrayList<>();
+        messages.add(message);
+        return ResponseEntity.ok(new DialogsResponseDto(messages) );
+    }
 
 }

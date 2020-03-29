@@ -3,6 +3,7 @@ package project.controllers.rest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.LoginRequestDto;
 import project.dto.responseDto.MessageResponseDto;
@@ -31,12 +32,14 @@ public class ApiAuthController {
         this.personService = personService;
     }
 
+
     @PostMapping(value = "login")
     ResponseEntity login(@RequestBody LoginRequestDto loginRequestDto) throws BadRequestException400 {
         ResponseDto responseDto = personService.login(loginRequestDto);
         if(responseDto == null) throw new BadRequestException400();//изменить ошибку
         return ResponseEntity.ok(responseDto);//необходимо оставить, обработать еще ошибки
     }
+
 
     @PostMapping(value = "logout")
     ResponseEntity logout(HttpServletRequest request) throws BadRequestException400 {
