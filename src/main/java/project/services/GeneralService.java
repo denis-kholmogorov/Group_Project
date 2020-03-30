@@ -11,14 +11,26 @@ public class GeneralService {
 
     private ImageRepository imageRepository;
 
-    public Integer saveImage(byte[] arrayImage) {
+    public Integer saveImage(byte[] arrayImage, String type) {
         Image image = new Image();
         image.setImage(arrayImage);
+        image.setType(type);
         Image imageSaved = imageRepository.save(image);
         return imageSaved.getId();
     }
 
-    public Image getImage(Integer id) {
+    public Image findImage(Integer id) {
         return imageRepository.findById(id).orElse(null);
+    }
+
+    public void deleteImage(Integer id) {
+        imageRepository.deleteById(id);
+    }
+
+    public void updateImage(byte[] arrayImage, String type, Integer id) {
+        Image image = findImage(id);
+        image.setImage(arrayImage);
+        image.setType(type);
+        imageRepository.save(image);
     }
  }

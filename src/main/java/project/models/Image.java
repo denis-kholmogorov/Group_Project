@@ -18,4 +18,6 @@ public class Image {
 
     @Lob
     private byte[] image;
+
+    private String type;
 }

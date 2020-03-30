@@ -24,7 +24,7 @@ public class FileUploadResponseDto {
 
     private String fileFormat;
 
-    private Integer bytes;
+    private Long bytes;
 
     private String fileType;
 
