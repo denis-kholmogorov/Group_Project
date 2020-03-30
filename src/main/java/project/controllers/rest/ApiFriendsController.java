@@ -65,7 +65,7 @@ public class ApiFriendsController {
 
     @GetMapping("/request")
     public ResponseEntity getFriendRequests(
-            @RequestParam(required = false) String name, @RequestParam(defaultValue = "0") Integer offset,
+            @RequestParam(required = false, name = "name") String name, @RequestParam(defaultValue = "0") Integer offset,
             @RequestParam(defaultValue = "20") Integer itemPerPage, HttpServletRequest request){
 
         Person person = tokenProvider.getPersonByRequest(request);

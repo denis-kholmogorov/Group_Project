@@ -13,10 +13,12 @@ import project.models.FriendshipStatus;
 import project.models.Person;
 import project.models.enums.FriendshipStatusCode;
 import project.repositories.FriendshipRepository;
+import project.repositories.PersonRepository;
 import project.security.TokenProvider;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -28,6 +30,8 @@ public class FriendshipService {
     private FriendshipRepository friendshipRepository;
     private PersonService personService;
     private TokenProvider tokenProvider;
+    @Autowired
+    private PersonRepository personRepository;
 
     @Autowired
     public FriendshipService(FriendshipRepository friendshipRepository, PersonService personService, TokenProvider tokenProvider) {
@@ -101,7 +105,7 @@ public class FriendshipService {
                 friend = friendship.getDstPerson();
             }
             return friend;
-        }).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
 
         List<Person> friends1 = person.getReceivedFriendshipRequests().stream().map(friendship -> {
             Person friend = null;
@@ -109,11 +113,12 @@ public class FriendshipService {
                 friend = friendship.getSrcPerson();
             }
             return friend;
-        }).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
 
         friends.addAll(friends1);
 
         //List<Person> friends = personRepository.findFriends(person);  // Старая версия. Лаконичная, но медленная
+
         return new ListResponseDto<>((long) friends.size(), offset, itemPerPage, friends);
     }
 
