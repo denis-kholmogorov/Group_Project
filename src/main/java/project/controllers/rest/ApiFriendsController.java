@@ -1,26 +1,37 @@
 package project.controllers.rest;
 
-import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import project.dto.responseDto.ListResponseDto;
-import project.repositories.FriendshipRepository;
+import project.dto.responseDto.ResponseDto;
+import project.models.Friendship;
+import project.models.Person;
+import project.security.TokenProvider;
 import project.services.FriendshipService;
+import project.services.PersonService;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping(value = "/api/vi/friends/")
-@AllArgsConstructor
+@RequestMapping(value = "/api/v1/friends")
+@Slf4j
 public class ApiFriendsController {
 
-    @Autowired
-    private FriendshipRepository friendshipRepository;
     private FriendshipService friendshipService;
+    private TokenProvider tokenProvider;
+    private PersonService personService;
 
-//        @GetMapping
+    @Autowired
+    public ApiFriendsController(FriendshipService friendshipService, TokenProvider tokenProvider, PersonService personService) {
+        this.friendshipService = friendshipService;
+        this.tokenProvider = tokenProvider;
+        this.personService = personService;
+    }
+
+    //        @GetMapping
 //        ResponseEntity<?> friends(@RequestParam(name = "query") String query, FriendParamsDto friendParams) throws EntityValidationException {
 //
 //            ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -37,7 +48,32 @@ public class ApiFriendsController {
 
     @GetMapping
     public ResponseEntity<ListResponseDto> getFriendList(
-            @RequestParam String name, @RequestParam(defaultValue = "0") Integer offset, @RequestParam(defaultValue = "20") Integer itemPerPage) {
-        return ResponseEntity.ok(friendshipService.getFriendList(name, offset, itemPerPage));
+            @RequestParam(required = false) String name, @RequestParam(defaultValue = "0") Integer offset,
+            @RequestParam(defaultValue = "20") Integer itemPerPage, ServletRequest servletRequest) {
+        Person person = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest);
+        return ResponseEntity.ok(friendshipService.getFriendsList(name, offset, itemPerPage, person));
+    }
+
+    @PostMapping("/{id}")
+    public ResponseDto<String> sendFriendRequest(@PathVariable Integer id, HttpServletRequest request) {
+
+        friendshipService.sendFriendshipRequest(id, request);
+        return new ResponseDto<>("ok");
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseDto<String> deleteFriend(@PathVariable Integer id, HttpServletRequest request){
+
+        friendshipService.deleteFriend(id, request);
+        return new ResponseDto<>("ok");
+    }
+
+    @GetMapping("/request")
+    public ResponseEntity<ListResponseDto> getFriendRequests(
+            @RequestParam(required = false) String name, @RequestParam(defaultValue = "0") Integer offset,
+            @RequestParam(defaultValue = "20") Integer itemPerPage, HttpServletRequest request){
+
+        Person person = tokenProvider.getPersonByRequest(request);
+        return ResponseEntity.ok(friendshipService.getFriendsList(name, offset, itemPerPage, person));
     }
 }
