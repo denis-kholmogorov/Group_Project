@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.dto.dialog.request.DialogUserShortList;
+import project.dto.dialog.request.MessageRequestDto;
 import project.dto.dialog.response.DialogDto;
 import project.dto.dialog.response.DialogResponseDto;
 import project.dto.dialog.response.MessageDto;
@@ -14,6 +15,7 @@ import project.handlerExceptions.BadRequestException400;
 import project.models.Dialog;
 import project.models.Message;
 import project.models.Person;
+import project.models.enums.ReadStatus;
 import project.repositories.DialogRepository;
 import project.repositories.MessageRepository;
 import project.repositories.PersonRepository;
@@ -21,6 +23,7 @@ import project.security.TokenProvider;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -54,15 +57,17 @@ public class MessageService {
     public ListResponseDto getAllMessages(String query, Integer offset, Integer itemPerPage,
                                           HttpServletRequest request) throws BadRequestException400 {
         Pageable paging = PageRequest.of((offset / itemPerPage), itemPerPage);
-        //Person person = tokenProvider.getPersonByRequest(request);
+        Person user = tokenProvider.getPersonByRequest(request);
+
+        Integer count = messageRepository.countByRecipientIdAndReadStatus(user.getId(), ReadStatus.SENT);
 
         Iterable<Dialog> dialogList = dialogRepository.findAll();
         List<DialogDto> dialogDtoList = new ArrayList<>();
         dialogList.forEach(dialog -> {
             DialogDto dialogDto = new DialogDto();
             dialogDto.setId(dialog.getId());
-            dialogDto.setUnreadCount(dialog.getUnread().size());
-            Message message = dialog.getListMessage().get(0);
+            dialogDto.setUnreadCount(count);
+            Message message = dialog.getListMessage().get(dialog.getListMessage().size() -1);
             MessageDto messageDto = new MessageDto();
             messageDto.setId(message.getId());
             messageDto.setAuthorId(message.getAuthorId());
@@ -91,10 +96,32 @@ public class MessageService {
         return new DialogResponseDto(id);
     }
 
+    public Integer getCountSendMessage(HttpServletRequest request) throws BadRequestException400 {
+        Person recipient = tokenProvider.getPersonByRequest(request);
+        return messageRepository
+                .countByRecipientIdAndReadStatus(recipient.getId(), ReadStatus.SENT);
+    }
+
     public ListResponseDto getDialogMessages(
             Dialog dialog, Integer offset, Integer itemPerPage, HttpServletRequest servletRequest) {
 
-
         return null;
+    }
+
+    public Message sentMessage(Integer id, MessageRequestDto dto, HttpServletRequest request) throws BadRequestException400 {
+        Person person = tokenProvider.getPersonByRequest(request);
+        Dialog dialog = dialogRepository.findById(id).get();
+        Message message = new Message();
+        message.setTime(new Date());
+        message.setAuthorId(person.getId());
+        message.setRecipientId(person.getId());
+        message.setMessageText(dto.getMessageText());
+        message.setReadStatus(ReadStatus.SENT);
+        message.setDialog(dialog);
+        Message messageSaved = messageRepository.save(message);
+        dialog.getListMessage().add(message);
+        dialogRepository.save(dialog);
+
+        return messageSaved;
     }
 }

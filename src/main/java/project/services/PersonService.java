@@ -223,7 +223,7 @@ public class PersonService {
         String typeImage = file.getContentType().substring(index);
         log.info(typeImage + " тип изображения");
         if(!file.isEmpty()){
-            String rawPath = "C:\\Users\\Nortoza Forhnis\\Downloads\\nginx-1.17.9\\nginx-1.17.9\\html\\static\\img";
+            String rawPath = "/usr/share/nginx/html/static/";
             String fileName = UUID.randomUUID().toString();
             String pathImage = rawPath + fileName + "." + typeImage ;
 

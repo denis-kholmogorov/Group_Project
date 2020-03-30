@@ -6,9 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import project.dto.CountResponseDto;
 import project.dto.dialog.request.DialogUserShortList;
+import project.dto.dialog.request.MessageRequestDto;
 import project.dto.dialog.response.DialogResponseDto;
+import project.dto.dialog.response.MessageDto;
 import project.dto.dialog.response.MessageDto2;
+import project.dto.dialog.response.MessageSetResponseDto;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
@@ -20,7 +24,7 @@ import project.services.MessageService;
 import project.services.PersonService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -59,6 +63,13 @@ public class ApiDialogsController {
     }
 
     @Secured("ROLE_USER")
+    @GetMapping(value = "/unreaded")
+    public ResponseEntity<?> countSentMessage(HttpServletRequest servletRequest) throws BadRequestException400 {
+        CountResponseDto responseDto = new CountResponseDto(messageService.getCountSendMessage(servletRequest));
+        return ResponseEntity.ok(new ResponseDto<>(responseDto));
+    }
+
+    @Secured("ROLE_USER")
     @GetMapping("/{id}/messages")
     public ResponseEntity<?> getMessages(@PathVariable(value = "id") Integer id,
                                         @RequestParam(name = "query",required = false) String query,
@@ -90,8 +101,18 @@ public class ApiDialogsController {
             messageDto.setRecipient(recipient);
             return messageDto;
         }).collect(Collectors.toList());
+        Set<MessageRequestDto> map = new HashSet(messageDtoList);
         return ResponseEntity.ok(
-                new ListResponseDto<>((long) messageDtoList.size(), offset, itemPerPage, messageDtoList));
+                new MessageSetResponseDto<>((long) messageDtoList.size(), offset, itemPerPage, map));
     }
 
+    @Secured("ROLE_USER")
+    @PostMapping("/{id}/messages")
+    public ResponseEntity<?> sentMessage(@PathVariable Integer id,
+                                         @RequestBody MessageRequestDto dto,
+                                         HttpServletRequest request){
+        log.error("Отработал POst message");
+        Message message = messageService.sentMessage(id,dto,request);
+        return ResponseEntity.ok(new ResponseDto<>(message));
+    }
 }

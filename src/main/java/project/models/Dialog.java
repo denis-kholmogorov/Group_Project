@@ -6,10 +6,7 @@ import lombok.ToString;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @Entity
@@ -32,12 +29,6 @@ public class Dialog
     public void removeUser() {
         persons.forEach(person -> person.getDialogs().remove(this));
     }
-
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)   //example
-    @JoinColumn(name = "dialog_id")
-    @Where(clause = "read_status = 'SENT'")
-    private List<Message> unread = new ArrayList<>();
 
     //@JsonIgnore
     //Comparator<Message> comparator = Comparator.comparing(m -> m.getTime().getTime());
