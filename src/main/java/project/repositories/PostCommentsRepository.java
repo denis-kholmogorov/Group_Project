@@ -10,4 +10,6 @@ import java.util.List;
 public interface PostCommentsRepository extends CrudRepository<PostComment, Integer>
 {
     List<PostComment> findAllByPostIdAndIsBlocked(Integer postId, boolean isBlocked);
+
+
 }

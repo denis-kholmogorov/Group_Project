@@ -4,14 +4,23 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+import project.dto.CommentDto;
+import project.dto.CommentModelDto;
 import project.dto.PostDto;
+import project.dto.requestDto.OffsetLimitDto;
 import project.dto.requestDto.PostRequestBodyDto;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
+import project.models.Person;
 import project.models.Post;
+import project.models.PostComment;
+import project.security.TokenProvider;
+import project.services.PostCommentsService;
 import project.services.PostService;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -21,6 +30,8 @@ import static java.util.stream.Collectors.toList;
 @AllArgsConstructor
 public class ApiPostController {
     private PostService postService;
+    private PostCommentsService postCommentsService;
+    private TokenProvider tokenProvider;
 
     @Secured("ROLE_USER")
     @GetMapping("{id}")
@@ -61,5 +72,36 @@ public class ApiPostController {
         return ResponseEntity.ok(new ListResponseDto<>((long) posts.size(), offsetParam, limitParam, listPostsDto));
     }
 
+    @Secured("ROLE_USER")
+    @GetMapping("{id}/comments")
+    public ResponseEntity<?> getAllComments
+            (@PathVariable(value = "id") Integer postId,
+             OffsetLimitDto offsetLimitDto){
+
+        List<CommentDto> commentDtoList = postCommentsService.getListCommentsDto(postId);
+
+        List<ResponseDto<CommentDto>> commentDtoResponseList =
+                commentDtoList.stream().map(ResponseDto::new).collect(toList());
+
+        ListResponseDto<ResponseDto<CommentDto>> commentList = new ListResponseDto<>
+                ((long) commentDtoResponseList.size(), offsetLimitDto.getOffset(), offsetLimitDto.getLimit(),
+                        commentDtoResponseList);
+
+        return ResponseEntity.ok(commentList);
+    }
+
+    @Secured("ROLE_USER")
+    @PostMapping("{id}/comments")
+    public ResponseEntity<ResponseDto<CommentDto>> addNewComent(@PathVariable(value = "id") Integer postId,
+                                                                @RequestBody CommentModelDto commentModelDto,
+                                                                ServletRequest servletRequest){
+
+        Person person = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest);
+        PostComment postComment = postCommentsService.addNewCommentToPost(postId, commentModelDto, person.getId());
+
+        return ResponseEntity.ok
+                (new ResponseDto<>(new CommentDto(commentModelDto,
+                        postComment.getId(), postId, postComment.getTime(), postComment.getAuthorId(), postComment.getIsBlocked())));
+    }
 
 }
