@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
-import project.models.Friendship;
 import project.models.Person;
 import project.security.TokenProvider;
 import project.services.FriendshipService;
@@ -22,13 +21,11 @@ public class ApiFriendsController {
 
     private FriendshipService friendshipService;
     private TokenProvider tokenProvider;
-    private PersonService personService;
 
     @Autowired
-    public ApiFriendsController(FriendshipService friendshipService, TokenProvider tokenProvider, PersonService personService) {
+    public ApiFriendsController(FriendshipService friendshipService, TokenProvider tokenProvider) {
         this.friendshipService = friendshipService;
         this.tokenProvider = tokenProvider;
-        this.personService = personService;
     }
 
     //        @GetMapping
@@ -56,24 +53,23 @@ public class ApiFriendsController {
 
     @PostMapping("/{id}")
     public ResponseDto<String> sendFriendRequest(@PathVariable Integer id, HttpServletRequest request) {
-
         friendshipService.sendFriendshipRequest(id, request);
         return new ResponseDto<>("ok");
     }
 
     @DeleteMapping("/{id}")
     public ResponseDto<String> deleteFriend(@PathVariable Integer id, HttpServletRequest request){
-
         friendshipService.deleteFriend(id, request);
         return new ResponseDto<>("ok");
     }
 
     @GetMapping("/request")
-    public ResponseEntity<ListResponseDto> getFriendRequests(
+    public ResponseEntity getFriendRequests(
             @RequestParam(required = false) String name, @RequestParam(defaultValue = "0") Integer offset,
             @RequestParam(defaultValue = "20") Integer itemPerPage, HttpServletRequest request){
 
         Person person = tokenProvider.getPersonByRequest(request);
-        return ResponseEntity.ok(friendshipService.getFriendsList(name, offset, itemPerPage, person));
+        log.info(person.getLastName());
+        return ResponseEntity.ok(friendshipService.getFriendRequests(name, offset, itemPerPage, person));
     }
 }
