@@ -12,6 +12,7 @@ import project.models.enums.MessagesPermission;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -91,7 +92,7 @@ public class Person {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "persons", fetch = FetchType.LAZY)
-    private Set<Dialog> dialogs;
+    private List<Dialog> dialogs;
 
     @PreRemove
     public void removeUser() {

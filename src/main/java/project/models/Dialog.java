@@ -2,15 +2,19 @@ package project.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
 @ToString(exclude = "listMessage")
+@EqualsAndHashCode(exclude = "listMessage")
 @Table(name = "dialog")
 public class Dialog
 {

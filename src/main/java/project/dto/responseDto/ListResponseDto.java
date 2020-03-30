@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import project.models.ResponseModel;
 
-import java.util.List;
+import java.util.Collection;
 
 @Data
 @AllArgsConstructor
@@ -18,5 +18,5 @@ public class ListResponseDto<T> extends ResponseModel {
 
     private Integer perPage;
 
-    private List<T> data;
+    private Collection<T> data;
 }

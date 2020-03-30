@@ -2,9 +2,12 @@ package project.services;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.models.Dialog;
 import project.repositories.DialogRepository;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -16,4 +19,11 @@ public class DialogService {
         return dialogRepository.findById(id).orElse(null);
     }
 
+    public List<Dialog> getAllDialogs(Pageable pageable) {
+        return dialogRepository.findAll(pageable);
+    }
+
+    public Dialog saveDialog(Dialog dialog) {
+        return dialogRepository.save(dialog);
+    }
 }

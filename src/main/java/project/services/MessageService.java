@@ -16,16 +16,15 @@ import project.models.Dialog;
 import project.models.Message;
 import project.models.Person;
 import project.models.enums.ReadStatus;
-import project.repositories.DialogRepository;
 import project.repositories.MessageRepository;
 import project.repositories.PersonRepository;
 import project.security.TokenProvider;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -39,48 +38,49 @@ public class MessageService {
 
     private PersonRepository personRepository;
 
-    private DialogRepository dialogRepository;
+    private DialogService dialogService;
 
     @Autowired
     public MessageService(MessageRepository messageRepository,
                           TokenProvider tokenProvider,
                           PersonService personService,
                           PersonRepository personRepository,
-                          DialogRepository dialogRepository) {
+                          DialogService dialogService) {
         this.messageRepository = messageRepository;
         this.tokenProvider = tokenProvider;
         this.personService = personService;
         this.personRepository = personRepository;
-        this.dialogRepository = dialogRepository;
+        this.dialogService = dialogService;
     }
 
-    public ListResponseDto getAllMessages(String query, Integer offset, Integer itemPerPage,
-                                          HttpServletRequest request) throws BadRequestException400 {
-        Pageable paging = PageRequest.of((offset / itemPerPage), itemPerPage);
-        Person user = tokenProvider.getPersonByRequest(request);
+    public ListResponseDto<DialogDto> getAllDialogs(String query, Integer offset, Integer itemPerPage,
+                                         HttpServletRequest request) throws BadRequestException400 {
+        //Pageable pageable = PageRequest.of((offset / itemPerPage), itemPerPage);
+        Person person = tokenProvider.getPersonByRequest(request);
 
-        Integer count = messageRepository.countByRecipientIdAndReadStatus(user.getId(), ReadStatus.SENT);
+        Integer count = messageRepository.countByRecipientIdAndReadStatus(person.getId(), ReadStatus.SENT);
 
-        Iterable<Dialog> dialogList = dialogRepository.findAll();
-        List<DialogDto> dialogDtoList = new ArrayList<>();
-        dialogList.forEach(dialog -> {
+        int toIndex = offset + itemPerPage;
+        int listSize =  person.getDialogs().size();
+        List<Dialog> dialogList = person.getDialogs().subList(offset, Math.min(toIndex, listSize)); //dialogService.getAllDialogs(paging);
+        List<DialogDto> dialogDtoList = dialogList.stream().map(dialog -> {
             DialogDto dialogDto = new DialogDto();
             dialogDto.setId(dialog.getId());
             dialogDto.setUnreadCount(count);
-            Message message = dialog.getListMessage().get(dialog.getListMessage().size() -1);
+            Message message = dialog.getListMessage().get(dialog.getListMessage().size() - 1);
             MessageDto messageDto = new MessageDto();
             messageDto.setId(message.getId());
             messageDto.setAuthorId(message.getAuthorId());
             messageDto.setMessageText(message.getMessageText());
             messageDto.setTime(message.getTime());
             messageDto.setReadStatus(message.getReadStatus());
-            Person person = personService.findPersonById(message.getRecipientId());
-            messageDto.setRecipient(person);
+            Person recipient = personService.findPersonById(message.getRecipientId());
+            messageDto.setRecipient(recipient);
             dialogDto.setMessage(messageDto);
-            dialogDtoList.add(dialogDto);
-        });
+            return dialogDto;
+        }).collect(Collectors.toList());
 
-        return new ListResponseDto((long) dialogDtoList.size(), offset, itemPerPage, dialogDtoList);
+        return new ListResponseDto<>((long) dialogDtoList.size(), offset, itemPerPage, dialogDtoList);
     }
 
     public DialogResponseDto createDialog(HttpServletRequest request, DialogUserShortList userIds) throws BadRequestException400 {
@@ -91,7 +91,7 @@ public class MessageService {
         Iterable<Person> personIterable = personRepository.findAllById(userIds.getUserIds());
 
         dialog.setPersons((Set<Person>) personIterable);
-        Integer id = dialogRepository.save(dialog).getId();
+        Integer id = dialogService.saveDialog(dialog).getId();
 
         return new DialogResponseDto(id);
     }
@@ -103,14 +103,28 @@ public class MessageService {
     }
 
     public ListResponseDto getDialogMessages(
-            Dialog dialog, Integer offset, Integer itemPerPage, HttpServletRequest servletRequest) {
+            Integer id, Integer offset, Integer itemPerPage, HttpServletRequest servletRequest) {
 
-        return null;
+        Pageable pageable = PageRequest.of((offset / itemPerPage), itemPerPage);
+        List<Message> dialogMessages = messageRepository.findAllByDialogId(id, pageable);
+        List<MessageDto> messageDtoList = dialogMessages.stream().distinct().map(message -> {
+            MessageDto messageDto = new MessageDto();
+            messageDto.setId(message.getId());
+            //Person author = personService.findPersonById(message.getRecipientId());
+            messageDto.setAuthorId(message.getAuthorId());
+            messageDto.setMessageText(message.getMessageText());
+            messageDto.setTime(message.getTime());
+            messageDto.setReadStatus(message.getReadStatus());
+            Person recipient = personService.findPersonById(message.getRecipientId());
+            messageDto.setRecipient(recipient);
+            return messageDto;
+        }).collect(Collectors.toList());
+        return new ListResponseDto<>((long) messageDtoList.size(), offset, itemPerPage, messageDtoList);
     }
 
     public Message sentMessage(Integer id, MessageRequestDto dto, HttpServletRequest request) throws BadRequestException400 {
         Person person = tokenProvider.getPersonByRequest(request);
-        Dialog dialog = dialogRepository.findById(id).get();
+        Dialog dialog = dialogService.findById(id);
         Message message = new Message();
         message.setTime(new Date());
         message.setAuthorId(person.getId());
@@ -120,7 +134,7 @@ public class MessageService {
         message.setDialog(dialog);
         Message messageSaved = messageRepository.save(message);
         dialog.getListMessage().add(message);
-        dialogRepository.save(dialog);
+        dialogService.saveDialog(dialog);
 
         return messageSaved;
     }
