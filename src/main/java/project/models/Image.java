@@ -13,7 +13,7 @@ import javax.persistence.Lob;
 public class Image {
 
     @Id
-    @GeneratedValue(strategy =  GenerationType.AUTO)
+    @GeneratedValue(strategy =  GenerationType.IDENTITY)
     private Integer id;
 
     @Lob
