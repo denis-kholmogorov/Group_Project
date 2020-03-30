@@ -10,7 +10,11 @@ import java.util.Date;
 @AllArgsConstructor
 public class CommentDto {
 
-    private CommentModelDto commentModel;
+   // private CommentModelDto commentModel;
+
+    private Integer parentId;
+
+    private String commentText;
 
     private Integer id;
 

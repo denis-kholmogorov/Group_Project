@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import project.dto.CommentDto;
 import project.dto.CommentModelDto;
 import project.dto.PostDto;
-import project.dto.requestDto.OffsetLimitDto;
 import project.dto.requestDto.PostRequestBodyDto;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
@@ -76,16 +75,13 @@ public class ApiPostController {
     @GetMapping("{id}/comments")
     public ResponseEntity<?> getAllComments
             (@PathVariable(value = "id") Integer postId,
-             OffsetLimitDto offsetLimitDto){
+             @RequestParam(required = false) Integer offsetParam,
+             @RequestParam(required = false) Integer limitParam){
 
         List<CommentDto> commentDtoList = postCommentsService.getListCommentsDto(postId);
 
-        List<ResponseDto<CommentDto>> commentDtoResponseList =
-                commentDtoList.stream().map(ResponseDto::new).collect(toList());
-
-        ListResponseDto<ResponseDto<CommentDto>> commentList = new ListResponseDto<>
-                ((long) commentDtoResponseList.size(), offsetLimitDto.getOffset(), offsetLimitDto.getLimit(),
-                        commentDtoResponseList);
+        ListResponseDto<CommentDto> commentList = new ListResponseDto<>((long)commentDtoList.size(), offsetParam,
+                limitParam, commentDtoList);
 
         return ResponseEntity.ok(commentList);
     }
@@ -99,8 +95,9 @@ public class ApiPostController {
         Person person = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest);
         PostComment postComment = postCommentsService.addNewCommentToPost(postId, commentModelDto, person.getId());
 
+
         return ResponseEntity.ok
-                (new ResponseDto<>(new CommentDto(commentModelDto,
+                (new ResponseDto<>(new CommentDto(commentModelDto.getParentId(), commentModelDto.getCommentText(),
                         postComment.getId(), postId, postComment.getTime(), postComment.getAuthorId(), postComment.getIsBlocked())));
     }
 
