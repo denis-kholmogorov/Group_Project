@@ -33,8 +33,6 @@ public class ApiGeneralController {
         return ResponseEntity.ok(postService.findAllPosts(name, offset, itemPerPage));
     }
 
-
-
     @PostMapping("storage")
     public ResponseEntity<FileUploadResponseDto> downloadImage(
             @RequestParam("type") String type, @RequestParam("file") MultipartFile file, HttpServletRequest request) {
@@ -43,4 +41,5 @@ public class ApiGeneralController {
 
         return ResponseEntity.ok().body(responseDto);
     }
+
 }

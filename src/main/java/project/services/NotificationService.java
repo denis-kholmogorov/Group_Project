@@ -14,6 +14,4 @@ public class NotificationService {
     public NotificationService(NotificationRepository notificationRepository) {
         this.notificationRepository = notificationRepository;
     }
-
-
 }
