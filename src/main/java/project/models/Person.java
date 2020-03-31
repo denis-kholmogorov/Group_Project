@@ -87,12 +87,20 @@ public class Person {
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_roles",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+            inverseJoinColumns =@JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Set<Role> roles = new HashSet<>();
 
     @JsonIgnore
     @ManyToMany(mappedBy = "persons", fetch = FetchType.LAZY)
     private List<Dialog> dialogs;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "srcPerson")
+    private List<Friendship> sentFriendshipRequests = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "dstPerson")
+    private List<Friendship> receivedFriendshipRequests = new ArrayList<>();
 
     @PreRemove
     public void removeUser() {

@@ -1,18 +1,19 @@
 package project.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import project.repositories.NotificationRepository;
+import project.models.NotificationType;
+import project.models.enums.NotificationTypeEnum;
+import project.repositories.NotificationTypeRepository;
 
 @Service
+@AllArgsConstructor
 public class NotificationTypeService {
 
-    private NotificationRepository notificationRepository;
+    private NotificationTypeRepository notificationTypeRepository;
 
-    @Autowired
-    public NotificationTypeService(NotificationRepository notificationRepository) {
-        this.notificationRepository = notificationRepository;
+
+    public NotificationType findByCode(NotificationTypeEnum code) {
+        return notificationTypeRepository.findByCode(code);
     }
-
-
 }

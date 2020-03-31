@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.PostRequestBodyTagsDto;
 import project.dto.requestDto.UpdatePersonDto;
+import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
@@ -23,6 +24,7 @@ import project.services.PostService;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -37,9 +39,8 @@ public class ApiUsersController {
     @Secured("ROLE_USER")
     @GetMapping("me")
     public ResponseEntity<?> getAuthUser(ServletRequest servletRequest) throws UnauthorizationException401 {
-
         Person person = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest);
-        log.warn("Есть аутентификации");
+
         person.setLastOnlineTime(new Date());
         return ResponseEntity.ok(new ResponseDto<>(person));
     }
@@ -101,4 +102,14 @@ public class ApiUsersController {
         return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
+    /**
+     * Тестовый контроллер для нахождения людей по имени для добавления в друзья
+     * Можно удалить, когда будет нормальный поиск
+     */
+    @GetMapping("/search")
+    public ResponseEntity<ListResponseDto> search(@RequestParam(name = "first_name") String name, @RequestParam(defaultValue = "0") Integer offset,
+                                                  @RequestParam(defaultValue = "20") Integer itemPerPage) {
+
+        return ResponseEntity.ok(personService.search(name, offset, itemPerPage));
+    }
 }

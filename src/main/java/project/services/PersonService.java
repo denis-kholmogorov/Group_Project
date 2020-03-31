@@ -1,6 +1,5 @@
 package project.services;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,6 +9,7 @@ import project.dto.requestDto.LoginRequestDto;
 import project.dto.requestDto.PasswordSetDto;
 import project.dto.requestDto.RegistrationRequestDto;
 import project.dto.requestDto.UpdatePersonDto;
+import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.PersonDtoWithToken;
 import project.dto.responseDto.ResponseDto;
@@ -29,11 +29,7 @@ import project.services.email.EmailService;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -78,6 +74,7 @@ public class PersonService {
 //        personRepository.save(person);
 //
 //    }
+
 
     public Boolean registrationPerson(RegistrationRequestDto dto) throws BadRequestException400 {
         Person exist = personRepository.findPersonByEmail(dto.getEmail()).orElse(null);
@@ -231,9 +228,22 @@ public class PersonService {
         person.setCity(dto.getCity());
         person.setCountry(dto.getCountry());
         person.setMessagesPermission(MessagesPermission.ALL);
-       // person.setMessagesPermission(dto.getMessagePermission());
+        // person.setMessagesPermission(dto.getMessagePermission());
         personRepository.save(person);
         return person;
+    }
+
+
+
+    //=================================================================================================================
+
+    /**
+     * Тестовый метод для нахождения людей по имени для добавления в друзья
+     * Можно удалить, когда будет нормальный поиск
+     */
+    public ListResponseDto search(String name, Integer offset, Integer itemPerPage){
+        List<Person> people = personRepository.findAllByFirstName(name);
+        return new ListResponseDto<>((long) people.size(), offset, itemPerPage, people);
     }
 
     public void updatePhoto(Person person, String url) {

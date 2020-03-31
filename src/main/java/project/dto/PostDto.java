@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import project.models.Person;
 
+import javax.persistence.Column;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
 public class PostDto {
     private Integer id;
 
+    @Column(updatable = false)
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Date time;
 
