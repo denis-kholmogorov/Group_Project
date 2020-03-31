@@ -12,7 +12,6 @@ import project.dto.requestDto.LoginRequestDto;
 import project.dto.requestDto.PasswordSetDto;
 import project.dto.requestDto.RegistrationRequestDto;
 import project.dto.requestDto.UpdatePersonDto;
-import project.dto.responseDto.FileUploadResponseDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.PersonDtoWithToken;
 import project.dto.responseDto.ResponseDto;
@@ -23,20 +22,20 @@ import project.models.Role;
 import project.models.Token;
 import project.models.VerificationToken;
 import project.models.enums.MessagesPermission;
+import project.models.util.entity.ImagePath;
 import project.repositories.PersonRepository;
 import project.repositories.RoleRepository;
 import project.repositories.TokenRepository;
 import project.security.TokenProvider;
 import project.services.email.EmailService;
 
-import javax.imageio.ImageIO;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -66,7 +65,8 @@ public class PersonService {
     @Autowired
     RoleRepository roleRepository;
 
-
+    @Autowired
+    private ImagePath imagePath;
 
     //    @PostConstruct
 //    public void init() {
@@ -80,7 +80,6 @@ public class PersonService {
 //        personRepository.save(person);
 //
 //    }
-
 
     public Boolean registrationPerson(RegistrationRequestDto dto) throws BadRequestException400 {
         Person exist = personRepository.findPersonByEmail(dto.getEmail()).orElse(null);
@@ -101,6 +100,7 @@ public class PersonService {
 
         person.setEmail(dto.getEmail());
         person.setPassword(encoder.encode(dto.getPasswd1()));
+        person.setPhoto(imagePath.getDefaultImagePath());
         person.setFirstName(dto.getFirstName());
         person.setLastName(dto.getLastName());
         person.setRegDate(new Date());
@@ -215,43 +215,6 @@ public class PersonService {
         return true;
     }
 
-    @SneakyThrows
-    public FileUploadResponseDto downloadImage(String type, MultipartFile file, HttpServletRequest request) throws BadRequestException400 {
-
-        Person person = tokenProvider.getPersonByRequest(request);
-        int index = file.getContentType().indexOf("/") + 1;
-        String typeImage = file.getContentType().substring(index);
-        log.info(typeImage + " тип изображения");
-        if(!file.isEmpty()){
-            String rawPath = "/usr/share/nginx/html/static/";
-            String fileName = UUID.randomUUID().toString();
-            String pathImage = rawPath + fileName + "." + typeImage ;
-
-            ByteArrayInputStream bais = new ByteArrayInputStream(file.getBytes());// получаем байты из изображения
-            BufferedImage bi = ImageIO.read(bais); // собираем байты в картинку
-            ImageIO.write(bi, typeImage,new File(pathImage));
-            log.info("Сохраненный файл " + pathImage);
-
-            int indexPhoto = pathImage.indexOf("static")-1;
-            String pathPhoto = pathImage.substring(indexPhoto);
-            person.setPhoto(pathPhoto);
-            personRepository.save(person);
-
-            return FileUploadResponseDto.builder()
-                    .id(person.getId().toString())
-                    .ownerId(person.getId())
-                    .fileName(fileName)
-                    .bytes(file.getBytes().length)
-                    .fileFormat(typeImage)
-                    .createdAt(new Date().getTime())
-                    .fileType(type)
-                    .rawFileURL(pathImage)
-                    .relativeFilePath(pathPhoto)
-                    .build();
-        }
-        return null;
-    }
-
     public void deletePersonByEmail(String email){
         Person person = findPersonByEmail(email);
         if(person != null){
@@ -280,5 +243,10 @@ public class PersonService {
        // person.setMessagesPermission(dto.getMessagePermission());
         personRepository.save(person);
         return person;
+    }
+
+    public void updatePhoto(Person person, String url) {
+        person.setPhoto(url);
+        personRepository.save(person);
     }
 }
