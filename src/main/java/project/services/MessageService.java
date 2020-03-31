@@ -16,6 +16,7 @@ import project.models.Dialog;
 import project.models.Message;
 import project.models.Person;
 import project.models.enums.ReadStatus;
+import project.repositories.DialogRepository;
 import project.repositories.MessageRepository;
 import project.repositories.PersonRepository;
 import project.security.TokenProvider;
@@ -38,17 +39,21 @@ public class MessageService {
 
     private DialogService dialogService;
 
+    private DialogRepository dialogRepository;
+
     @Autowired
     public MessageService(MessageRepository messageRepository,
                           TokenProvider tokenProvider,
                           PersonService personService,
                           PersonRepository personRepository,
-                          DialogService dialogService) {
+                          DialogService dialogService,
+                          DialogRepository dialogRepository) {
         this.messageRepository = messageRepository;
         this.tokenProvider = tokenProvider;
         this.personService = personService;
         this.personRepository = personRepository;
         this.dialogService = dialogService;
+        this.dialogRepository = dialogRepository;
     }
 
     public ListResponseDto<DialogDto> getAllDialogs(String query, Integer offset, Integer itemPerPage,
@@ -67,7 +72,8 @@ public class MessageService {
             Message message = dialog.getListMessage().get(dialog.getListMessage().size() - 1);
             MessageDto messageDto = new MessageDto();
             messageDto.setId(message.getId());
-            messageDto.setAuthorId(message.getAuthorId());
+            messageDto.setAuthor(personRepository.findById(message.getAuthorId()).get());
+            //messageDto.setAuthorId(message.getAuthorId());
             messageDto.setMessageText(message.getMessageText());
             messageDto.setTime(message.getTime());
             messageDto.setReadStatus(message.getReadStatus());
@@ -108,7 +114,7 @@ public class MessageService {
             MessageDto messageDto = new MessageDto();
             messageDto.setId(message.getId());
             //Person author = personService.findPersonById(message.getRecipientId());
-            messageDto.setAuthorId(message.getAuthorId());
+            messageDto.setAuthor(personRepository.findById(message.getAuthorId()).get());
             messageDto.setMessageText(message.getMessageText());
             messageDto.setTime(message.getTime());
             messageDto.setReadStatus(message.getReadStatus());
@@ -127,8 +133,8 @@ public class MessageService {
         personList.remove(person);
         Message message = new Message();
         message.setTime(new Date());
-        message.setAuthorId(person.getId());
-        message.setRecipientId(personList.get(0).getId());
+        message.setAuthorId(personList.get(0).getId());
+        message.setRecipientId(person.getId());
         message.setMessageText(dto.getMessageText());
         message.setReadStatus(ReadStatus.SENT);
         message.setDialog(dialog);
@@ -137,5 +143,13 @@ public class MessageService {
         dialogService.saveDialog(dialog);
 
         return messageSaved;
+    }
+
+    public void readMessage(Integer dialogId, Integer messageId, HttpServletRequest request){
+       Message message = messageRepository.findByIdAndDialogId(messageId, dialogId).orElseThrow(BadRequestException400::new);
+       log.info(message.getMessageText() + " Прочитана");
+       message.setReadStatus(ReadStatus.READ);
+       messageRepository.save(message);
+
     }
 }

@@ -11,6 +11,7 @@ import project.dto.dialog.request.CreateDialogDto;
 import project.dto.dialog.request.MessageRequestDto;
 import project.dto.dialog.response.DialogResponseDto;
 import project.dto.responseDto.ListResponseDto;
+import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
 import project.models.Message;
@@ -80,5 +81,14 @@ public class ApiDialogsController {
         log.error("Отработал POst message");
         Message message = messageService.sentMessage(id,dto,request);
         return ResponseEntity.ok(new ResponseDto<>(message));
+    }
+
+    @Secured("ROLE_ADMIN")
+    @PutMapping("{dialog_id}/messages/{message_id}/read")
+    public ResponseEntity<?> readMessage(@PathVariable(value = "dialog_id") Integer dialogId,
+                                         @PathVariable(value = "message_id") Integer messageId,
+                                         HttpServletRequest request){
+        messageService.readMessage(dialogId, messageId, request);
+        return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 }

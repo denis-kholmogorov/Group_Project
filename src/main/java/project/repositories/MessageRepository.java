@@ -8,6 +8,7 @@ import project.models.Message;
 import project.models.enums.ReadStatus;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MessageRepository extends CrudRepository<Message, Integer>
@@ -18,4 +19,6 @@ public interface MessageRepository extends CrudRepository<Message, Integer>
     Integer countByRecipientIdAndReadStatus(Integer recipientId, ReadStatus readStatus);
 
     List<Message> findAllByDialogId(Integer dialogId, Pageable pageable);
+
+    Optional<Message> findByIdAndDialogId(Integer messageId, Integer dialogId);
 }
