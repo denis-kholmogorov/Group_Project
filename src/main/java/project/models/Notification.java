@@ -2,6 +2,7 @@ package project.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -9,6 +10,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "notification")
+@EqualsAndHashCode(exclude = "person")
 public class Notification
 {
     @Id
@@ -22,8 +24,9 @@ public class Notification
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Date sentTime;
 
-    @Column(name = "person_id")
-    private Integer personId;
+    @JoinColumn(name = "person_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Person person;
 
     @Column(name = "entity_id")
     private Integer entityId;

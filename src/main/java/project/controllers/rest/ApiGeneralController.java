@@ -89,12 +89,13 @@ public class ApiGeneralController {
         return ResponseEntity.ok(new ResponseDto<>(response));
     }
 
+    @GetMapping("notifications")
     public ResponseEntity<?> getAllNotifications(@RequestParam(defaultValue = "0") Integer offset,
                                                  @RequestParam(defaultValue = "20") Integer itemPerPage,
                                                  HttpServletRequest servletRequest) {
         Person person = tokenProvider.getPersonByRequest(servletRequest);
         return ResponseEntity.ok(
-                notificationService.findAllNotificationsByPersonId(person.getId(), offset, itemPerPage));
+                notificationService.findAllNotificationsByPersonId(person, offset, itemPerPage));
     }
 
     @GetMapping(value = "storage/{id}")

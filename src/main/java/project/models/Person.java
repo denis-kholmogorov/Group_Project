@@ -12,7 +12,7 @@ import javax.persistence.*;
 import java.util.*;
 
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"notificationList", "sentFriendshipRequests", "receivedFriendshipRequests"})
 @Entity
 @Table(name = "person")
 public class Person {
@@ -84,6 +84,10 @@ public class Person {
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns =@JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Set<Role> roles = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "person")
+    private List<Notification> notificationList = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "srcPerson")
