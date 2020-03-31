@@ -6,7 +6,8 @@ public enum NotificationTypeEnum {
 //    POST_COMMENT("Комментарий к посту"),
 //    COMMENT_COMMENT("Ответ на комментарий"),
 //    FRIEND_REQUEST("Запрос дружбы"),
-//    MESSAGE("Личное сообщение");
+//    MESSAGE("Личное сообщение")
+//    FRIEND_BIRTHDAY("День рождения друга");
 //
 //    private final String code2Name;
 //
@@ -22,7 +23,8 @@ public enum NotificationTypeEnum {
     POST_COMMENT,
     COMMENT_COMMENT,
     FRIEND_REQUEST,
-    MESSAGE
+    MESSAGE,
+    FRIEND_BIRTHDAY
 }
 
 
