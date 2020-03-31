@@ -29,36 +29,32 @@ import java.util.stream.Collectors;
 @Service
 public class MessageService {
 
-    private MessageRepository messageRepository;
+    private final MessageRepository messageRepository;
 
-    private TokenProvider tokenProvider;
+    private final TokenProvider tokenProvider;
 
-    private PersonService personService;
+    private final PersonService personService;
 
-    private PersonRepository personRepository;
+    private final PersonRepository personRepository;
 
-    private DialogService dialogService;
-
-    private DialogRepository dialogRepository;
+    private final DialogRepository dialogRepository;
 
     @Autowired
     public MessageService(MessageRepository messageRepository,
                           TokenProvider tokenProvider,
                           PersonService personService,
                           PersonRepository personRepository,
-                          DialogService dialogService,
                           DialogRepository dialogRepository) {
         this.messageRepository = messageRepository;
         this.tokenProvider = tokenProvider;
         this.personService = personService;
         this.personRepository = personRepository;
-        this.dialogService = dialogService;
         this.dialogRepository = dialogRepository;
     }
 
     public ListResponseDto<DialogDto> getAllDialogs(String query, Integer offset, Integer itemPerPage,
                                          HttpServletRequest request) throws BadRequestException400 {
-        Pageable pageable = PageRequest.of((offset / itemPerPage), itemPerPage);
+       // Pageable pageable = PageRequest.of((offset / itemPerPage), itemPerPage);
         Person person = tokenProvider.getPersonByRequest(request);
         //Integer count = messageRepository.countByRecipientIdAndReadStatus(person.getId(), ReadStatus.SENT);
 
@@ -72,7 +68,7 @@ public class MessageService {
             Message message = dialog.getListMessage().get(dialog.getListMessage().size() - 1);
             MessageDto messageDto = new MessageDto();
             messageDto.setId(message.getId());
-            messageDto.setAuthor(personRepository.findById(message.getAuthorId()).get());
+            messageDto.setAuthor(personRepository.findById(message.getAuthorId()).orElseThrow(BadRequestException400::new));
             //messageDto.setAuthorId(message.getAuthorId());
             messageDto.setMessageText(message.getMessageText());
             messageDto.setTime(message.getTime());
@@ -87,15 +83,14 @@ public class MessageService {
     }
 
     public DialogResponseDto createDialog(HttpServletRequest request, CreateDialogDto userIds) throws BadRequestException400 {
-        userIds.getUserIds().forEach(id->log.info(id+""));
         Person person = tokenProvider.getPersonByRequest(request); // как этого чувака привязать к диалогам
         Dialog dialog = new Dialog();
 
         Iterable<Person> personIterable = personRepository.findAllById(userIds.getUserIds());
 
         dialog.setPersons((Set<Person>) personIterable);
-        Integer id = dialogService.saveDialog(dialog).getId();
-
+        dialog.getPersons().add(person);
+        Integer id = dialogRepository.save(dialog).getId();
         return new DialogResponseDto(id);
     }
 
@@ -127,7 +122,7 @@ public class MessageService {
 
     public Message sentMessage(Integer id, MessageRequestDto dto, HttpServletRequest request) throws BadRequestException400 {
         Person person = tokenProvider.getPersonByRequest(request);
-        Dialog dialog = dialogService.findById(id);
+        Dialog dialog = dialogRepository.findById(id).orElseThrow(BadRequestException400::new);
         Set<Person> personsSet = dialog.getPersons();
         List<Person> personList = new ArrayList<>(personsSet);
         personList.remove(person);
@@ -140,7 +135,7 @@ public class MessageService {
         message.setDialog(dialog);
         Message messageSaved = messageRepository.save(message);
         dialog.getListMessage().add(message);
-        dialogService.saveDialog(dialog);
+        dialogRepository.save(dialog);
 
         return messageSaved;
     }

@@ -15,15 +15,5 @@ import java.util.List;
 public class DialogService {
     private DialogRepository dialogRepository;
 
-    public Dialog findById(Integer id) {
-        return dialogRepository.findById(id).orElse(null);
-    }
 
-    public List<Dialog> getAllDialogs(Pageable pageable) {
-        return dialogRepository.findAll(pageable);
-    }
-
-    public Dialog saveDialog(Dialog dialog) {
-        return dialogRepository.save(dialog);
-    }
 }

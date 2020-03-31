@@ -27,14 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 @AllArgsConstructor
 public class ApiDialogsController {
 
-    @Autowired
-    PersonService personService;
-
-    @Autowired
+     @Autowired
     MessageService messageService;
-
-    @Autowired
-    DialogService dialogService;
 
     @Secured("ROLE_USER")
     @GetMapping()
