@@ -9,6 +9,9 @@ import project.dto.PostDto;
 import project.dto.responseDto.FileUploadResponseDto;
 import project.dto.responseDto.ListResponseDto;
 import project.handlerExceptions.BadRequestException400;
+import project.models.Person;
+import project.security.TokenProvider;
+import project.services.NotificationService;
 import project.services.PersonService;
 import project.services.PostService;
 
@@ -23,6 +26,8 @@ public class ApiGeneralController {
 
     private PostService postService;
     private PersonService personService;
+    private NotificationService notificationService;
+    private TokenProvider tokenProvider;
 
     @GetMapping("feeds")
     public ResponseEntity<ListResponseDto<PostDto>> feeds(
@@ -42,4 +47,11 @@ public class ApiGeneralController {
         return ResponseEntity.ok().body(responseDto);
     }
 
+    public ResponseEntity<?> getAllNotifications(@RequestParam(defaultValue = "0") Integer offset,
+                                                 @RequestParam(defaultValue = "20") Integer itemPerPage,
+                                                 HttpServletRequest servletRequest) {
+        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        return ResponseEntity.ok(
+                notificationService.findAllNotificationsByPersonId(person.getId(), offset, itemPerPage));
+    }
 }

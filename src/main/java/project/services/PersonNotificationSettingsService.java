@@ -2,7 +2,7 @@ package project.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import project.dto.requestDto.NotificationSettingDto;
+import project.dto.responseDto.NotificationSettingsResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.models.NotificationType;
 import project.models.PersonNotificationSetting;
@@ -18,11 +18,15 @@ public class PersonNotificationSettingsService {
 
     PersonNotificationSettingsRepository personNotificationSettingsRepository;
 
-    public ResponseDto<List<NotificationSettingDto>> findAllByPersonId(Integer personId) {
+    public ResponseDto<List<NotificationSettingsResponseDto>> findAllByPersonId(Integer personId) {
         List<PersonNotificationSetting> settingList = personNotificationSettingsRepository.findAllByPersonId(personId);
-        List<NotificationSettingDto> dtoSettingList = settingList.stream()
-                .map(setting -> new NotificationSettingDto(
-                        setting.getNotificationType().getCode(), setting.getEnable())).collect(toList());
+        List<NotificationSettingsResponseDto> dtoSettingList = settingList.stream().map(
+                setting -> new NotificationSettingsResponseDto(
+                        "",
+                        setting.getNotificationType().getName(),
+                        setting.getNotificationType().getCode(),
+                        setting.getEnable()))
+                .collect(toList());
         return new ResponseDto<>(dtoSettingList);
     }
 
