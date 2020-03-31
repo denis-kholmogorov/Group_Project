@@ -4,15 +4,15 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
 import project.models.enums.MessagesPermission;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
+@EqualsAndHashCode
 @Entity
 @Table(name = "person")
 public class Person {
@@ -84,6 +84,14 @@ public class Person {
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns =@JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Set<Role> roles = new HashSet<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "srcPerson")
+    private List<Friendship> sentFriendshipRequests = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "dstPerson")
+    private List<Friendship> receivedFriendshipRequests = new ArrayList<>();
 
     @PreRemove
     public void removeUser() {

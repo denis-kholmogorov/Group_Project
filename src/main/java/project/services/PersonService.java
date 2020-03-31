@@ -11,16 +11,11 @@ import project.dto.requestDto.LoginRequestDto;
 import project.dto.requestDto.PasswordSetDto;
 import project.dto.requestDto.RegistrationRequestDto;
 import project.dto.requestDto.UpdatePersonDto;
-import project.dto.responseDto.FileUploadResponseDto;
-import project.dto.responseDto.MessageResponseDto;
-import project.dto.responseDto.PersonDtoWithToken;
-import project.dto.responseDto.ResponseDto;
+import project.dto.responseDto.*;
 import project.handlerExceptions.BadRequestException400;
 import project.handlerExceptions.UnauthorizationException401;
-import project.models.Person;
-import project.models.Role;
-import project.models.Token;
-import project.models.VerificationToken;
+import project.models.*;
+import project.models.enums.FriendshipStatusCode;
 import project.models.enums.MessagesPermission;
 import project.repositories.PersonRepository;
 import project.repositories.RoleRepository;
@@ -34,8 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -269,8 +264,21 @@ public class PersonService {
         person.setCity(dto.getCity());
         person.setCountry(dto.getCountry());
         person.setMessagesPermission(MessagesPermission.ALL);
-       // person.setMessagesPermission(dto.getMessagePermission());
+        // person.setMessagesPermission(dto.getMessagePermission());
         personRepository.save(person);
         return person;
+    }
+
+
+
+    //=================================================================================================================
+
+    /**
+     * Тестовый метод для нахождения людей по имени для добавления в друзья
+     * Можно удалить, когда будет нормальный поиск
+     */
+    public ListResponseDto search(String name, Integer offset, Integer itemPerPage){
+        List<Person> people = personRepository.findAllByFirstName(name);
+        return new ListResponseDto<>((long) people.size(), offset, itemPerPage, people);
     }
 }

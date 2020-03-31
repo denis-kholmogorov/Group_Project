@@ -11,6 +11,7 @@ import java.util.Date;
 @Entity
 @Table(name = "friendship_status")
 public class FriendshipStatus {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
@@ -22,7 +23,4 @@ public class FriendshipStatus {
 
     @Enumerated(EnumType.STRING)
     private FriendshipStatusCode code;
-
-//    @OneToOne(mappedBy = "statusId")
-//    private Friendship friendship;
 }

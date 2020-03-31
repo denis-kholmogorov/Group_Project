@@ -8,18 +8,20 @@ import javax.persistence.*;
 @Entity
 @Table(name = "friendship")
 public class Friendship {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    //@OneToOne(cascade = CascadeType.ALL)
-    //@JoinColumn(name = "status_id")
-    @Column(name = "status_id")
-    private Integer statusId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "status_id")
+    private FriendshipStatus status;
 
-    @Column(name = "src_person_id")
-    private Integer personIdWhoSendFriendship;
+    @JoinColumn(name = "src_person_id", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Person srcPerson;
 
-    @Column(name = "dst_person_id")
-    private Integer personIdWhoTakeFriendship;
+    @JoinColumn(name = "dst_person_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Person dstPerson;
 }

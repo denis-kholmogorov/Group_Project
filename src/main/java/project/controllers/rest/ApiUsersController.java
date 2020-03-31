@@ -5,9 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.PostRequestBodyTagsDto;
 import project.dto.requestDto.UpdatePersonDto;
+import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
@@ -20,6 +22,7 @@ import project.services.PostService;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -43,7 +46,7 @@ public class ApiUsersController {
     @Secured("ROLE_USER")
     @PutMapping("me")
     public ResponseEntity<?> personEditBody(@RequestBody UpdatePersonDto updatePersonDto,
-                                                 HttpServletRequest request) throws UnauthorizationException401
+                                            HttpServletRequest request) throws UnauthorizationException401
     {
         Person person = personService.editBody(updatePersonDto, request);
         person.setLastOnlineTime(new Date());
@@ -94,4 +97,14 @@ public class ApiUsersController {
         return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
+    /**
+     * Тестовый контроллер для нахождения людей по имени для добавления в друзья
+     * Можно удалить, когда будет нормальный поиск
+     */
+    @GetMapping("/search")
+    public ResponseEntity<ListResponseDto> search(@RequestParam(name = "first_name") String name, @RequestParam(defaultValue = "0") Integer offset,
+                                                  @RequestParam(defaultValue = "20") Integer itemPerPage) {
+
+        return ResponseEntity.ok(personService.search(name, offset, itemPerPage));
+    }
 }
