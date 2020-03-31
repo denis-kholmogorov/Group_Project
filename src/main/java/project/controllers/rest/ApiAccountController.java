@@ -36,7 +36,7 @@ public class ApiAccountController {
     public ResponseEntity<ResponseDto<MessageResponseDto>> register(@RequestBody RegistrationRequestDto dto) throws BadRequestException400 {
         log.info("контроллер Register отработал");
         personService.registrationPerson(dto);
-        return ResponseEntity.ok(new ResponseDto(new MessageResponseDto()));
+        return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
     @PutMapping(value = "password/recovery")

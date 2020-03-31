@@ -1,6 +1,5 @@
 package project.services;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,13 +9,16 @@ import project.dto.requestDto.LoginRequestDto;
 import project.dto.requestDto.PasswordSetDto;
 import project.dto.requestDto.RegistrationRequestDto;
 import project.dto.requestDto.UpdatePersonDto;
+import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.PersonDtoWithToken;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
 import project.handlerExceptions.UnauthorizationException401;
-import project.models.*;
-import project.models.enums.FriendshipStatusCode;
+import project.models.Person;
+import project.models.Role;
+import project.models.Token;
+import project.models.VerificationToken;
 import project.models.enums.MessagesPermission;
 import project.models.util.entity.ImagePath;
 import project.repositories.PersonRepository;
@@ -27,11 +29,7 @@ import project.services.email.EmailService;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
