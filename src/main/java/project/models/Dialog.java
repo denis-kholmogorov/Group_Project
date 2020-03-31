@@ -34,9 +34,6 @@ public class Dialog
         persons.forEach(person -> person.getDialogs().remove(this));
     }
 
-    //@JsonIgnore
-    //Comparator<Message> comparator = Comparator.comparing(m -> m.getTime().getTime());
-
     @JsonIgnore
     @OneToMany(mappedBy = "dialog", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Message> listMessage = new ArrayList<>();

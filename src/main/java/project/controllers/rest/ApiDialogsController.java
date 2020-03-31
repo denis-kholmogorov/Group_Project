@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import project.dto.CountResponseDto;
-import project.dto.dialog.request.DialogUserShortList;
+import project.dto.dialog.request.CreateDialogDto;
 import project.dto.dialog.request.MessageRequestDto;
 import project.dto.dialog.response.DialogResponseDto;
 import project.dto.responseDto.ListResponseDto;
@@ -43,16 +43,15 @@ public class ApiDialogsController {
                                            HttpServletRequest request) {
 
         ListResponseDto answer = messageService.getAllDialogs(query, offset, itemPerPage, request);
-
-
         log.info(query + " Параметр query в контроллере Dialog");
         return ResponseEntity.ok(answer);
     }
 
     @Secured("ROLE_USER")
     @PostMapping()
-    public ResponseEntity<?> creationDialogue (HttpServletRequest request, @RequestBody DialogUserShortList dialogUserShortList) throws BadRequestException400 {
-        DialogResponseDto dialogResponseDto = messageService.createDialog(request, dialogUserShortList);
+    public ResponseEntity<?> createDialog (HttpServletRequest request,
+                                             @RequestBody CreateDialogDto createDialogDto) throws BadRequestException400 {
+        DialogResponseDto dialogResponseDto = messageService.createDialog(request, createDialogDto);
         return ResponseEntity.ok(new ResponseDto<>(dialogResponseDto));
     }
 
@@ -70,7 +69,6 @@ public class ApiDialogsController {
                                         @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset,
                                         @RequestParam(name = "itemPerPage", required = false, defaultValue = "20") Integer itemPerPage,
                                         HttpServletRequest request){
-        ;
         return ResponseEntity.ok(messageService.getDialogMessages(id, offset, itemPerPage, request));
     }
 

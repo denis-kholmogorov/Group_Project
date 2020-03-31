@@ -7,5 +7,6 @@ import project.models.Dialog;
 import java.util.List;
 
 public interface DialogRepository extends CrudRepository<Dialog, Integer> {
+
         List<Dialog> findAll(Pageable pageable);
 }

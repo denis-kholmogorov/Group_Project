@@ -7,7 +7,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DialogUserShortList {
+public class CreateDialogDto {
 
     @JsonProperty("user_ids")
     private Set<Integer> userIds;
