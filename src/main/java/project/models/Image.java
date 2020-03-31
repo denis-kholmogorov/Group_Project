@@ -1,21 +1,23 @@
 package project.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 @Data
 @Entity
-public class Language {
+public class Image {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy =  GenerationType.IDENTITY)
     private Integer id;
 
-    @JsonProperty("title")
-    private String language;
+    @Lob
+    private byte[] image;
+
+    private String type;
 }
