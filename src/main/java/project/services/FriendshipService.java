@@ -158,10 +158,10 @@ public class FriendshipService {
             notificationType.setCode(NotificationTypeEnum.FRIEND_REQUEST);
             notificationType.setName("Name");
             notification.setMainEntity(friendship);
+            save(friendship);
             notificationTypeRepository.save(notificationType);
             notification.setNotificationType(notificationType);
             notificationRepository.save(notification);
-            save(friendship);
         } else {
             log.info("Fuck you!");
         }
