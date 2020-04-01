@@ -156,10 +156,10 @@ public class FriendshipService {
             Notification notification = new Notification();
             NotificationType notificationType = new NotificationType();
             notificationType.setCode(NotificationTypeEnum.FRIEND_REQUEST);
-            notificationType.setName("Wonder");
+            notificationType.setName("Name");
+            notification.setMainEntity(friendship);
             notificationTypeRepository.save(notificationType);
             notification.setNotificationType(notificationType);
-            log.info(notification.getNotificationType().getId().toString());
             notificationRepository.save(notification);
             save(friendship);
         } else {

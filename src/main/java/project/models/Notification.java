@@ -5,7 +5,6 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 @Entity
@@ -28,8 +27,9 @@ public class Notification
     @ManyToOne(fetch = FetchType.LAZY)
     private Person person;
 
-    @Column(name = "entity_id")
-    private Integer entityId;
+    @JoinColumn(name = "entity_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private MainEntity mainEntity;
 
     private String contact;
 }
