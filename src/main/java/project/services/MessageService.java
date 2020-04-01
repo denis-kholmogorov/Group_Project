@@ -23,6 +23,7 @@ import project.security.TokenProvider;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -88,10 +89,20 @@ public class MessageService {
 
     public DialogResponseDto createDialog(HttpServletRequest request, CreateDialogDto userIds) {
         Person personAuthor = tokenProvider.getPersonByRequest(request); // как этого чувака привязать к диалогам
-        Dialog dialog = new Dialog();
-
         Person personRecipient = personRepository.findById(userIds.getUserIds().get(0)).orElse(null);
+        AtomicReference<Boolean> exist = new AtomicReference<>(false);
+        AtomicReference<Integer> existDialog = null;
+        personAuthor.getDialogs().forEach(dialog -> {
+            if(dialog.getPersons().contains(personRecipient)){
+                existDialog.set(dialog.getId());
+                exist.set(true);
+            }
+        });
+        if(exist.get()){
+            return new DialogResponseDto(existDialog.get());
+        }
 
+        Dialog dialog = new Dialog();
         dialog.getPersons().add(personAuthor);
         dialog.getPersons().add(personRecipient);
         Integer id = dialogRepository.save(dialog).getId();
