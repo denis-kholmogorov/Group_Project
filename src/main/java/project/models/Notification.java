@@ -9,15 +9,15 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "notification")
-
 public class Notification
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
-    private Integer typeId;
+    @JoinColumn(nullable = false)
+    @OneToOne
+    private NotificationType notificationType;
 
     @Column(name = "sent_time", updatable = false, nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
@@ -27,8 +27,9 @@ public class Notification
     @ManyToOne(fetch = FetchType.LAZY)
     private Person person;
 
-    @Column(name = "entity_id")
-    private Integer entityId;
+    @JoinColumn(name = "entity_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private MainEntity mainEntity;
 
     private String contact;
 }

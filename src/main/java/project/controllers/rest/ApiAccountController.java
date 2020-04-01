@@ -2,7 +2,10 @@ package project.controllers.rest;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.NotificationSettingDto;
 import project.dto.requestDto.PasswordSetDto;
@@ -11,9 +14,9 @@ import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
 import project.models.NotificationType;
+import project.models.Person;
 import project.models.PersonNotificationSetting;
 import project.security.TokenProvider;
-import project.services.NotificationService;
 import project.services.NotificationTypeService;
 import project.services.PersonNotificationSettingsService;
 import project.services.PersonService;
@@ -27,16 +30,12 @@ import java.util.Map;
 @AllArgsConstructor
 public class ApiAccountController {
     private PersonService personService;
-    private NotificationService notificationService;
-    private PersonNotificationSettingsService personNotificationSettingsService;
-    private TokenProvider tokenProvider;
-    private NotificationTypeService notificationTypeService;
 
     @PostMapping(value = "register")
     public ResponseEntity<ResponseDto<MessageResponseDto>> register(@RequestBody RegistrationRequestDto dto) throws BadRequestException400 {
         log.info("контроллер Register отработал");
         personService.registrationPerson(dto);
-        return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
+        return ResponseEntity.ok(new ResponseDto(new MessageResponseDto()));
     }
 
     @PutMapping(value = "password/recovery")
@@ -51,17 +50,19 @@ public class ApiAccountController {
 
     @GetMapping("notifications")
     public ResponseEntity<?> getNotificationSettings(HttpServletRequest servletRequest) {
-        Integer personId = tokenProvider.getPersonByRequest(servletRequest).getId();
-        return ResponseEntity.ok(personNotificationSettingsService.findAllByPersonId(personId));
+        log.info("trig get");
+        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        return ResponseEntity.ok(personNotificationSettingsService.findAllByPerson(person));
     }
 
     @PutMapping("notifications")
     public ResponseEntity<ResponseDto<PersonNotificationSetting>> updatePersonNotificationSettings(
             @RequestBody NotificationSettingDto dto, HttpServletRequest servletRequest) {
-        Integer personId = tokenProvider.getPersonByRequest(servletRequest).getId();
+        log.info("trig put");
+        Person person = tokenProvider.getPersonByRequest(servletRequest);
         NotificationType notificationType = notificationTypeService.findByCode(dto.getNotificationType());
         return ResponseEntity.ok(personNotificationSettingsService.
-                updateNotificationSetting(personId, notificationType, dto.getEnable()));
+                updateNotificationSetting(person, notificationType, dto.getEnable()));
     }
 }
 

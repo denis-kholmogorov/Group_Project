@@ -99,6 +99,14 @@ public class Person {
     @OneToMany(mappedBy = "dstPerson")
     private List<Friendship> receivedFriendshipRequests = new ArrayList<>();
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "person")
+    private List<Notification> notifications = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "person")
+    private List<PersonNotificationSetting> notificationSettings = new ArrayList<>();
+
     @PreRemove
     public void removeUser() {
         roles.forEach(role -> role.getUsers().remove(this));
