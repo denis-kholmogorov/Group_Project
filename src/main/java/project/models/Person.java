@@ -10,10 +10,7 @@ import org.hibernate.annotations.Type;
 import project.models.enums.MessagesPermission;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @Entity

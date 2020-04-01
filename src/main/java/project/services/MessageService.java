@@ -54,42 +54,46 @@ public class MessageService {
 
     public ListResponseDto<DialogDto> getAllDialogs(String query, Integer offset, Integer itemPerPage,
                                          HttpServletRequest request) throws BadRequestException400 {
-       // Pageable pageable = PageRequest.of((offset / itemPerPage), itemPerPage);
         Person person = tokenProvider.getPersonByRequest(request);
-        //Integer count = messageRepository.countByRecipientIdAndReadStatus(person.getId(), ReadStatus.SENT);
-
         int toIndex = offset + itemPerPage;
         int listSize =  person.getDialogs().size();
-        List<Dialog> dialogList = person.getDialogs().subList(offset, Math.min(toIndex, listSize)); //dialogService.getAllDialogs(paging);
+        List<Dialog> dialogList = person.getDialogs().subList(offset, Math.min(toIndex, listSize));
         List<DialogDto> dialogDtoList = dialogList.stream().map(dialog -> {
             DialogDto dialogDto = new DialogDto();
             dialogDto.setId(dialog.getId());
             dialogDto.setUnreadCount(messageRepository.countByRecipientIdAndReadStatus(person.getId(), ReadStatus.SENT));
-            Message message = dialog.getListMessage().get(dialog.getListMessage().size() - 1);
-            MessageDto messageDto = new MessageDto();
-            messageDto.setId(message.getId());
-            messageDto.setAuthor(personRepository.findById(message.getAuthorId()).orElseThrow(BadRequestException400::new));
-            //messageDto.setAuthorId(message.getAuthorId());
-            messageDto.setMessageText(message.getMessageText());
-            messageDto.setTime(message.getTime());
-            messageDto.setReadStatus(message.getReadStatus());
-            Person recipient = personService.findPersonById(message.getRecipientId());
-            messageDto.setRecipient(recipient);
-            dialogDto.setMessage(messageDto);
+            Message message = null;
+            if(dialog.getListMessage().size() == 0) {
+                message = sentMessage(
+                        dialog.getId(),
+                        new MessageRequestDto("Привет! Я " + person.getFirstName() + " " + person.getLastName()),
+                        request);
+            }else {
+                message = dialog.getListMessage().get(dialog.getListMessage().size() - 1);
+            }
+            dialogDto.setMessage(MessageDto.builder()
+                    .id(message.getId())
+                    .author(personRepository.findById(message.getAuthorId()).orElseThrow(BadRequestException400::new))
+                    .recipient(personRepository.findById(message.getRecipientId()).orElseThrow(BadRequestException400::new))
+                    .readStatus(message.getReadStatus())
+                    .messageText(message.getMessageText())
+                    .sentByMe(message.getAuthorId() == person.getId())
+                    .time(message.getTime())
+                    .build());
             return dialogDto;
         }).collect(Collectors.toList());
 
         return new ListResponseDto<>((long) dialogDtoList.size(), offset, itemPerPage, dialogDtoList);
     }
 
-    public DialogResponseDto createDialog(HttpServletRequest request, CreateDialogDto userIds) throws BadRequestException400 {
-        Person person = tokenProvider.getPersonByRequest(request); // как этого чувака привязать к диалогам
+    public DialogResponseDto createDialog(HttpServletRequest request, CreateDialogDto userIds) {
+        Person personAuthor = tokenProvider.getPersonByRequest(request); // как этого чувака привязать к диалогам
         Dialog dialog = new Dialog();
 
-        Iterable<Person> personIterable = personRepository.findAllById(userIds.getUserIds());
+        Person personRecipient = personRepository.findById(userIds.getUserIds().get(0)).orElse(null);
 
-        dialog.setPersons((Set<Person>) personIterable);
-        dialog.getPersons().add(person);
+        dialog.getPersons().add(personAuthor);
+        dialog.getPersons().add(personRecipient);
         Integer id = dialogRepository.save(dialog).getId();
         return new DialogResponseDto(id);
     }
@@ -102,21 +106,18 @@ public class MessageService {
 
     public ListResponseDto getDialogMessages(
             Integer id, Integer offset, Integer itemPerPage, HttpServletRequest servletRequest) {
-
         Pageable pageable = PageRequest.of((offset / itemPerPage), itemPerPage);
+        Person author = tokenProvider.getPersonByRequest(servletRequest);
         List<Message> dialogMessages = messageRepository.findAllByDialogId(id, pageable);
-        List<MessageDto> messageDtoList = dialogMessages.stream().distinct().map(message -> {
-            MessageDto messageDto = new MessageDto();
-            messageDto.setId(message.getId());
-            //Person author = personService.findPersonById(message.getRecipientId());
-            messageDto.setAuthor(personRepository.findById(message.getAuthorId()).get());
-            messageDto.setMessageText(message.getMessageText());
-            messageDto.setTime(message.getTime());
-            messageDto.setReadStatus(message.getReadStatus());
-            Person recipient = personService.findPersonById(message.getRecipientId());
-            messageDto.setRecipient(recipient);
-            return messageDto;
-        }).collect(Collectors.toList());
+        List<MessageDto> messageDtoList = dialogMessages.stream().distinct().map(message -> MessageDto.builder()
+               .id(message.getId())
+               .author(personRepository.findById(message.getAuthorId()).orElseThrow(BadRequestException400::new))
+               .recipient(personRepository.findById(message.getRecipientId()).orElseThrow(BadRequestException400::new))
+               .readStatus(message.getReadStatus())
+               .messageText(message.getMessageText())
+               .sentByMe(message.getAuthorId() == author.getId())
+               .time(message.getTime())
+               .build()).collect(Collectors.toList());
         return new ListResponseDto<>((long) messageDtoList.size(), offset, itemPerPage, messageDtoList);
     }
 
@@ -128,8 +129,8 @@ public class MessageService {
         personList.remove(person);
         Message message = new Message();
         message.setTime(new Date());
-        message.setAuthorId(personList.get(0).getId());
-        message.setRecipientId(person.getId());
+        message.setAuthorId(personList.get(0).getId()); // Перепутаны на фронте
+        message.setRecipientId(person.getId());         // Перепутаны на фронте
         message.setMessageText(dto.getMessageText());
         message.setReadStatus(ReadStatus.SENT);
         message.setDialog(dialog);
@@ -145,6 +146,6 @@ public class MessageService {
        log.info(message.getMessageText() + " Прочитана");
        message.setReadStatus(ReadStatus.READ);
        messageRepository.save(message);
-
     }
+
 }

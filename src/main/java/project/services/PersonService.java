@@ -105,10 +105,9 @@ public class PersonService {
 
     public ResponseDto<PersonDtoWithToken> login(LoginRequestDto dto){
         String email = dto.getEmail();
-        Person person = personRepository.findPersonByEmail(email).orElse(null);//необходимо оставить
-        if (person == null) {
-            throw new BadRequestException400();
-        }
+        Person person = personRepository.findPersonByEmail(email).orElseThrow(BadRequestException400::new);//необходимо оставить
+
+        person.setLastOnlineTime(new Date());
         Token jwtToken = new Token();
         String token = tokenProvider.createToken(email);//необходимо оставить
         PersonDtoWithToken personDto = new PersonDtoWithToken();
@@ -131,8 +130,8 @@ public class PersonService {
         jwtToken.setToken(token);
         jwtToken.setDateCreated(Calendar.getInstance());
         jwtToken.setEmailUser(person.getEmail());
+        personRepository.save(person);
         tokenRepository.save(jwtToken);
-
         return new ResponseDto<>(personDto);
     }
 
