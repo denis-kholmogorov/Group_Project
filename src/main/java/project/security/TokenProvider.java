@@ -14,7 +14,6 @@ import project.handlerExceptions.UnauthorizationException401;
 import project.models.Person;
 import project.models.Role;
 import project.repositories.PersonRepository;
-import project.repositories.TokenRepository;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -27,10 +26,7 @@ import java.util.*;
 @Component
 public class TokenProvider
 {
-    @Autowired
-    TokenRepository tokenRepository;
-
-    @Autowired
+        @Autowired
     PersonRepository personRepository;
 
     @Value("${jwt.token.secret}")

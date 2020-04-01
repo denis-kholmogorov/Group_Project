@@ -23,7 +23,6 @@ import project.models.enums.MessagesPermission;
 import project.models.util.entity.ImagePath;
 import project.repositories.PersonRepository;
 import project.repositories.RoleRepository;
-import project.repositories.TokenRepository;
 import project.security.TokenProvider;
 import project.services.email.EmailService;
 
@@ -43,9 +42,6 @@ public class PersonService {
 
     @Autowired
     private TokenProvider tokenProvider;
-
-    @Autowired
-    TokenRepository tokenRepository;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -108,7 +104,6 @@ public class PersonService {
         Person person = personRepository.findPersonByEmail(email).orElseThrow(BadRequestException400::new);//необходимо оставить
 
         person.setLastOnlineTime(new Date());
-        Token jwtToken = new Token();
         String token = tokenProvider.createToken(email);//необходимо оставить
         PersonDtoWithToken personDto = new PersonDtoWithToken();
         personDto.setId(person.getId());
@@ -126,12 +121,6 @@ public class PersonService {
         personDto.setLastOnlineTime(person.getLastOnlineTime());
         personDto.setBlocked(person.isBlocked());
         personDto.setToken(token);
-
-        jwtToken.setToken(token);
-        jwtToken.setDateCreated(Calendar.getInstance());
-        jwtToken.setEmailUser(person.getEmail());
-        personRepository.save(person);
-        tokenRepository.save(jwtToken);
         return new ResponseDto<>(personDto);
     }
 
@@ -199,7 +188,6 @@ public class PersonService {
     public void deletePersonByEmail(String email){
         Person person = findPersonByEmail(email);
         if(person != null){
-            tokenRepository.deleteByEmailUser(email);
             personRepository.deleteByEmail(email);
         }
     }
