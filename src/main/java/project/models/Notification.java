@@ -2,7 +2,6 @@ package project.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -10,7 +9,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "notification")
-@EqualsAndHashCode(exclude = "person")
+
 public class Notification
 {
     @Id

@@ -98,6 +98,15 @@ public class ApiGeneralController {
                 notificationService.findAllNotificationsByPersonId(person, offset, itemPerPage));
     }
 
+    @PutMapping("notifications")
+    public ResponseEntity<?> readNotifications(@RequestParam(required = false) Integer id,
+                                               @RequestParam(required = false) Boolean all,
+                                               HttpServletRequest servletRequest) {
+        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        return ResponseEntity.ok(
+                notificationService.findAllNotificationsByPersonId(person, 0, 20));
+    }
+
     @GetMapping(value = "storage/{id}")
     ResponseEntity<?> download(@PathVariable Integer id) {
         Image image = generalService.findImage(id);
