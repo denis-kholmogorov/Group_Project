@@ -30,6 +30,9 @@ import java.util.Map;
 @AllArgsConstructor
 public class ApiAccountController {
     private PersonService personService;
+    private TokenProvider tokenProvider;
+    private PersonNotificationSettingsService personNotificationSettingsService;
+    private NotificationTypeService notificationTypeService;
 
     @PostMapping(value = "register")
     public ResponseEntity<ResponseDto<MessageResponseDto>> register(@RequestBody RegistrationRequestDto dto) throws BadRequestException400 {

@@ -30,9 +30,9 @@ public class NotificationService {
         List<NotificationDto> notificationDtoList = notificationList.stream().map(notification -> {
             NotificationDto notificationDto = new NotificationDto();
             notificationDto.setId(notification.getId());
-            notificationDto.setTypeId(notification.getTypeId());
+            notificationDto.setNotificationType(notification.getNotificationType());
             notificationDto.setSentTime(notification.getSentTime());
-            notificationDto.setEntityId(notification.getEntityId());
+            notificationDto.setMainEntity(notification.getMainEntity());
             notificationDto.setInfo("info");
             return notificationDto;
         }).collect(Collectors.toList());

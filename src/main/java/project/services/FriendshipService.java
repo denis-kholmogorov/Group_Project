@@ -16,6 +16,7 @@ import project.repositories.NotificationTypeRepository;
 import project.security.TokenProvider;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -148,20 +149,21 @@ public class FriendshipService {
         if (findByFriendsCouple(src, dst) == null){
             Friendship friendship = new Friendship();
             FriendshipStatus fs = new FriendshipStatus();
+            fs.setName(FriendshipStatusCode.REQUEST.getCode2Name());
             fs.setCode(FriendshipStatusCode.REQUEST);
+            fs.setTime(new Date());
             friendship.setSrcPerson(src);
             friendship.setDstPerson(dst);
             friendship.setStatus(fs);
+            friendshipRepository.save(friendship);
 
             Notification notification = new Notification();
-            NotificationType notificationType = new NotificationType();
-            notificationType.setCode(NotificationTypeEnum.FRIEND_REQUEST);
-            notificationType.setName("Name");
+            NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.FRIEND_REQUEST);
             notification.setMainEntity(friendship);
-            notificationTypeRepository.save(notificationType);
             notification.setNotificationType(notificationType);
+            notification.setSentTime(new Date());
             notificationRepository.save(notification);
-            save(friendship);
+
         } else {
             log.info("Fuck you!");
         }
