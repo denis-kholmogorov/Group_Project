@@ -6,4 +6,5 @@ import project.models.Notification;
 
 @Repository
 public interface NotificationRepository extends CrudRepository<Notification, Integer> {
+
 }

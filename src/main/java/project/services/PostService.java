@@ -39,7 +39,8 @@ public class PostService {
     private PersonService personService;
     private PostCommentsService postCommentsService;
 
-    public ListResponseDto<PostDto> findAllPosts(String name, Integer offset, Integer itemPerPage) throws BadRequestException400 {
+    public ListResponseDto<PostDto> findAllPosts(String name, Integer offset, Integer itemPerPage)
+            throws BadRequestException400 {
         Sort sort = Sort.by(Sort.Direction.DESC, name == null ? "time" : "title");
         Pageable pageable = PageRequest.of(offset, itemPerPage, sort);
         List<Post> postList = name != null ?
@@ -64,7 +65,7 @@ public class PostService {
         Post post = getPostById(id);
         if (post == null) throw new BadRequestException400();
         post.setTitle(dto.getTitle());
-        post.setTime(publishDate == null ? new Date() : getDateFromLong(publishDate + ""));
+        //post.setTime(publishDate == null ? new Date() : getDateFromLong(publishDate + ""));
         post.setPostText(dto.getPostText());
         Post postDB = postRepository.save(post);
 

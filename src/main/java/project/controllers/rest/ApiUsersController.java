@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.PostRequestBodyTagsDto;
 import project.dto.requestDto.UpdatePersonDto;
+import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
@@ -22,7 +23,12 @@ import project.services.PostService;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -37,9 +43,8 @@ public class ApiUsersController {
     @Secured("ROLE_USER")
     @GetMapping("me")
     public ResponseEntity<?> getAuthUser(ServletRequest servletRequest) throws UnauthorizationException401 {
-
         Person person = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest);
-        log.warn("Есть аутентификации");
+
         person.setLastOnlineTime(new Date());
         return ResponseEntity.ok(new ResponseDto<>(person));
     }
@@ -101,4 +106,19 @@ public class ApiUsersController {
         return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
+    @GetMapping("search")
+    ResponseEntity<?> search(@RequestParam(name = "first_name", required = false) @Size(max = 255) String firstName,
+                             @RequestParam(name = "last_name", required = false) @Size(max = 255) String lastName,
+                             @RequestParam(name = "age_from", required = false) Integer ageFrom,
+                             @RequestParam(name = "age_to", required = false) Integer ageTo,
+                             @RequestParam(required = false) @Size(max = 255) String country,
+                             @RequestParam(required = false) @Size(max = 255) String city,
+                             @RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer offset,
+                             @RequestParam(required = false, defaultValue = "20") @Positive @Max(20) Integer itemPerPage,
+                             HttpServletRequest request) {
+        Person person = tokenProvider.getPersonByRequest(request);
+        long personCount = personService.searchCount(person, firstName, lastName, ageFrom, ageTo, country, city);
+        List<Person> persons = personService.search(person, firstName, lastName, ageFrom, ageTo, country, city, offset, itemPerPage);
+        return ResponseEntity.ok(new ListResponseDto<>(personCount, offset, itemPerPage, persons));
+    }
 }

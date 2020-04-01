@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Entity
@@ -19,8 +19,8 @@ public class Notification
     private Integer typeId;
 
     @Column(name = "sent_time", updatable = false, nullable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
-    private LocalDateTime sentTime;
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
+    private Date sentTime;
 
     @Column(name = "person_id")
     private Integer personId;

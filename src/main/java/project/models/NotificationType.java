@@ -1,7 +1,7 @@
 package project.models;
 
 import lombok.Data;
-import project.models.enums.NotificationEnum;
+import project.models.enums.NotificationTypeEnum;
 
 import javax.persistence.*;
 
@@ -15,7 +15,7 @@ public class NotificationType
     private Integer id;
 
     @Enumerated(EnumType.STRING)
-    private NotificationEnum code;
+    private NotificationTypeEnum code;
 
     @Column(nullable = false)
     private String name;

@@ -7,14 +7,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.dto.PostDto;
 import project.dto.responseDto.FileUploadResponseDto;
@@ -22,10 +15,11 @@ import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
 import project.models.Image;
-import project.models.util.entity.ImagePath;
 import project.models.Person;
+import project.models.util.entity.ImagePath;
 import project.security.TokenProvider;
 import project.services.GeneralService;
+import project.services.NotificationService;
 import project.services.PersonService;
 import project.services.PostService;
 
@@ -45,6 +39,7 @@ public class ApiGeneralController {
     private GeneralService generalService;
     private TokenProvider tokenProvider;
     private ImagePath imagePath;
+    private NotificationService notificationService;
 
     @GetMapping("feeds")
     public ResponseEntity<ListResponseDto<PostDto>> feeds(
@@ -92,6 +87,14 @@ public class ApiGeneralController {
         }
 
         return ResponseEntity.ok(new ResponseDto<>(response));
+    }
+
+    public ResponseEntity<?> getAllNotifications(@RequestParam(defaultValue = "0") Integer offset,
+                                                 @RequestParam(defaultValue = "20") Integer itemPerPage,
+                                                 HttpServletRequest servletRequest) {
+        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        return ResponseEntity.ok(
+                notificationService.findAllNotificationsByPersonId(person.getId(), offset, itemPerPage));
     }
 
     @GetMapping(value = "storage/{id}")

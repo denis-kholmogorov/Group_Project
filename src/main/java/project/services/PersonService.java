@@ -1,13 +1,12 @@
 package project.services;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.multipart.MultipartFile;
 import project.dto.requestDto.LoginRequestDto;
 import project.dto.requestDto.PasswordSetDto;
 import project.dto.requestDto.RegistrationRequestDto;
@@ -31,11 +30,7 @@ import project.services.email.EmailService;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -81,10 +76,10 @@ public class PersonService {
 //
 //    }
 
+
     public Boolean registrationPerson(RegistrationRequestDto dto) throws BadRequestException400 {
         Person exist = personRepository.findPersonByEmail(dto.getEmail()).orElse(null);
-        if (exist != null && Integer.valueOf(dto.getCode()) != 3675
-                && !dto.getPasswd1().equals(dto.getEmail())) throw new BadRequestException400();
+        if (exist != null) throw new BadRequestException400();
         Person person = new Person();
         Boolean existsById = roleRepository.existsById(1);
 
@@ -105,22 +100,15 @@ public class PersonService {
         person.setLastName(dto.getLastName());
         person.setRegDate(new Date());
         person.setRoles(Collections.singleton(role));
-        person.setMessagesPermission(MessagesPermission.ALL);
         personRepository.save(person);
         return true;
     }
 
     public ResponseDto<PersonDtoWithToken> login(LoginRequestDto dto){
         String email = dto.getEmail();
-        Person person = personRepository.findPersonByEmail(email).orElse(null);//необходимо оставить
-        if (person == null) {
-            throw new BadRequestException400();
-        }
-        if(!encoder.matches(dto.getPassword(), person.getPassword())){
-            throw new BadRequestException400();
-        }
+        Person person = personRepository.findPersonByEmail(email).orElseThrow(BadRequestException400::new);//необходимо оставить
+
         person.setLastOnlineTime(new Date());
-        personRepository.save(person);
         Token jwtToken = new Token();
         String token = tokenProvider.createToken(email);//необходимо оставить
         PersonDtoWithToken personDto = new PersonDtoWithToken();
@@ -143,8 +131,8 @@ public class PersonService {
         jwtToken.setToken(token);
         jwtToken.setDateCreated(Calendar.getInstance());
         jwtToken.setEmailUser(person.getEmail());
+        personRepository.save(person);
         tokenRepository.save(jwtToken);
-
         return new ResponseDto<>(personDto);
     }
 
@@ -240,7 +228,7 @@ public class PersonService {
         person.setCity(dto.getCity());
         person.setCountry(dto.getCountry());
         person.setMessagesPermission(MessagesPermission.ALL);
-       // person.setMessagesPermission(dto.getMessagePermission());
+        // person.setMessagesPermission(dto.getMessagePermission());
         personRepository.save(person);
         return person;
     }
@@ -248,5 +236,28 @@ public class PersonService {
     public void updatePhoto(Person person, String url) {
         person.setPhoto(url);
         personRepository.save(person);
+    }
+
+    public List<Person> search(Person person,
+                               String firstName,
+                               String lastName,
+                               Integer ageFrom,
+                               Integer ageTo,
+                               String country,
+                               String city,
+                               Integer offset,
+                               Integer itemPerPage) {
+        Pageable pageable = PageRequest.of(offset, itemPerPage);
+        return personRepository.search(person.getId(), firstName, lastName, ageFrom, ageTo, country, city, pageable);
+    }
+
+    public long searchCount(Person person,
+                            String firstName,
+                            String lastName,
+                            Integer ageFrom,
+                            Integer ageTo,
+                            String country,
+                            String city) {
+        return personRepository.searchCount(person.getId(), firstName, lastName, ageFrom, ageTo, country, city);
     }
 }
