@@ -2,7 +2,6 @@ package project.repositories;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
-import project.models.Token;
 
 import java.util.Optional;
 

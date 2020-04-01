@@ -18,7 +18,6 @@ import project.handlerExceptions.BadRequestException400;
 import project.handlerExceptions.UnauthorizationException401;
 import project.models.Person;
 import project.models.Role;
-import project.models.Token;
 import project.models.VerificationToken;
 import project.models.enums.MessagesPermission;
 import project.models.util.entity.ImagePath;
@@ -182,12 +181,6 @@ public class PersonService {
 
     public Person findPersonByEmail(String email){
         return personRepository.findPersonByEmail(email).orElse(null);
-    }
-
-    public boolean logout(HttpServletRequest request) throws BadRequestException400 {
-        String token = tokenProvider.resolveToken(request);
-        tokenRepository.deleteByToken(token);
-        return true;
     }
 
     public Person findPersonById(Integer id) {
