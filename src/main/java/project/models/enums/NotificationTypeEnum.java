@@ -1,6 +1,6 @@
 package project.models.enums;
 
-public enum NotificationEnum {
+public enum NotificationTypeEnum {
     POST,
     POST_COMMENTS,
     COMMENT_COMMENT,

@@ -1,6 +1,5 @@
 package project.services;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -8,12 +7,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.dto.responseDto.ListResponseDto;
 import project.handlerExceptions.BadRequestException400;
-import project.models.Friendship;
-import project.models.FriendshipStatus;
-import project.models.Person;
+import project.models.*;
 import project.models.enums.FriendshipStatusCode;
+import project.models.enums.NotificationTypeEnum;
 import project.repositories.FriendshipRepository;
-import project.repositories.PersonRepository;
+import project.repositories.NotificationRepository;
+import project.repositories.NotificationTypeRepository;
 import project.security.TokenProvider;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +30,9 @@ public class FriendshipService {
     private PersonService personService;
     private TokenProvider tokenProvider;
     @Autowired
-    private PersonRepository personRepository;
+    private NotificationRepository notificationRepository;
+    @Autowired
+    private NotificationTypeRepository notificationTypeRepository;
 
     @Autowired
     public FriendshipService(FriendshipRepository friendshipRepository, PersonService personService, TokenProvider tokenProvider) {
@@ -132,7 +133,7 @@ public class FriendshipService {
             if (friendship.getStatus().getCode().equals(FriendshipStatusCode.REQUEST))
                 friendRequester = friendship.getSrcPerson();
             return friendRequester;
-        }).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
 
         //List<Person> friends = personRepository.findFriendRequests(person); // Старая версия
         return new ListResponseDto<>((long) friendRequests.size(), offset, itemPerPage, friendRequests);
@@ -151,6 +152,15 @@ public class FriendshipService {
             friendship.setSrcPerson(src);
             friendship.setDstPerson(dst);
             friendship.setStatus(fs);
+
+            Notification notification = new Notification();
+            NotificationType notificationType = new NotificationType();
+            notificationType.setCode(NotificationTypeEnum.FRIEND_REQUEST);
+            notificationType.setName("Wonder");
+            notificationTypeRepository.save(notificationType);
+            notification.setNotificationType(notificationType);
+            log.info(notification.getNotificationType().getId().toString());
+            notificationRepository.save(notification);
             save(friendship);
         } else {
             log.info("Fuck you!");

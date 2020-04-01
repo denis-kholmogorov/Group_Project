@@ -2,15 +2,21 @@ package project.controllers.rest;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import project.dto.requestDto.NotificationSettingDto;
 import project.dto.requestDto.PasswordSetDto;
 import project.dto.requestDto.RegistrationRequestDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
+import project.models.NotificationType;
+import project.models.Person;
+import project.models.PersonNotificationSetting;
+import project.security.TokenProvider;
+import project.services.NotificationTypeService;
+import project.services.PersonNotificationSettingsService;
 import project.services.PersonService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +25,21 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/account/")
-@AllArgsConstructor
 public class ApiAccountController {
+
     private PersonService personService;
+    private TokenProvider tokenProvider;
+    private NotificationTypeService notificationTypeService;
+    private PersonNotificationSettingsService personNotificationSettingsService;
+
+    @Autowired
+    public ApiAccountController(PersonService personService, TokenProvider tokenProvider,
+                                NotificationTypeService notificationTypeService, PersonNotificationSettingsService personNotificationSettingsService) {
+        this.personService = personService;
+        this.tokenProvider = tokenProvider;
+        this.notificationTypeService = notificationTypeService;
+        this.personNotificationSettingsService = personNotificationSettingsService;
+    }
 
     @PostMapping(value = "register")
     public ResponseEntity<ResponseDto<MessageResponseDto>> register(@RequestBody RegistrationRequestDto dto) throws BadRequestException400 {
@@ -38,6 +56,23 @@ public class ApiAccountController {
     @PutMapping("password/set")
     public ResponseEntity<ResponseDto<MessageResponseDto>> setNewPassword(@RequestBody PasswordSetDto passwordSetDto, HttpServletRequest request) throws BadRequestException400 {
         return ResponseEntity.ok(personService.setNewPassword(passwordSetDto, request));
+    }
+
+    @GetMapping("notifications")
+    public ResponseEntity<?> getNotificationSettings(HttpServletRequest servletRequest) {
+        log.info("trig get");
+        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        return ResponseEntity.ok(personNotificationSettingsService.findAllByPerson(person));
+    }
+
+    @PutMapping("notifications")
+    public ResponseEntity<ResponseDto<PersonNotificationSetting>> updatePersonNotificationSettings(
+            @RequestBody NotificationSettingDto dto, HttpServletRequest servletRequest) {
+        log.info("trig put");
+        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        NotificationType notificationType = notificationTypeService.findByCode(dto.getNotificationType());
+        return ResponseEntity.ok(personNotificationSettingsService.
+                updateNotificationSetting(person, notificationType, dto.getEnable()));
     }
 }
 
