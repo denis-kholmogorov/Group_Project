@@ -27,7 +27,7 @@ public class ApiPlatformController {
     @GetMapping("languages")
     ResponseEntity<?> languages(@RequestParam(required = false) String name,
                                 @RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer offset,
-                                @RequestParam(required = false, defaultValue = "20") @Positive @Max(value = 20) Integer itemPerPage) {
+                                @RequestParam(required = false, defaultValue = "20") @Positive @Max(20) Integer itemPerPage) {
         long total;
         List<Language> list;
         if (name == null || name.isEmpty()) {

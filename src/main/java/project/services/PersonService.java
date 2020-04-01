@@ -2,6 +2,8 @@ package project.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -9,7 +11,6 @@ import project.dto.requestDto.LoginRequestDto;
 import project.dto.requestDto.PasswordSetDto;
 import project.dto.requestDto.RegistrationRequestDto;
 import project.dto.requestDto.UpdatePersonDto;
-import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.PersonDtoWithToken;
 import project.dto.responseDto.ResponseDto;
@@ -233,21 +234,31 @@ public class PersonService {
         return person;
     }
 
-
-
-    //=================================================================================================================
-
-    /**
-     * Тестовый метод для нахождения людей по имени для добавления в друзья
-     * Можно удалить, когда будет нормальный поиск
-     */
-    public ListResponseDto search(String name, Integer offset, Integer itemPerPage){
-        List<Person> people = personRepository.findAllByFirstName(name);
-        return new ListResponseDto<>((long) people.size(), offset, itemPerPage, people);
-    }
-
     public void updatePhoto(Person person, String url) {
         person.setPhoto(url);
         personRepository.save(person);
+    }
+
+    public List<Person> search(Person person,
+                               String firstName,
+                               String lastName,
+                               Integer ageFrom,
+                               Integer ageTo,
+                               String country,
+                               String city,
+                               Integer offset,
+                               Integer itemPerPage) {
+        Pageable pageable = PageRequest.of(offset, itemPerPage);
+        return personRepository.search(person.getId(), firstName, lastName, ageFrom, ageTo, country, city, pageable);
+    }
+
+    public long searchCount(Person person,
+                            String firstName,
+                            String lastName,
+                            Integer ageFrom,
+                            Integer ageTo,
+                            String country,
+                            String city) {
+        return personRepository.searchCount(person.getId(), firstName, lastName, ageFrom, ageTo, country, city);
     }
 }
