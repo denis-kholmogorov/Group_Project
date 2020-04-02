@@ -1,6 +1,7 @@
 package project.services;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import project.dto.responseDto.NotificationSettingsResponseDto;
 import project.dto.responseDto.ResponseDto;
@@ -16,6 +17,7 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class PersonNotificationSettingsService {
 
     PersonNotificationSettingsRepository personNotificationSettingsRepository;
@@ -24,6 +26,7 @@ public class PersonNotificationSettingsService {
         List<PersonNotificationSetting> settingList = personNotificationSettingsRepository.findAllByPerson(person);
         List<NotificationSettingsResponseDto> dtoSettingList = new ArrayList<>();
         if (settingList.size() != 0) {
+            log.info(String.valueOf(settingList.size()));
             dtoSettingList = settingList.stream().map(
                     setting -> new NotificationSettingsResponseDto(
                             "",

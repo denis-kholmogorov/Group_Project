@@ -52,7 +52,7 @@ public class ApiFriendsController {
     }
 
     @PostMapping("/{id}")
-    public ResponseDto<String> sendFriendRequest(@PathVariable Integer id, HttpServletRequest request) {
+    public ResponseDto<String> sendFriendRequest(@PathVariable Integer id, HttpServletRequest request) throws Exception {
         friendshipService.sendFriendshipRequest(id, request);
         return new ResponseDto<>("ok");
     }

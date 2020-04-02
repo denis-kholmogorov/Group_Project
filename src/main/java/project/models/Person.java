@@ -95,7 +95,7 @@ public class Person {
 
     @JsonIgnore
     @OneToMany(mappedBy = "person")
-    private List<Notification> notifications = new ArrayList<>();
+    private List<Notification> notificationList = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "person")

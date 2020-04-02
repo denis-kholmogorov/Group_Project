@@ -1,10 +1,12 @@
 package project.services;
 
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.dto.responseDto.ListResponseDto;
 import project.handlerExceptions.BadRequestException400;
 import project.models.*;
@@ -15,7 +17,10 @@ import project.repositories.NotificationRepository;
 import project.repositories.NotificationTypeRepository;
 import project.security.TokenProvider;
 
+import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -33,6 +38,8 @@ public class FriendshipService {
     private NotificationRepository notificationRepository;
     @Autowired
     private NotificationTypeRepository notificationTypeRepository;
+    @Autowired
+    private EntityManager entityManager;
 
     @Autowired
     public FriendshipService(FriendshipRepository friendshipRepository, PersonService personService, TokenProvider tokenProvider) {
@@ -141,11 +148,13 @@ public class FriendshipService {
 
     //=========================
 
-    public void sendFriendshipRequest(Integer id, HttpServletRequest request){
+    @Transactional(rollbackFor = Exception.class)
+    public void sendFriendshipRequest(Integer id, HttpServletRequest request) throws Exception {
 
         Person src = tokenProvider.getPersonByRequest(request);
         Person dst = personService.findPersonById(id);
         if (findByFriendsCouple(src, dst) == null){
+
             Friendship friendship = new Friendship();
             FriendshipStatus fs = new FriendshipStatus();
             fs.setCode(FriendshipStatusCode.REQUEST);
@@ -154,16 +163,15 @@ public class FriendshipService {
             friendship.setStatus(fs);
 
             Notification notification = new Notification();
-            NotificationType notificationType = new NotificationType();
-            notificationType.setCode(NotificationTypeEnum.FRIEND_REQUEST);
-            notificationType.setName("Name");
+            NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.FRIEND_REQUEST);
+            notification.setPerson(dst);
+            notification.setContact("Contact");
             notification.setMainEntity(friendship);
             save(friendship);
-            notificationTypeRepository.save(notificationType);
             notification.setNotificationType(notificationType);
             notificationRepository.save(notification);
         } else {
-            log.info("Fuck you!");
+            throw new Exception("Fuck you!");
         }
     }
 
