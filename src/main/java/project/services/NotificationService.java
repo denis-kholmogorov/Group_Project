@@ -1,6 +1,7 @@
 package project.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.proxy.LazyInitializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import project.dto.responseDto.ListResponseDto;
@@ -27,6 +28,8 @@ public class NotificationService {
     private MessageService messageService;
     private PostService postService;
     private PostCommentsService postCommentsService;
+
+
 
     @Autowired
     public NotificationService(NotificationRepository notificationRepository,

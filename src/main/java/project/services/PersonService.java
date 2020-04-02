@@ -239,6 +239,12 @@ public class PersonService {
         return null;
     }
 
+    public void updatePhoto(Person person, String url) {
+        person.setPhoto(url);
+        personRepository.save(person);
+    }
+
+
     public void deletePersonByEmail(String email){
         Person person = findPersonByEmail(email);
         if(person != null){
