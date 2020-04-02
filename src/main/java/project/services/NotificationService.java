@@ -63,8 +63,8 @@ public class NotificationService {
         return new ListResponseDto<>((long) notificationDtoList.size(), offset, itemsPerPage, notificationDtoList);
     }
 
-    private Object getEntityById(Integer entityId, NotificationTypeEnum notificationTypeCode) {
-        Object entity = null;
+    private MainEntity getEntityById(Integer entityId, NotificationTypeEnum notificationTypeCode) {
+        MainEntity entity = null;
         switch (notificationTypeCode) {
             case POST:
                 break;
