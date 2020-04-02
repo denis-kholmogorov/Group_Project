@@ -5,5 +5,6 @@ public enum NotificationTypeEnum {
     POST_COMMENTS,
     COMMENT_COMMENT,
     FRIEND_REQUEST,
-    MESSAGE
+    MESSAGE,
+    FRIEND_BIRTHDAY
 }

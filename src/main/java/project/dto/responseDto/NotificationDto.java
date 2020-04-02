@@ -16,7 +16,7 @@ public class NotificationDto {
     private Integer id;
 
     @JsonProperty("type_id")
-    private Integer notificationType;
+    private NotificationType notificationType;
 
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     @JsonProperty("sent_time")
