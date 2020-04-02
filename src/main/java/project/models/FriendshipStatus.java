@@ -13,7 +13,7 @@ import java.util.Date;
 public class FriendshipStatus {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)

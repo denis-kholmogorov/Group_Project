@@ -1,5 +1,6 @@
 package project.controllers.rest;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -7,41 +8,23 @@ import org.springframework.web.bind.annotation.*;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.models.Person;
+import project.repositories.FriendshipRepository;
 import project.security.TokenProvider;
 import project.services.FriendshipService;
-import project.services.PersonService;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/api/v1/friends")
+@AllArgsConstructor
 @Slf4j
 public class ApiFriendsController {
 
+    @Autowired
+    private FriendshipRepository friendshipRepository;
     private FriendshipService friendshipService;
     private TokenProvider tokenProvider;
-
-    @Autowired
-    public ApiFriendsController(FriendshipService friendshipService, TokenProvider tokenProvider) {
-        this.friendshipService = friendshipService;
-        this.tokenProvider = tokenProvider;
-    }
-
-    //        @GetMapping
-//        ResponseEntity<?> friends(@RequestParam(name = "query") String query, FriendParamsDto friendParams) throws EntityValidationException {
-//
-//            ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-//            Validator validator = factory.getValidator();
-//
-//            Set<ConstraintViolation<FriendParamsDto>> violations = validator.validate(friendParams);
-//
-//            if (violations.size() != 0) {
-//                throw new EntityValidationException(FriendParamsDto.class, new EntityViolation<>(violations).toString());
-//            }
-//
-//            return ResponseEntity.ok().build();
-//        }
 
     @GetMapping
     public ResponseEntity<ListResponseDto> getFriendList(

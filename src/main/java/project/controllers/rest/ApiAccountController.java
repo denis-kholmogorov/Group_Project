@@ -3,6 +3,8 @@ package project.controllers.rest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.NotificationSettingDto;
 import project.dto.requestDto.PasswordSetDto;
@@ -24,21 +26,12 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/account/")
+@AllArgsConstructor
 public class ApiAccountController {
-
     private PersonService personService;
     private TokenProvider tokenProvider;
-    private NotificationTypeService notificationTypeService;
     private PersonNotificationSettingsService personNotificationSettingsService;
-
-    @Autowired
-    public ApiAccountController(PersonService personService, TokenProvider tokenProvider,
-                                NotificationTypeService notificationTypeService, PersonNotificationSettingsService personNotificationSettingsService) {
-        this.personService = personService;
-        this.tokenProvider = tokenProvider;
-        this.notificationTypeService = notificationTypeService;
-        this.personNotificationSettingsService = personNotificationSettingsService;
-    }
+    private NotificationTypeService notificationTypeService;
 
     @PostMapping(value = "register")
     public ResponseEntity<ResponseDto<MessageResponseDto>> register(@RequestBody RegistrationRequestDto dto) throws BadRequestException400 {
