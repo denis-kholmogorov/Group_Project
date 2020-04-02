@@ -13,7 +13,7 @@ import javax.persistence.*;
 public class PersonNotificationSetting {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
 
     @JoinColumn(name = "person_id")
