@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import project.models.MainEntity;
 import project.models.NotificationType;
+import project.models.Person;
 
 import javax.persistence.JoinColumn;
 import java.util.Date;
@@ -15,15 +16,14 @@ public class NotificationDto {
     private Integer id;
 
     @JsonProperty("type_id")
-    private NotificationType notificationType;
+    private Integer notificationType;
 
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     @JsonProperty("sent_time")
     private Date sentTime;
 
-    @JoinColumn(name = "entity_author")
     @JsonProperty("entity_author")
-    private MainEntity mainEntity;
+    private Integer entity;
 
     private String info;
 }

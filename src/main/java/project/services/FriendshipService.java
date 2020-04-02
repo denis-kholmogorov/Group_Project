@@ -151,6 +151,7 @@ public class FriendshipService {
     @Transactional(rollbackFor = Exception.class)
     public void sendFriendshipRequest(Integer id, HttpServletRequest request) throws Exception {
 
+        log.info("trig transac");
         Person src = tokenProvider.getPersonByRequest(request);
         Person dst = personService.findPersonById(id);
         if (findByFriendsCouple(src, dst) == null){
@@ -168,7 +169,7 @@ public class FriendshipService {
             NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.FRIEND_REQUEST);
             notification.setPerson(dst);
             notification.setContact("Contact");
-            notification.setMainEntity(friendship);
+            notification.setMainEntity(src);
             save(friendship);
             notification.setNotificationType(notificationType);
             notificationRepository.save(notification);

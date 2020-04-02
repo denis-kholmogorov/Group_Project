@@ -1,7 +1,9 @@
 package project.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import project.Main;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -27,8 +29,8 @@ public class Notification
     @ManyToOne(fetch = FetchType.LAZY)
     private Person person;
 
-    @JoinColumn(name = "entity_id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "entity_author")
+    @OneToOne
     private MainEntity mainEntity;
 
     private String contact;

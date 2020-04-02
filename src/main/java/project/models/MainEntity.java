@@ -18,6 +18,5 @@ public abstract class MainEntity {
     private Integer id;
 
     @Getter
-    @OneToMany(mappedBy = "mainEntity")
-    private List<Notification> notifications = new ArrayList<>();
+    private Notification notification;
 }

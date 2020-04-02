@@ -17,10 +17,11 @@ import java.util.*;
 @ToString(exclude = {"sentFriendshipRequests", "receivedFriendshipRequests", "notificationList", "notificationSettings"})
 @Entity
 @Table(name = "person")
-public class Person {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+public class Person extends MainEntity{
+
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.AUTO)
+//    private Integer id;
 
     @Column(name = "first_name")
     @JsonProperty("first_name")
