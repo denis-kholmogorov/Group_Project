@@ -18,5 +18,6 @@ public abstract class MainEntity {
     private Integer id;
 
     @Getter
-    private Notification notification;
+    @OneToMany(mappedBy = "mainEntity")
+    protected List<Notification> sentNotifications = new ArrayList<>();
 }

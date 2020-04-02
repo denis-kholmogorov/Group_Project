@@ -30,8 +30,8 @@ public class Notification
     private Person person;
 
     @JoinColumn(name = "entity_author")
-    @OneToOne
-    private MainEntity mainEntity;
+    @OneToOne(fetch = FetchType.LAZY)
+    private Person mainEntity;
 
     private String contact;
 }
