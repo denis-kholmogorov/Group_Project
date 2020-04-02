@@ -30,7 +30,8 @@ public class NotificationService {
             notificationDto.setId(notification.getId());
             notificationDto.setNotificationType(notification.getNotificationType().getId());
             notificationDto.setSentTime(new Date());
-            notificationDto.setEntity(notification.getMainEntity().getId());
+            notificationDto.setEntity(person);
+            //notificationDto.setEntity(notification.getMainEntity().getId());
             notificationDto.setInfo("info");
             return notificationDto;
         }).collect(Collectors.toList());

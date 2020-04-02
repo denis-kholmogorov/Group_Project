@@ -13,7 +13,9 @@ import javax.persistence.*;
 import java.util.*;
 
 @Data
-@EqualsAndHashCode(exclude = {"sentFriendshipRequests", "receivedFriendshipRequests", "notificationList", "notificationSettings"})
+@EqualsAndHashCode(
+        exclude = {"sentFriendshipRequests", "receivedFriendshipRequests", "notificationList", "notificationSettings"},
+        callSuper = false)
 @ToString(exclude = {"sentFriendshipRequests", "receivedFriendshipRequests", "notificationList", "notificationSettings"})
 @Entity
 @Table(name = "person")

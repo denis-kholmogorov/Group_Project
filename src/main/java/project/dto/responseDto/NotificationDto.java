@@ -23,7 +23,7 @@ public class NotificationDto {
     private Date sentTime;
 
     @JsonProperty("entity_author")
-    private Integer entity;
+    private Object entity;
 
     private String info;
 }

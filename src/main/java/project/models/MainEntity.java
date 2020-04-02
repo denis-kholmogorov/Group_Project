@@ -1,5 +1,6 @@
 package project.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,6 +18,7 @@ public abstract class MainEntity {
     @Setter
     private Integer id;
 
+    @JsonIgnore
     @Getter
     @OneToMany(mappedBy = "mainEntity")
     protected List<Notification> sentNotifications = new ArrayList<>();

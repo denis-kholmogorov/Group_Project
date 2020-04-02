@@ -29,9 +29,9 @@ public class Notification
     @ManyToOne(fetch = FetchType.LAZY)
     private Person person;
 
-    @JoinColumn(name = "entity_author")
+    @JoinColumn(name = "entity_id")
     @OneToOne(fetch = FetchType.LAZY)
-    private Person mainEntity;
+    private MainEntity mainEntity;
 
     private String contact;
 }
