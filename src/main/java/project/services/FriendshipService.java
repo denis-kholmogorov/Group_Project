@@ -158,6 +158,8 @@ public class FriendshipService {
             Friendship friendship = new Friendship();
             FriendshipStatus fs = new FriendshipStatus();
             fs.setCode(FriendshipStatusCode.REQUEST);
+            fs.setName(FriendshipStatusCode.REQUEST.getCode2Name());
+            fs.setTime(new Date());
             friendship.setSrcPerson(src);
             friendship.setDstPerson(dst);
             friendship.setStatus(fs);

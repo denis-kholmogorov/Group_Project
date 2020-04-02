@@ -1,6 +1,7 @@
 package project.models;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ public abstract class MainEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE)
     @Getter
+    @Setter
     private Integer id;
 
     @Getter

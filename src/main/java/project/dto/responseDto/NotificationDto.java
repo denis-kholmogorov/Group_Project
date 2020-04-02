@@ -6,6 +6,7 @@ import lombok.Data;
 import project.models.MainEntity;
 import project.models.NotificationType;
 
+import javax.persistence.JoinColumn;
 import java.util.Date;
 
 @Data
@@ -14,14 +15,15 @@ public class NotificationDto {
     private Integer id;
 
     @JsonProperty("type_id")
-    private Integer notificationType;
+    private NotificationType notificationType;
 
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     @JsonProperty("sent_time")
     private Date sentTime;
 
-    @JsonProperty("entity_id")
-    private Integer mainEntity;
+    @JoinColumn(name = "entity_author")
+    @JsonProperty("entity_author")
+    private MainEntity mainEntity;
 
     private String info;
 }
