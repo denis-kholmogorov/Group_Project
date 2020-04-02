@@ -60,6 +60,8 @@ public class ApiGeneralController {
             if (multipartFile.isEmpty())
                 throw  new BadRequestException400();
 
+            log.info("MultiPart: " + multipartFile.getOriginalFilename());
+            log.info("MultiPart: " + multipartFile.getContentType());
             response.setFileName(multipartFile.getOriginalFilename());
             response.setRelativeFilePath("");
             response.setFileFormat(multipartFile.getContentType());
@@ -70,6 +72,7 @@ public class ApiGeneralController {
             Person person = tokenProvider.getPersonByRequest(request);
             response.setOwnerId(person.getId());
             String photo = person.getPhoto();
+            log.info("Photo: " + photo);
             if (photo.equals(imagePath.getDefaultImagePath())) {
                 Integer id = generalService.saveImage(multipartFile.getBytes(), multipartFile.getContentType());
                 response.setId(String.valueOf(id));
@@ -77,8 +80,10 @@ public class ApiGeneralController {
                 response.setRawFileURL(URL);
                 personService.updatePhoto(person, URL);
             } else {
-                Integer oldId = Integer.valueOf(photo.replace(imagePath.getImagePath(), ""));
-                response.setId(String.valueOf(oldId));
+                //Integer oldId = Integer.valueOf(photo.replace(imagePath.getImagePath(), ""));
+                //response.setId(String.valueOf(oldId));
+                Integer oldId = 1;
+                response.setId(String.valueOf(1));
                 response.setRawFileURL(imagePath.getImagePath());
                 generalService.updateImage(multipartFile.getBytes(), multipartFile.getContentType(), oldId);
             }

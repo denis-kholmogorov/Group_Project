@@ -22,7 +22,6 @@ public class NotificationService {
         this.notificationRepository = notificationRepository;
     }
 
-
     public ListResponseDto<NotificationDto> findAllNotificationsByPersonId(
             Person person, Integer offset, Integer itemsPerPage) {
         List<Notification> notificationList = person.getNotificationList().subList(

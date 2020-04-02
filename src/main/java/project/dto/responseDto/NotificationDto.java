@@ -7,9 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import project.models.MainEntity;
 import project.models.NotificationType;
-import project.models.Person;
 
-import javax.persistence.*;
 import java.util.Date;
 
 @Data
@@ -19,17 +17,14 @@ public class NotificationDto {
 
     private Integer id;
 
-    @JsonProperty("type_id")
+    @JsonProperty("event_type")
     private NotificationType notificationType;
 
     @JsonProperty("sent_time")
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Date sentTime;
 
-    @JsonProperty("peron_id")
-    private Person person;
-
-    @JsonProperty("entity_id")
+    @JsonProperty("entity_author")
     private MainEntity mainEntity;
 
     private String info;

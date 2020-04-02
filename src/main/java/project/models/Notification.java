@@ -28,7 +28,7 @@ public class Notification
     private Person person;
 
     @JoinColumn(name = "entity_id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private MainEntity mainEntity;
 
     private String contact;

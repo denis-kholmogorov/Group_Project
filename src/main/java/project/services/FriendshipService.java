@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.dto.responseDto.ListResponseDto;
 import project.handlerExceptions.BadRequestException400;
 import project.models.*;
@@ -142,6 +143,7 @@ public class FriendshipService {
 
     //=========================
 
+    @Transactional(rollbackFor = Exception.class)
     public void sendFriendshipRequest(Integer id, HttpServletRequest request){
 
         Person src = tokenProvider.getPersonByRequest(request);
@@ -159,7 +161,8 @@ public class FriendshipService {
 
             Notification notification = new Notification();
             NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.FRIEND_REQUEST);
-            notification.setMainEntity(friendship);
+            notification.setMainEntity(src);
+            notification.setPerson(dst);
             notification.setNotificationType(notificationType);
             notification.setSentTime(new Date());
             notificationRepository.save(notification);
