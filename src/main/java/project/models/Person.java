@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
 import project.models.enums.MessagesPermission;
 
@@ -12,7 +13,8 @@ import javax.persistence.*;
 import java.util.*;
 
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"sentFriendshipRequests", "receivedFriendshipRequests", "notificationList", "notificationSettings"})
+@ToString(exclude = {"sentFriendshipRequests", "receivedFriendshipRequests", "notificationList", "notificationSettings"})
 @Entity
 @Table(name = "person")
 public class Person {

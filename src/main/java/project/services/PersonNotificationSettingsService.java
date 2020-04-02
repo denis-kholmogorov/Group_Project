@@ -23,7 +23,7 @@ public class PersonNotificationSettingsService {
     PersonNotificationSettingsRepository personNotificationSettingsRepository;
 
     public ResponseDto<List<NotificationSettingsResponseDto>> findAllByPerson(Person person) {
-        List<PersonNotificationSetting> settingList = personNotificationSettingsRepository.findAllByPerson(person);
+        List<PersonNotificationSetting> settingList = person.getNotificationSettings();
         List<NotificationSettingsResponseDto> dtoSettingList = new ArrayList<>();
         if (settingList.size() != 0) {
             log.info(String.valueOf(settingList.size()));

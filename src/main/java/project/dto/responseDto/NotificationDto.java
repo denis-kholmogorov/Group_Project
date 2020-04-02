@@ -14,14 +14,14 @@ public class NotificationDto {
     private Integer id;
 
     @JsonProperty("type_id")
-    private NotificationType notificationType;
+    private Integer notificationType;
 
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     @JsonProperty("sent_time")
     private Date sentTime;
 
     @JsonProperty("entity_id")
-    private MainEntity mainEntity;
+    private Integer mainEntity;
 
     private String info;
 }
