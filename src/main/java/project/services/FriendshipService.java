@@ -163,34 +163,39 @@ public class FriendshipService {
     //=========================
 
     @Transactional(rollbackFor = Exception.class)
-    public void sendFriendshipRequest(Integer id, HttpServletRequest request) throws Exception {
+    public void sendFriendshipRequest(Integer id, HttpServletRequest request) throws IllegalStateException {
 
-        log.info("trig transac");
         Person src = tokenProvider.getPersonByRequest(request);
         Person dst = personService.findPersonById(id);
-        if (findByFriendsCouple(src, dst) == null){
-
-            Friendship friendship = new Friendship();
-            FriendshipStatus fs = new FriendshipStatus();
-            fs.setCode(FriendshipStatusCode.REQUEST);
-            fs.setName(FriendshipStatusCode.REQUEST.getCode2Name());
-            fs.setTime(new Date());
-            friendship.setSrcPerson(src);
-            friendship.setDstPerson(dst);
-            friendship.setStatus(fs);
-            save(friendship);
-
+        Friendship friendship = findByFriendsCouple(src, dst);
+        if (friendship == null){
+            sendRequest(src, dst);
             Notification notification = new Notification();
             NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.FRIEND_REQUEST);
-            notification.setPerson(dst);
-            notification.setContact("Contact");
             notification.setMainEntity(src);
+            notification.setPerson(dst);
             notification.setNotificationType(notificationType);
             notification.setSentTime(new Date());
             notificationRepository.save(notification);
+        } else if (friendship.getStatus().getCode().equals(FriendshipStatusCode.REQUEST)){
+            friendship.getStatus().setCode(FriendshipStatusCode.FRIEND);
+            //TODO менять описание статуса
         } else {
-            throw new Exception("Fuck you!");
+            throw new IllegalStateException("Fuck you!");
         }
+    }
+
+    private void sendRequest(Person src, Person dst){
+
+        Friendship friendship = new Friendship();
+        FriendshipStatus fs = new FriendshipStatus();
+        fs.setName(FriendshipStatusCode.REQUEST.getCode2Name());
+        fs.setCode(FriendshipStatusCode.REQUEST);
+        fs.setTime(new Date());
+        friendship.setSrcPerson(src);
+        friendship.setDstPerson(dst);
+        friendship.setStatus(fs);
+        friendshipRepository.save(friendship);
     }
 
     public void deleteFriend(Integer id, HttpServletRequest request) {
