@@ -241,4 +241,31 @@ public class PersonService {
                             String city) {
         return personRepository.searchCount(person.getId(), firstName, lastName, ageFrom, ageTo, country, city);
     }
+
+    public List<Person> recommendations(Person person, Integer offset, Integer itemPerPage) {
+        if (person.getCity() != null && person.getBirthDate() != null) {
+            Pageable pageable = PageRequest.of(offset, itemPerPage);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(person.getBirthDate());
+            calendar.add(Calendar.YEAR, -3);
+            Date dateFrom = calendar.getTime();
+            calendar.add(Calendar.YEAR, 6);
+            Date dateTo = calendar.getTime();
+            return personRepository.findByIdNotAndCityEqualsAndBirthDateBetween(person.getId(), person.getCity(), dateFrom, dateTo, pageable);
+        }
+        return new ArrayList<>();
+    }
+
+    public long recommendationsCount(Person person) {
+        if (person.getCity() != null && person.getBirthDate() != null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(person.getBirthDate());
+            calendar.add(Calendar.YEAR, -3);
+            Date dateFrom = calendar.getTime();
+            calendar.add(Calendar.YEAR, 6);
+            Date dateTo = calendar.getTime();
+            return personRepository.countByIdNotAndCityEqualsAndBirthDateBetween(person.getId(), person.getCity(), dateFrom, dateTo);
+        }
+        return 0;
+    }
 }

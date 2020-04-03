@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import project.models.Person;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,4 +62,8 @@ public interface PersonRepository extends CrudRepository<Person, Integer> {
             "(:country is null or p.country = :country) and " +
             "(:city is null or p.city = :city)")
     long searchCount(Integer id, String firstName, String lastName, Integer ageFrom, Integer ageTo, String country, String city);
+
+    List<Person> findByIdNotAndCityEqualsAndBirthDateBetween(Integer id, String city, Date dateFrom, Date DateTo, Pageable pageable);
+
+    long countByIdNotAndCityEqualsAndBirthDateBetween(Integer id, String city, Date dateFrom, Date DateTo);
 }
