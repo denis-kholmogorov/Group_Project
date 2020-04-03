@@ -12,13 +12,10 @@ import project.dto.dialog.response.DialogResponseDto;
 import project.dto.dialog.response.MessageDto;
 import project.dto.responseDto.ListResponseDto;
 import project.handlerExceptions.BadRequestException400;
-import project.models.Dialog;
-import project.models.Message;
-import project.models.Person;
+import project.models.*;
+import project.models.enums.NotificationTypeEnum;
 import project.models.enums.ReadStatus;
-import project.repositories.DialogRepository;
-import project.repositories.MessageRepository;
-import project.repositories.PersonRepository;
+import project.repositories.*;
 import project.security.TokenProvider;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,17 +37,23 @@ public class MessageService {
 
     private final DialogRepository dialogRepository;
 
+    private final NotificationTypeRepository notificationTypeRepository;
+
+    private final NotificationRepository notificationRepository;
+
     @Autowired
     public MessageService(MessageRepository messageRepository,
                           TokenProvider tokenProvider,
                           PersonService personService,
                           PersonRepository personRepository,
-                          DialogRepository dialogRepository) {
+                          DialogRepository dialogRepository, NotificationTypeRepository notificationTypeRepository, NotificationRepository notificationRepository) {
         this.messageRepository = messageRepository;
         this.tokenProvider = tokenProvider;
         this.personService = personService;
         this.personRepository = personRepository;
         this.dialogRepository = dialogRepository;
+        this.notificationTypeRepository = notificationTypeRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     public ListResponseDto<DialogDto> getAllDialogs(String query, Integer offset, Integer itemPerPage,
@@ -92,14 +95,17 @@ public class MessageService {
         Person personRecipient = personRepository.findById(userIds.getUserIds().get(0)).orElse(null);
         AtomicReference<Boolean> exist = new AtomicReference<>(false);
         AtomicReference<Integer> existDialog = null;
-        personAuthor.getDialogs().forEach(dialog -> {
-            if(dialog.getPersons().contains(personRecipient)){
-                existDialog.set(dialog.getId());
-                exist.set(true);
+        List<Dialog> list = personAuthor.getDialogs();
+        if (list.size() != 0) {
+            personAuthor.getDialogs().forEach(dialog -> {
+                if (dialog.getPersons().contains(personRecipient)) {
+                    existDialog.set(dialog.getId());
+                    exist.set(true);
+                }
+            });
+            if (exist.get()) {
+                return new DialogResponseDto(existDialog.get());
             }
-        });
-        if(exist.get()){
-            return new DialogResponseDto(existDialog.get());
         }
 
         Dialog dialog = new Dialog();
@@ -133,21 +139,30 @@ public class MessageService {
     }
 
     public Message sentMessage(Integer id, MessageRequestDto dto, HttpServletRequest request) throws BadRequestException400 {
-        Person person = tokenProvider.getPersonByRequest(request);
+        Person dstPerson = tokenProvider.getPersonByRequest(request);
         Dialog dialog = dialogRepository.findById(id).orElseThrow(BadRequestException400::new);
         Set<Person> personsSet = dialog.getPersons();
         List<Person> personList = new ArrayList<>(personsSet);
-        personList.remove(person);
+        personList.remove(dstPerson);
         Message message = new Message();
         message.setTime(new Date());
         message.setAuthorId(personList.get(0).getId()); // Перепутаны на фронте
-        message.setRecipientId(person.getId());         // Перепутаны на фронте
+        message.setRecipientId(dstPerson.getId());         // Перепутаны на фронте
         message.setMessageText(dto.getMessageText());
         message.setReadStatus(ReadStatus.SENT);
         message.setDialog(dialog);
         Message messageSaved = messageRepository.save(message);
         dialog.getListMessage().add(message);
         dialogRepository.save(dialog);
+
+        Notification notification = new Notification();
+        NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.MESSAGE);
+        notification.setPerson(dstPerson);
+        notification.setContact("Contact");
+        notification.setMainEntity(personList.get(0));
+        notification.setNotificationType(notificationType);
+        notification.setSentTime(new Date());
+        notificationRepository.save(notification);
 
         return messageSaved;
     }

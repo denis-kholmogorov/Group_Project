@@ -16,7 +16,7 @@ import java.util.*;
 @EqualsAndHashCode(
         callSuper = false)
 @ToString(exclude = {"sentFriendshipRequests", "receivedFriendshipRequests",
-        "notificationList", "notificationSettings", "postList"})
+        "notificationList", "notificationSettings", "postList", "dialogs"})
 @Entity
 @Table(name = "person")
 public class Person extends MainEntity {

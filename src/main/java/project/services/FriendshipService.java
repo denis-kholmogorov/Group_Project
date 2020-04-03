@@ -186,6 +186,7 @@ public class FriendshipService {
             notification.setContact("Contact");
             notification.setMainEntity(src);
             notification.setNotificationType(notificationType);
+            notification.setSentTime(new Date());
             notificationRepository.save(notification);
         } else {
             throw new Exception("Fuck you!");
