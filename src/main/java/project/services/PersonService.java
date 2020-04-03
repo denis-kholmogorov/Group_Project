@@ -228,7 +228,7 @@ public class PersonService {
                     .id(person.getId().toString())
                     .ownerId(person.getId())
                     .fileName(fileName)
-                    .bytes(file.getBytes().length)
+                    .bytes((long) file.getBytes().length)
                     .fileFormat(typeImage)
                     .createdAt(new Date().getTime())
                     .fileType(type)

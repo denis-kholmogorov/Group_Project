@@ -30,7 +30,7 @@ public class Notification
     private Person person;
 
     @JoinColumn(name = "entity_id")
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     private MainEntity mainEntity;
 
     private String contact;

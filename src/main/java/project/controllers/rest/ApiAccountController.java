@@ -26,12 +26,24 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/account/")
-@AllArgsConstructor
 public class ApiAccountController {
     private PersonService personService;
     private TokenProvider tokenProvider;
     private PersonNotificationSettingsService personNotificationSettingsService;
     private NotificationTypeService notificationTypeService;
+
+    @Autowired
+    public ApiAccountController(PersonService personService,
+                                TokenProvider tokenProvider,
+                                PersonNotificationSettingsService personNotificationSettingsService,
+                                NotificationTypeService notificationTypeService) {
+        this.personService = personService;
+        this.tokenProvider = tokenProvider;
+        this.personNotificationSettingsService = personNotificationSettingsService;
+        this.notificationTypeService = notificationTypeService;
+    }
+
+
 
     @PostMapping(value = "register")
     public ResponseEntity<ResponseDto<MessageResponseDto>> register(@RequestBody RegistrationRequestDto dto) throws BadRequestException400 {

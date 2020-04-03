@@ -50,13 +50,13 @@ public class NotificationService {
                 offset, Math.min(itemsPerPage, person.getNotificationList().size()));
         List<NotificationDto> notificationDtoList = notificationList.stream().map(notification -> {
             NotificationDto notificationDto = new NotificationDto();
-            Integer entityId = notification.getMainEntity().getId();
-            NotificationType notificationType = notification.getNotificationType();
+            //Integer entityId = notification.getMainEntity().getId();
+            NotificationTypeEnum notificationTypeCode = notification.getNotificationType().getCode();
             notificationDto.setId(notification.getId());
-            notificationDto.setNotificationType(notificationType);
+            notificationDto.setNotificationType(notificationTypeCode);
             notificationDto.setSentTime(new Date());
-            notificationDto.setEntity(getEntityById(entityId, notificationType.getCode()));
-            //notificationDto.setEntity(notification.getMainEntity().getId());
+            //notificationDto.setEntity(getEntityById(entityId, notificationTypeCode));
+            notificationDto.setEntity(notification.getMainEntity());
             notificationDto.setInfo("info");
             return notificationDto;
         }).collect(Collectors.toList());

@@ -82,7 +82,7 @@ public class ApiGeneralController {
             response.setFileName(multipartFile.getOriginalFilename());
             response.setRelativeFilePath("");
             response.setFileFormat(multipartFile.getContentType());
-            response.setBytes((int )multipartFile.getSize());
+            response.setBytes(multipartFile.getSize());
             response.setFileType("IMAGE");
             response.setCreatedAt(new Date().getTime());
 
