@@ -15,10 +15,10 @@ public interface FriendshipRepository extends CrudRepository<Friendship, Integer
 
     @Query("select f from Friendship f " +
             "join FriendshipStatus fs on fs.id = f.status " +
-            "where (f.srcPerson = :personId OR f.dstPerson = :personId) " +
+            "where (f.srcPerson = :person OR f.dstPerson = :person) " +
             "AND fs.code = 'FRIEND'")
-    List<Friendship> findAllByPersonIdWhoSendFriendshipOrPersonIdWhoTakeFriendshipAndStatus
-            (Integer personId, Pageable pageable);
+    List<Friendship> findAllBySrcPersonOrDstPersonAndStatus
+            (Person person, Pageable pageable);
 
     // Поиск френдшипа, содержащего определенную пару пользователей
     @Query(value = "select f from Friendship f " +

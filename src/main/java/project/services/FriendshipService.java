@@ -5,6 +5,7 @@ import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.dto.responseDto.ListResponseDto;
@@ -79,34 +80,48 @@ public class FriendshipService {
 
 
     // Метод Ильи для списка друзей
-    public ListResponseDto getFriendList(String name, Integer offset, Integer itemPerPage, Person person) {
+    public ListResponseDto<Person> getFriendList(String name, Integer offset, Integer itemPerPage, Person person) {
+
+        List<Person> friendList = getFriendsList(person);
+
+        if (name == null) {
+            return new ListResponseDto<>((long) friendList.size(), offset, itemPerPage,
+                    friendList.subList(offset, Math.min(friendList.size(), itemPerPage)));
+        }
+        List<Person> filterList = friendList.stream().filter(
+                person1 -> person1.getFirstName().contains(name)
+                        || person1.getLastName().contains(name))
+                .collect(Collectors.toList());
+        return new ListResponseDto<>((long) filterList.size(), offset, itemPerPage,
+                filterList.subList(offset, Math.min(filterList.size(), itemPerPage)));
+
         //Sort sort = Sort.by(Sort.Direction.DESC, "time");
-        Pageable pageable = PageRequest.of(offset, itemPerPage);
-        int personId = person.getId();
-        List<Friendship> friendshipList =
-                friendshipRepository.findAllByPersonIdWhoSendFriendshipOrPersonIdWhoTakeFriendshipAndStatus(
-                        personId, pageable);
-
-        List<Person> personFriendList = friendshipList.stream().map(friendship -> {
-            Person personFriend;
-            if (friendship.getSrcPerson().getId() != personId) {
-                personFriend = personService.findPersonById(friendship.getSrcPerson().getId());
-            }
-            else if (friendship.getSrcPerson().getId() != personId) {
-                personFriend = personService.findPersonById(friendship.getSrcPerson().getId());
-            }
-            else throw new BadRequestException400();
-            return personFriend;
-        }).collect(toList());
-
-        return new ListResponseDto((long) personFriendList.size(), offset, itemPerPage, personFriendList);
+        //Pageable pageable = PageRequest.of(offset, itemPerPage);
+//        int personId = person.getId();
+//        List<Friendship> friendshipList =
+//                friendshipRepository.findAllBySrcPersonOrDstPersonAndStatus(
+//                        person, pageable);
+//
+//        List<Person> personFriendList = friendshipList.stream().map(friendship -> {
+//            Person personFriend;
+//            if (friendship.getSrcPerson().getId() != personId) {
+//                personFriend = friendship.getSrcPerson();
+//            }
+//            else if (friendship.getDstPerson().getId() != personId) {
+//                personFriend = friendship.getDstPerson();
+//            }
+//            else throw new BadRequestException400();
+//            return personFriend;
+//        }).collect(toList());
+//
+//        return new ListResponseDto((long) personFriendList.size(), offset, itemPerPage, personFriendList);
     }
 
     //====================================  FM  ===========================================================
 
     // Метод получения друзей после добавления связи Person - Friendship; кажется наиболее актуальным,
     // т.к. проверяет только те френдшипы, в которых присутствует данный пользователь
-    public ListResponseDto getFriendsList(String name, Integer offset, Integer itemPerPage, Person person){
+    public List<Person> getFriendsList(Person person){
         List<Person> friends = person.getSentFriendshipRequests().stream().map(friendship -> {
             Person friend = null;
             if (friendship.getStatus().getCode().equals(FriendshipStatusCode.FRIEND)){
@@ -125,9 +140,7 @@ public class FriendshipService {
 
         friends.addAll(friends1);
 
-        //List<Person> friends = personRepository.findFriends(person);  // Старая версия. Лаконичная, но медленная
-
-        return new ListResponseDto<>((long) friends.size(), offset, itemPerPage, friends);
+        return friends;
     }
 
     //=======================

@@ -36,7 +36,7 @@ public class ApiFriendsController {
             @RequestParam(required = false) String name, @RequestParam(defaultValue = "0") Integer offset,
             @RequestParam(defaultValue = "20") Integer itemPerPage, ServletRequest servletRequest) {
         Person person = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest);
-        return ResponseEntity.ok(friendshipService.getFriendsList(name, offset, itemPerPage, person));
+        return ResponseEntity.ok(friendshipService.getFriendList(name, offset, itemPerPage, person));
     }
 
     @PostMapping("/{id}")

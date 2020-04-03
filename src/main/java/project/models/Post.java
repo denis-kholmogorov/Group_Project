@@ -19,8 +19,10 @@ public class Post {
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Date time;
 
-    @Column(name = "author_Id")
-    private Integer authorId;
+
+    @ManyToOne
+    @JoinColumn(name = "author_Id", nullable = false)
+    private Person author;
 
     private String title;
 

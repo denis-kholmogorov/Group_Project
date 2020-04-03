@@ -18,6 +18,7 @@ import project.handlerExceptions.BadRequestException400;
 import project.models.*;
 import project.models.enums.NotificationTypeEnum;
 import project.models.enums.PostTypeEnum;
+import project.repositories.NotificationRepository;
 import project.repositories.NotificationTypeRepository;
 import project.repositories.PostRepository;
 
@@ -38,6 +39,8 @@ public class PostService {
     private PersonService personService;
     private PostCommentsService postCommentsService;
     private NotificationTypeRepository notificationTypeRepository;
+    private FriendshipService friendshipService;
+    private NotificationRepository notificationRepository;
 
     public ListResponseDto<PostDto> findAllPosts(String name, Integer offset, Integer itemPerPage)
             throws BadRequestException400 {
@@ -81,13 +84,12 @@ public class PostService {
     public PostDto getPostDtoById(Integer id, Post post2Dto) {
         Post post = post2Dto == null ? getPostById(id) : post2Dto;
         if (post == null) throw new BadRequestException400();
-        Person person = personService.findPersonById(post.getAuthorId());
 
         Integer countLikes = postLikeService.countLikesByPostId(post.getId());
 
         List<CommentDto> comments = postCommentsService.getListCommentsDto(post.getId());
 
-        return new PostDto(post.getId(), post.getTime(), person, post.getTitle(),
+        return new PostDto(post.getId(), post.getTime(), post.getAuthor(), post.getTitle(),
                 post.getPostText(), post.getIsBlocked(), countLikes, comments);
     }
 
@@ -96,23 +98,26 @@ public class PostService {
                                                          Long publishDate,
                                                          PostRequestBodyTagsDto dto) throws BadRequestException400 {
         Post post = new Post();
-        post.setAuthorId(authorId);
+        Person author = personService.findPersonById(authorId);
+        post.setAuthor(author);
         post.setTime(publishDate == null ? new Date() : getDateFromLong(publishDate + ""));
         post.setTitle(dto.getTitle());
         post.setPostText(dto.getPostText());
         post.setIsBlocked(false);
         Post finalPost = postRepository.save(post);
 
-        Person author = personService.findPersonById(authorId);
+        List<Person> friendList = friendshipService.getFriendsList(author);
+        friendList.forEach(friend -> {
 
-
-        Notification notification = new Notification();
-        NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.POST);
-        notification.setPerson(dst);
-        notification.setContact("Contact");
-        notification.setMainEntity(src);
-        notification.setNotificationType(notificationType);
-        notificationRepository.save(notification);
+            Notification notification = new Notification();
+            NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.POST);
+            notification.setPerson(friend);
+            notification.setContact("Contact");
+            notification.setMainEntity(author);
+            notification.setNotificationType(notificationType);
+            //notificationRepository.save(notification);
+            friend.getNotificationList().add(notification);
+        });
 
         if (finalPost == null) throw new BadRequestException400();
 
@@ -148,7 +153,7 @@ public class PostService {
             PersonsWallPostDto personsWallPostDto = new PersonsWallPostDto();
             personsWallPostDto.setId(wallPost.getId());
             personsWallPostDto.setTime(wallPost.getTime());
-            personsWallPostDto.setAuthor(personService.findPersonById(wallPost.getAuthorId()));
+            personsWallPostDto.setAuthor(wallPost.getAuthor());
             personsWallPostDto.setTitle(wallPost.getTitle());
             personsWallPostDto.setPostText(wallPost.getPostText());
             personsWallPostDto.setIsBlocked(wallPost.getIsBlocked());
