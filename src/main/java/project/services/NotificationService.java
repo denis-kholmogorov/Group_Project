@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.proxy.LazyInitializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import project.dto.PostDto;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.NotificationDto;
 import project.models.MainEntity;
@@ -50,14 +51,34 @@ public class NotificationService {
                 offset, Math.min(itemsPerPage, person.getNotificationList().size()));
         List<NotificationDto> notificationDtoList = notificationList.stream().map(notification -> {
             NotificationDto notificationDto = new NotificationDto();
-            //Integer entityId = notification.getMainEntity().getId();
+            Integer entityId = notification.getMainEntity().getId();
             NotificationTypeEnum notificationTypeCode = notification.getNotificationType().getCode();
             notificationDto.setId(notification.getId());
             notificationDto.setNotificationType(notificationTypeCode);
-            notificationDto.setSentTime(new Date());
-            //notificationDto.setEntity(getEntityById(entityId, notificationTypeCode));
-            notificationDto.setEntity(notification.getMainEntity());
-            notificationDto.setInfo("info");
+            notificationDto.setSentTime(notification.getSentTime());
+
+            switch (notificationTypeCode) {
+                case POST:
+                    PostDto postDto = postService.getPostDtoById(entityId, null);
+                    notificationDto.setEntity(postDto.getAuthor());
+                    notificationDto.setInfo(postDto.getTitle());
+                    break;
+                case POST_COMMENTS:
+                case COMMENT_COMMENT:
+                    break;
+                case FRIEND_BIRTHDAY:
+                    break;
+                case FRIEND_REQUEST:
+                    Person personResponse = personService.findPersonById(entityId);
+                    notificationDto.setEntity(personResponse);
+                    notificationDto.setInfo(personResponse.getFirstName() + " " + personResponse.getLastName());
+                    break;
+                case MESSAGE:
+
+                    break;
+            }
+
+
             return notificationDto;
         }).collect(Collectors.toList());
         return new ListResponseDto<>((long) notificationDtoList.size(), offset, itemsPerPage, notificationDtoList);
@@ -67,6 +88,8 @@ public class NotificationService {
         MainEntity entity = null;
         switch (notificationTypeCode) {
             case POST:
+                PostDto postDto = postService.getPostDtoById(entityId, null);
+
                 break;
             case POST_COMMENTS:
             case COMMENT_COMMENT:

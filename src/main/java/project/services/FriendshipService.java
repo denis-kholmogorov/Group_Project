@@ -164,13 +164,13 @@ public class FriendshipService {
             friendship.setSrcPerson(src);
             friendship.setDstPerson(dst);
             friendship.setStatus(fs);
+            save(friendship);
 
             Notification notification = new Notification();
             NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.FRIEND_REQUEST);
             notification.setPerson(dst);
             notification.setContact("Contact");
             notification.setMainEntity(src);
-            save(friendship);
             notification.setNotificationType(notificationType);
             notificationRepository.save(notification);
         } else {

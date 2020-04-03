@@ -7,6 +7,7 @@ import project.Main;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Entity
@@ -22,8 +23,8 @@ public class Notification
     private NotificationType notificationType;
 
     @Column(name = "sent_time", updatable = false, nullable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
-    private LocalDateTime sentTime = LocalDateTime.now();
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
+    private Date sentTime;
 
     @JoinColumn(name = "person_id")
     @ManyToOne(fetch = FetchType.LAZY)

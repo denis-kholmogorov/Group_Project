@@ -15,11 +15,10 @@ import project.dto.requestDto.PostRequestBodyTagsDto;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
-import project.models.Person;
-import project.models.Post;
-import project.models.Post2Tag;
-import project.models.Tag;
+import project.models.*;
+import project.models.enums.NotificationTypeEnum;
 import project.models.enums.PostTypeEnum;
+import project.repositories.NotificationTypeRepository;
 import project.repositories.PostRepository;
 
 import java.util.Calendar;
@@ -38,6 +37,7 @@ public class PostService {
     private PostLikeService postLikeService;
     private PersonService personService;
     private PostCommentsService postCommentsService;
+    private NotificationTypeRepository notificationTypeRepository;
 
     public ListResponseDto<PostDto> findAllPosts(String name, Integer offset, Integer itemPerPage)
             throws BadRequestException400 {
@@ -102,6 +102,18 @@ public class PostService {
         post.setPostText(dto.getPostText());
         post.setIsBlocked(false);
         Post finalPost = postRepository.save(post);
+
+        Person author = personService.findPersonById(authorId);
+
+
+        Notification notification = new Notification();
+        NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.POST);
+        notification.setPerson(dst);
+        notification.setContact("Contact");
+        notification.setMainEntity(src);
+        notification.setNotificationType(notificationType);
+        notificationRepository.save(notification);
+
         if (finalPost == null) throw new BadRequestException400();
 
         List<String> tags = dto.getTags();

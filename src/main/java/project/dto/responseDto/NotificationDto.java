@@ -15,7 +15,7 @@ public class NotificationDto {
 
     private Integer id;
 
-    @JsonProperty("type_id")
+    @JsonProperty("event_type")
     @Enumerated(EnumType.STRING)
     private NotificationTypeEnum notificationType;
 
