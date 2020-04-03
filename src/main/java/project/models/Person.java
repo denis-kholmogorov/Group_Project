@@ -19,7 +19,7 @@ import java.util.*;
         "notificationList", "notificationSettings", "postList"})
 @Entity
 @Table(name = "person")
-public class Person extends MainEntity{
+public class Person extends MainEntity {
 
 //    @Id
 //    @GeneratedValue(strategy = GenerationType.AUTO)

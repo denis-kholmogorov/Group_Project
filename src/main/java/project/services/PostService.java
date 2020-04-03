@@ -113,10 +113,10 @@ public class PostService {
             NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.POST);
             notification.setPerson(friend);
             notification.setContact("Contact");
-            notification.setMainEntity(author);
+            notification.setMainEntity(finalPost);
             notification.setNotificationType(notificationType);
-            //notificationRepository.save(notification);
-            friend.getNotificationList().add(notification);
+            notification.setSentTime(new Date());
+            notificationRepository.save(notification);
         });
 
         if (finalPost == null) throw new BadRequestException400();
@@ -212,6 +212,8 @@ public class PostService {
     public void deleteAllPostsByAuthorId(Integer id) {
         postRepository.deleteAllByAuthorId(id);
     }
+
+
 
     public Date getDateFromLong(String date) {
         if (!date.isEmpty()) {

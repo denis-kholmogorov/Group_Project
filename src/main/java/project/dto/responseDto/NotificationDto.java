@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import project.models.MainEntity;
+import project.models.Person;
 import project.models.enums.NotificationTypeEnum;
 
 import javax.persistence.EnumType;
@@ -24,7 +25,7 @@ public class NotificationDto {
     private Date sentTime;
 
     @JsonProperty("entity_author")
-    private MainEntity entity;
+    private MainEntity mainEntity;
 
     private String info;
 }

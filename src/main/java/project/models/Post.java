@@ -10,10 +10,10 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "post")
-public class Post {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+public class Post extends MainEntity {
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.AUTO)
+//    private Integer id;
 
     @Column(updatable = false)
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)

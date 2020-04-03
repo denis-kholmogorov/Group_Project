@@ -136,7 +136,8 @@ public class FriendshipService {
                 friend = friendship.getSrcPerson();
             }
             return friend;
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+        }).filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
         friends.addAll(friends1);
 

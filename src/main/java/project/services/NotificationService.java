@@ -60,7 +60,7 @@ public class NotificationService {
             switch (notificationTypeCode) {
                 case POST:
                     PostDto postDto = postService.getPostDtoById(entityId, null);
-                    notificationDto.setEntity(postDto.getAuthor());
+                    notificationDto.setMainEntity(postDto.getAuthor());
                     notificationDto.setInfo(postDto.getTitle());
                     break;
                 case POST_COMMENTS:
@@ -70,14 +70,13 @@ public class NotificationService {
                     break;
                 case FRIEND_REQUEST:
                     Person personResponse = personService.findPersonById(entityId);
-                    notificationDto.setEntity(personResponse);
+                    notificationDto.setMainEntity(personResponse);
                     notificationDto.setInfo(personResponse.getFirstName() + " " + personResponse.getLastName());
                     break;
                 case MESSAGE:
 
                     break;
             }
-
 
             return notificationDto;
         }).collect(Collectors.toList());
