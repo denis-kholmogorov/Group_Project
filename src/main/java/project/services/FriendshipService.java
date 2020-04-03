@@ -161,7 +161,6 @@ public class FriendshipService {
             fs.setCode(FriendshipStatusCode.REQUEST);
             fs.setName(FriendshipStatusCode.REQUEST.getCode2Name());
             fs.setTime(new Date());
-            src.setPhoto("ffgh");
             friendship.setSrcPerson(src);
             friendship.setDstPerson(dst);
             friendship.setStatus(fs);
