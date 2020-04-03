@@ -22,14 +22,12 @@ import static java.util.stream.Collectors.toList;
 public class ApiPostController {
     private PostService postService;
 
-    @Secured("ROLE_USER")
     @GetMapping("{id}")
     public ResponseEntity<ResponseDto<PostDto>> getPostById(@PathVariable Integer id) throws BadRequestException400 {
         PostDto postDto = postService.getPostDtoById(id, null);
         return ResponseEntity.ok(new ResponseDto<>(postDto));
     }
 
-    @Secured("ROLE_USER")
     @PutMapping("{id}")
     public ResponseEntity<ResponseDto<PostDto>> editPostById(
             @PathVariable Integer id, @RequestParam(value = "publish_date", required = false) Long publishDate,
@@ -37,13 +35,13 @@ public class ApiPostController {
         return ResponseEntity.ok(postService.editPostById(id, publishDate, dto));
     }
 
-    @Secured("ROLE_USER")
+    //@Secured("ROLE_USER")
     @DeleteMapping("{id}")
     public ResponseEntity<ResponseDto<Integer>> deletePostById(@PathVariable Integer id) {
         return ResponseEntity.ok(postService.deletePostById(id));
     }
 
-    @Secured("ROLE_USER")
+    //@Secured("ROLE_USER")
     @GetMapping
     public ResponseEntity<ListResponseDto<ResponseDto<PostDto>>> findPostsByTitleAndDate(
             @RequestParam String text,

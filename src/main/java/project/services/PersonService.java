@@ -1,36 +1,34 @@
 package project.services;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import project.dto.requestDto.LoginRequestDto;
 import project.dto.requestDto.PasswordSetDto;
 import project.dto.requestDto.RegistrationRequestDto;
 import project.dto.requestDto.UpdatePersonDto;
-import project.dto.responseDto.*;
+import project.dto.responseDto.MessageResponseDto;
+import project.dto.responseDto.PersonDtoWithToken;
+import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
 import project.handlerExceptions.UnauthorizationException401;
-import project.models.*;
-import project.models.enums.FriendshipStatusCode;
+import project.models.Person;
+import project.models.Role;
+import project.models.VerificationToken;
 import project.models.enums.MessagesPermission;
+import project.models.util.entity.ImagePath;
 import project.repositories.PersonRepository;
 import project.repositories.RoleRepository;
-import project.repositories.TokenRepository;
 import project.security.TokenProvider;
 import project.services.email.EmailService;
 
-import javax.imageio.ImageIO;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -46,9 +44,6 @@ public class PersonService {
     private TokenProvider tokenProvider;
 
     @Autowired
-    TokenRepository tokenRepository;
-
-    @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
@@ -60,7 +55,8 @@ public class PersonService {
     @Autowired
     RoleRepository roleRepository;
 
-
+    @Autowired
+    private ImagePath imagePath;
 
     //    @PostConstruct
 //    public void init() {
@@ -94,6 +90,7 @@ public class PersonService {
 
         person.setEmail(dto.getEmail());
         person.setPassword(encoder.encode(dto.getPasswd1()));
+        person.setPhoto(imagePath.getDefaultImagePath());
         person.setFirstName(dto.getFirstName());
         person.setLastName(dto.getLastName());
         person.setRegDate(new Date());
@@ -104,11 +101,9 @@ public class PersonService {
 
     public ResponseDto<PersonDtoWithToken> login(LoginRequestDto dto){
         String email = dto.getEmail();
-        Person person = personRepository.findPersonByEmail(email).orElse(null);//необходимо оставить
-        if (person == null) {
-            throw new BadRequestException400();
-        }
-        Token jwtToken = new Token();
+        Person person = personRepository.findPersonByEmail(email).orElseThrow(BadRequestException400::new);//необходимо оставить
+
+        person.setLastOnlineTime(new Date());
         String token = tokenProvider.createToken(email);//необходимо оставить
         PersonDtoWithToken personDto = new PersonDtoWithToken();
         personDto.setId(person.getId());
@@ -126,12 +121,6 @@ public class PersonService {
         personDto.setLastOnlineTime(person.getLastOnlineTime());
         personDto.setBlocked(person.isBlocked());
         personDto.setToken(token);
-
-        jwtToken.setToken(token);
-        jwtToken.setDateCreated(Calendar.getInstance());
-        jwtToken.setEmailUser(person.getEmail());
-        tokenRepository.save(jwtToken);
-
         return new ResponseDto<>(personDto);
     }
 
@@ -183,12 +172,6 @@ public class PersonService {
         return personRepository.findPersonByEmail(email).orElse(null);
     }
 
-    public boolean logout(HttpServletRequest request) throws BadRequestException400 {
-        String token = tokenProvider.resolveToken(request);
-        tokenRepository.deleteByToken(token);
-        return true;
-    }
-
     public Person findPersonById(Integer id) {
         Optional<Person> optionalPerson = personRepository.findById(id);
         return optionalPerson.orElse(null);
@@ -202,53 +185,9 @@ public class PersonService {
         return true;
     }
 
-    @SneakyThrows
-    public FileUploadResponseDto downloadImage(String type, MultipartFile file, HttpServletRequest request) throws BadRequestException400 {
-
-        Person person = tokenProvider.getPersonByRequest(request);
-        int index = file.getContentType().indexOf("/") + 1;
-        String typeImage = file.getContentType().substring(index);
-        log.info(typeImage + " тип изображения");
-        if(!file.isEmpty()){
-            String rawPath = "C:\\Users\\Nortoza Forhnis\\Downloads\\nginx-1.17.9\\nginx-1.17.9\\html\\static\\img";
-            String fileName = UUID.randomUUID().toString();
-            String pathImage = rawPath + fileName + "." + typeImage ;
-
-            ByteArrayInputStream bais = new ByteArrayInputStream(file.getBytes());// получаем байты из изображения
-            BufferedImage bi = ImageIO.read(bais); // собираем байты в картинку
-            ImageIO.write(bi, typeImage,new File(pathImage));
-            log.info("Сохраненный файл " + pathImage);
-
-            int indexPhoto = pathImage.indexOf("static")-1;
-            String pathPhoto = pathImage.substring(indexPhoto);
-            person.setPhoto(pathPhoto);
-            personRepository.save(person);
-
-            return FileUploadResponseDto.builder()
-                    .id(person.getId().toString())
-                    .ownerId(person.getId())
-                    .fileName(fileName)
-                    .bytes((long) file.getBytes().length)
-                    .fileFormat(typeImage)
-                    .createdAt(new Date().getTime())
-                    .fileType(type)
-                    .rawFileURL(pathImage)
-                    .relativeFilePath(pathPhoto)
-                    .build();
-        }
-        return null;
-    }
-
-    public void updatePhoto(Person person, String url) {
-        person.setPhoto(url);
-        personRepository.save(person);
-    }
-
-
     public void deletePersonByEmail(String email){
         Person person = findPersonByEmail(email);
         if(person != null){
-            tokenRepository.deleteByEmailUser(email);
             personRepository.deleteByEmail(email);
         }
     }
@@ -275,16 +214,31 @@ public class PersonService {
         return person;
     }
 
+    public void updatePhoto(Person person, String url) {
+        person.setPhoto(url);
+        personRepository.save(person);
+    }
 
+    public List<Person> search(Person person,
+                               String firstName,
+                               String lastName,
+                               Integer ageFrom,
+                               Integer ageTo,
+                               String country,
+                               String city,
+                               Integer offset,
+                               Integer itemPerPage) {
+        Pageable pageable = PageRequest.of(offset, itemPerPage);
+        return personRepository.search(person.getId(), firstName, lastName, ageFrom, ageTo, country, city, pageable);
+    }
 
-    //=================================================================================================================
-
-    /**
-     * Тестовый метод для нахождения людей по имени для добавления в друзья
-     * Можно удалить, когда будет нормальный поиск
-     */
-    public ListResponseDto search(String name, Integer offset, Integer itemPerPage){
-        List<Person> people = personRepository.findAllByFirstName(name);
-        return new ListResponseDto<>((long) people.size(), offset, itemPerPage, people);
+    public long searchCount(Person person,
+                            String firstName,
+                            String lastName,
+                            Integer ageFrom,
+                            Integer ageTo,
+                            String country,
+                            String city) {
+        return personRepository.searchCount(person.getId(), firstName, lastName, ageFrom, ageTo, country, city);
     }
 }

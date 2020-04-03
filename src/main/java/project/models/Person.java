@@ -91,6 +91,10 @@ public class Person extends MainEntity{
     private Set<Role> roles = new HashSet<>();
 
     @JsonIgnore
+    @ManyToMany(mappedBy = "persons", fetch = FetchType.LAZY)
+    private List<Dialog> dialogs;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "srcPerson")
     private List<Friendship> sentFriendshipRequests = new ArrayList<>();
 

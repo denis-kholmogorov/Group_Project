@@ -5,7 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.PostRequestBodyTagsDto;
 import project.dto.requestDto.UpdatePersonDto;
@@ -21,6 +23,10 @@ import project.services.PostService;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
 
@@ -46,7 +52,7 @@ public class ApiUsersController {
     @Secured("ROLE_USER")
     @PutMapping("me")
     public ResponseEntity<?> personEditBody(@RequestBody UpdatePersonDto updatePersonDto,
-                                            HttpServletRequest request) throws UnauthorizationException401
+                                                 HttpServletRequest request) throws UnauthorizationException401
     {
         Person person = personService.editBody(updatePersonDto, request);
         person.setLastOnlineTime(new Date());
@@ -78,6 +84,7 @@ public class ApiUsersController {
         return ResponseEntity.ok(postService.findAllByAuthorId(id, offset, itemPerPage, compareId));
     }
 
+    @Secured("ROLE_USER")
     @PostMapping("{id}/wall")
     public ResponseEntity<?> addWallPostById(
             @PathVariable Integer id, @RequestParam(value = "publish_date", required = false) Long publishDate,
@@ -85,26 +92,33 @@ public class ApiUsersController {
         return ResponseEntity.ok(postService.addNewWallPostByAuthorId(id, publishDate, dto));
     }
 
+    @Secured("ROLE_USER")
     @PutMapping("block/{id}")
     public ResponseEntity<?> blockPersonById(@PathVariable Integer id) throws BadRequestException400 {    //обработать 400 и 401
         personService.blockPersonById(id, true);
         return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
+    @Secured("ROLE_USER")
     @DeleteMapping("block/{id}")
     public ResponseEntity<?> unblockPersonById(@PathVariable Integer id) throws BadRequestException400 { //обработать 400 и 401
         personService.blockPersonById(id, false);
         return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
-    /**
-     * Тестовый контроллер для нахождения людей по имени для добавления в друзья
-     * Можно удалить, когда будет нормальный поиск
-     */
-    @GetMapping("/search")
-    public ResponseEntity<ListResponseDto> search(@RequestParam(name = "first_name") String name, @RequestParam(defaultValue = "0") Integer offset,
-                                                  @RequestParam(defaultValue = "20") Integer itemPerPage) {
-
-        return ResponseEntity.ok(personService.search(name, offset, itemPerPage));
+    @GetMapping("search")
+    ResponseEntity<?> search(@RequestParam(name = "first_name", required = false) @Size(max = 255) String firstName,
+                             @RequestParam(name = "last_name", required = false) @Size(max = 255) String lastName,
+                             @RequestParam(name = "age_from", required = false) Integer ageFrom,
+                             @RequestParam(name = "age_to", required = false) Integer ageTo,
+                             @RequestParam(required = false) @Size(max = 255) String country,
+                             @RequestParam(required = false) @Size(max = 255) String city,
+                             @RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer offset,
+                             @RequestParam(required = false, defaultValue = "20") @Positive @Max(20) Integer itemPerPage,
+                             HttpServletRequest request) {
+        Person person = tokenProvider.getPersonByRequest(request);
+        long personCount = personService.searchCount(person, firstName, lastName, ageFrom, ageTo, country, city);
+        List<Person> persons = personService.search(person, firstName, lastName, ageFrom, ageTo, country, city, offset, itemPerPage);
+        return ResponseEntity.ok(new ListResponseDto<>(personCount, offset, itemPerPage, persons));
     }
 }

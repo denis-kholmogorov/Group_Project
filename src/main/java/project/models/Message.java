@@ -1,14 +1,17 @@
 package project.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.ToString;
 import project.models.enums.ReadStatus;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Entity
+@ToString(exclude = "dialog")
 @Table(name = "message")
 public class Message {
     @Id
@@ -16,10 +19,10 @@ public class Message {
     private Integer id;
 
     @Column(updatable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
-    private LocalDateTime time;
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
+    private Date time;
 
-    @Column(name = "autor_id")
+    @Column(name = "author_id")
     private Integer authorId;
 
     @Column(name = "recipient_id")
@@ -31,4 +34,9 @@ public class Message {
     @Column(name = "read_status")
     @Enumerated(EnumType.STRING)
     private ReadStatus readStatus;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "dialog_id", nullable = false)
+    private Dialog dialog;
 }

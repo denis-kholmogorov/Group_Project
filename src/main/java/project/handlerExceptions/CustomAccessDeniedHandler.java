@@ -21,21 +21,15 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e) throws IOException, ServletException {
         Authentication auth
                 = SecurityContextHolder.getContext().getAuthentication();
+
         if (auth != null) {
-            log.warn("User: " + auth.getName()
-                    + " attempted to access the protected URL: "
+            log.info("User: " + auth.getName()
                     + request.getRequestURI());
         }
-        log.warn("User: " + auth.getName()
+        log.info("User: " + auth.getName()
                 + " attempted to doesn't " +
                 "access the protected URL: "
                 + request.getRequestURI());
-        response.resetBuffer();
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setHeader("Content-Type", "application/json");
-        String error401 = "{\n\t\"error\":\"unauthorized\",\n\t\"error_description\":\"Unauthorized\"\n}";
-        response.getOutputStream().print(error401);
-        response.flushBuffer();
-        response.getOutputStream().close();
+        response.sendError(401);
     }
 }

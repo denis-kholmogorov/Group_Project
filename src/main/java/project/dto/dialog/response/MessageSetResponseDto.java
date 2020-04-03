@@ -1,16 +1,17 @@
-package project.dto.responseDto;
+package project.dto.dialog.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import project.models.ResponseModel;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ListResponseDto<T> extends ResponseModel {
+public class MessageSetResponseDto<T> extends ResponseModel {
 
     private Long total;
 
@@ -18,5 +19,5 @@ public class ListResponseDto<T> extends ResponseModel {
 
     private Integer perPage;
 
-    private Collection<T> data;
+    private Set<T> data;
 }

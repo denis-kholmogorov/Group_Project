@@ -1,8 +1,6 @@
 package project.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,12 +13,11 @@ import org.springframework.stereotype.Component;
 import project.handlerExceptions.UnauthorizationException401;
 import project.models.Person;
 import project.models.Role;
-import project.models.Token;
 import project.repositories.PersonRepository;
-import project.repositories.TokenRepository;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.nio.file.AccessDeniedException;
 import java.util.*;
 
 /**
@@ -29,14 +26,14 @@ import java.util.*;
 @Component
 public class TokenProvider
 {
-    @Autowired
-    TokenRepository tokenRepository;
-
-    @Autowired
+        @Autowired
     PersonRepository personRepository;
 
     @Value("${jwt.token.secret}")
     private String secret; // секретное слово из application.yml
+
+    @Value("${jwt.token.expired}")
+    private long validityMillisecond;
 
 
     private UserDetailsService userDetailsService;
@@ -59,9 +56,11 @@ public class TokenProvider
 
         Claims claims = Jwts.claims().setSubject(email); //создаем клайм
         Date now = new Date();
+        Date validity = new Date(now.getTime() + validityMillisecond);
         return Jwts.builder()       // создаем токен
                 .setClaims(claims)  // установка клайм
-                .setIssuedAt(now)   // установка даты создания
+                .setIssuedAt(now)
+                .setExpiration(validity)// установка даты создания
                 .signWith(SignatureAlgorithm.HS256, secret) //хэширование секретного кода
                 .compact();
     }
@@ -98,23 +97,17 @@ public class TokenProvider
     }
 
     /** Валидация токена*/
-    public boolean validateToken(String token) {
-        Optional<Token> optionalToken = tokenRepository.findByToken(token);
-        if (optionalToken.isPresent()) {
-            Token jwtToken = optionalToken.get();
-            Calendar date = jwtToken.getDateCreated();
-            date.add(Calendar.MONTH, 1);
-            if (Calendar.getInstance().before(date)) {
-                jwtToken.setDateCreated(Calendar.getInstance());
-                tokenRepository.save(jwtToken);
-                return true;
-            }
-            tokenRepository.delete(jwtToken);
-            log.info("УДАЛЕН ТОКЕН!");
-            return false;
-        }
-        log.info("Токен НЕ найден в базе");
-        return false;
+    public boolean validateToken(String token) throws AccessDeniedException {
+
+         try {
+             Jws<Claims> claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
+             if(claims.getBody().getExpiration().before(new Date())){
+                 return false;
+             }
+             return true;
+         } catch (JwtException | IllegalArgumentException e){
+             throw new AccessDeniedException("Token was expired");
+         }
     }
 
     public List<String> getRoleName(List<Role> personRole){
