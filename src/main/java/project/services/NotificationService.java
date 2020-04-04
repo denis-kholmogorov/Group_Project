@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import project.dto.PostDto;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.NotificationDto;
-import project.models.MainEntity;
-import project.models.Notification;
-import project.models.NotificationType;
-import project.models.Person;
+import project.models.*;
 import project.models.enums.NotificationTypeEnum;
 import project.repositories.NotificationRepository;
 
@@ -74,7 +71,12 @@ public class NotificationService {
                     notificationDto.setInfo(personResponse.getFirstName() + " " + personResponse.getLastName());
                     break;
                 case MESSAGE:
-
+                    Message message = messageService.findMessageById(entityId);
+                    if (message != null) {
+                        Person author = personService.findPersonById(message.getAuthorId());
+                        notificationDto.setMainEntity(author);
+                        notificationDto.setInfo(message.getMessageText());
+                    }
                     break;
             }
 

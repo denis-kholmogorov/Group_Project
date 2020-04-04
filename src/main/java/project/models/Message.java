@@ -13,10 +13,10 @@ import java.util.Date;
 @Entity
 @ToString(exclude = "dialog")
 @Table(name = "message")
-public class Message {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+public class Message extends MainEntity {
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.AUTO)
+//    private Integer id;
 
     @Column(updatable = false)
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)

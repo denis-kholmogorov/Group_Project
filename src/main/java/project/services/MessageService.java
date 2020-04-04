@@ -56,6 +56,10 @@ public class MessageService {
         this.notificationRepository = notificationRepository;
     }
 
+    public Message findMessageById(Integer id) {
+        return messageRepository.findById(id).orElse(null);
+    }
+
     public ListResponseDto<DialogDto> getAllDialogs(String query, Integer offset, Integer itemPerPage,
                                          HttpServletRequest request) throws BadRequestException400 {
         Person person = tokenProvider.getPersonByRequest(request);
@@ -97,7 +101,7 @@ public class MessageService {
         AtomicReference<Integer> existDialog = null;
         List<Dialog> list = personAuthor.getDialogs();
         if (list.size() != 0) {
-            personAuthor.getDialogs().forEach(dialog -> {
+            list.stream().forEach(dialog -> {
                 if (dialog.getPersons().contains(personRecipient)) {
                     existDialog.set(dialog.getId());
                     exist.set(true);
@@ -159,7 +163,7 @@ public class MessageService {
         NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.MESSAGE);
         notification.setPerson(dstPerson);
         notification.setContact("Contact");
-        notification.setMainEntity(personList.get(0));
+        notification.setMainEntity(message);
         notification.setNotificationType(notificationType);
         notification.setSentTime(new Date());
         notificationRepository.save(notification);

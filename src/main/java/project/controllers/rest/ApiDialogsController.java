@@ -31,7 +31,7 @@ public class ApiDialogsController {
     MessageService messageService;
 
     @Secured("ROLE_USER")
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<?> getAllDialogs(@RequestParam(name = "query",required = false) String query,
                                            @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset,
                                            @RequestParam(name = "itemPerPage", required = false, defaultValue = "20") Integer itemPerPage,
@@ -43,8 +43,8 @@ public class ApiDialogsController {
     }
 
     @Secured("ROLE_USER")
-    @PostMapping()
-    public ResponseEntity<?> createDialog (HttpServletRequest request,
+    @PostMapping
+    public ResponseEntity<?> createDialog(HttpServletRequest request,
                                              @RequestBody CreateDialogDto createDialogDto) throws BadRequestException400 {
         DialogResponseDto dialogResponseDto = messageService.createDialog(request, createDialogDto);
         return ResponseEntity.ok(new ResponseDto<>(dialogResponseDto));
