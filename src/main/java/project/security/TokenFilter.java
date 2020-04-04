@@ -33,7 +33,7 @@ public class TokenFilter extends GenericFilterBean
     {
        String token = tokenProvider.resolveToken((HttpServletRequest) servletRequest); //Берем заголовок
        log.info(token + " токен из хедера авторизации");
-        if(token != null && tokenProvider.validateToken(token)){ //проверяем его валидность
+       if(token != null && tokenProvider.validateToken(token)){ //проверяем его валидность
            Authentication auth = tokenProvider.getAuthentication(token); //получаем аутентификацию
            if(auth != null){
                log.info(" Авторизация в контекст путь " + ((HttpServletRequest) servletRequest).getRequestURI() +

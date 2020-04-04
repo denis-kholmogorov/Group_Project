@@ -102,8 +102,8 @@ public class PersonService {
     public ResponseDto<PersonDtoWithToken> login(LoginRequestDto dto){
         String email = dto.getEmail();
         Person person = personRepository.findPersonByEmail(email).orElseThrow(BadRequestException400::new);//необходимо оставить
-
         person.setLastOnlineTime(new Date());
+        personRepository.save(person);
         String token = tokenProvider.createToken(email);//необходимо оставить
         PersonDtoWithToken personDto = new PersonDtoWithToken();
         personDto.setId(person.getId());

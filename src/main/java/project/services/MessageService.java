@@ -69,7 +69,6 @@ public class MessageService {
         List<DialogDto> dialogDtoList = dialogList.stream().map(dialog -> {
             DialogDto dialogDto = new DialogDto();
             dialogDto.setId(dialog.getId());
-            dialogDto.setUnreadCount(messageRepository.countByRecipientIdAndReadStatus(person.getId(), ReadStatus.SENT));
             Message message = null;
             if(dialog.getListMessage().size() == 0) {
                 message = sentMessage(
@@ -88,8 +87,12 @@ public class MessageService {
                     .sentByMe(message.getAuthorId() == person.getId())
                     .time(message.getTime())
                     .build());
+            dialogDto.setUnreadCount(messageRepository.countByAuthorIdAndReadStatusAndDialogId(person.getId(),
+                    ReadStatus.SENT,
+                    dialog.getId()));
             return dialogDto;
         }).collect(Collectors.toList());
+
 
         return new ListResponseDto<>((long) dialogDtoList.size(), offset, itemPerPage, dialogDtoList);
     }
@@ -98,7 +101,8 @@ public class MessageService {
         Person personAuthor = tokenProvider.getPersonByRequest(request); // как этого чувака привязать к диалогам
         Person personRecipient = personRepository.findById(userIds.getUserIds().get(0)).orElse(null);
         AtomicReference<Boolean> exist = new AtomicReference<>(false);
-        AtomicReference<Integer> existDialog = null;
+        AtomicReference<Integer> existDialog = new AtomicReference<>() ;
+
         List<Dialog> list = personAuthor.getDialogs();
         if (list.size() != 0) {
             list.stream().forEach(dialog -> {
@@ -122,7 +126,7 @@ public class MessageService {
     public Integer getCountSendMessage(HttpServletRequest request) throws BadRequestException400 {
         Person recipient = tokenProvider.getPersonByRequest(request);
         return messageRepository
-                .countByRecipientIdAndReadStatus(recipient.getId(), ReadStatus.SENT);
+                .countByAuthorIdAndReadStatus(recipient.getId(), ReadStatus.SENT);
     }
 
     public ListResponseDto getDialogMessages(
