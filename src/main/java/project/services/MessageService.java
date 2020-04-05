@@ -69,13 +69,13 @@ public class MessageService {
         List<DialogDto> dialogDtoList = dialogList.stream().map(dialog -> {
             DialogDto dialogDto = new DialogDto();
             dialogDto.setId(dialog.getId());
-            Message message = null;
-            if(dialog.getListMessage().size() == 0) {
+            Message message;
+            if (dialog.getListMessage().size() == 0) {
                 message = sentMessage(
                         dialog.getId(),
                         new MessageRequestDto("Привет! Я " + person.getFirstName() + " " + person.getLastName()),
                         request);
-            }else {
+            } else {
                 message = dialog.getListMessage().get(dialog.getListMessage().size() - 1);
             }
             dialogDto.setMessage(MessageDto.builder()
@@ -100,12 +100,15 @@ public class MessageService {
     public DialogResponseDto createDialog(HttpServletRequest request, CreateDialogDto userIds) {
         Person personAuthor = tokenProvider.getPersonByRequest(request); // как этого чувака привязать к диалогам
         Person personRecipient = personRepository.findById(userIds.getUserIds().get(0)).orElse(null);
+
+        if (personAuthor == personRecipient) return new DialogResponseDto(null); //шобы не написать самому себе
+
         AtomicReference<Boolean> exist = new AtomicReference<>(false);
         AtomicReference<Integer> existDialog = new AtomicReference<>() ;
 
         List<Dialog> list = personAuthor.getDialogs();
         if (list.size() != 0) {
-            list.stream().forEach(dialog -> {
+            list.forEach(dialog -> {
                 if (dialog.getPersons().contains(personRecipient)) {
                     existDialog.set(dialog.getId());
                     exist.set(true);

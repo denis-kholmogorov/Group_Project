@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.dto.responseDto.ListResponseDto;
+import project.handlerExceptions.BadRequestException400;
 import project.models.*;
 import project.models.enums.FriendshipStatusCode;
 import project.models.enums.NotificationTypeEnum;
@@ -123,8 +124,11 @@ public class FriendshipService {
 
         Person src = tokenProvider.getPersonByRequest(request);
         Person dst = personService.findPersonById(id);
+
+        if (src == dst) throw new BadRequestException400(); //шобы не отправить заявку самому себе, но нужно обработать нормально
+
         Friendship friendship = findByFriendsCouple(src, dst);
-        if (friendship == null){
+        if (friendship == null) {
             sendRequest(src, dst);
 //            Notification notification = new Notification();
 //            NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.FRIEND_REQUEST);
