@@ -2,6 +2,7 @@ package project.dto.responseDto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import project.models.MainEntity;
 import project.models.Person;
@@ -12,6 +13,7 @@ import javax.persistence.Enumerated;
 import java.util.Date;
 
 @Data
+@AllArgsConstructor
 public class NotificationDto {
 
     private Integer id;

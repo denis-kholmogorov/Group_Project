@@ -27,14 +27,19 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/friends")
-@AllArgsConstructor
 @Slf4j
 public class ApiFriendsController {
 
-    @Autowired
     private FriendshipService friendshipService;
     private TokenProvider tokenProvider;
     private PersonService personService;
+
+    @Autowired
+    public ApiFriendsController(FriendshipService friendshipService, TokenProvider tokenProvider, PersonService personService) {
+        this.friendshipService = friendshipService;
+        this.tokenProvider = tokenProvider;
+        this.personService = personService;
+    }
 
     @GetMapping
     public ResponseEntity<ListResponseDto> getFriendList(

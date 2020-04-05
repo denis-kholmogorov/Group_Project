@@ -1,15 +1,10 @@
 package project.services;
 
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.dto.responseDto.ListResponseDto;
-import project.handlerExceptions.BadRequestException400;
 import project.models.*;
 import project.models.enums.FriendshipStatusCode;
 import project.models.enums.NotificationTypeEnum;
@@ -21,12 +16,8 @@ import project.security.TokenProvider;
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toList;
 
 @Service
 @Slf4j
@@ -43,7 +34,8 @@ public class FriendshipService {
     private EntityManager entityManager;
 
     @Autowired
-    public FriendshipService(FriendshipRepository friendshipRepository, PersonService personService, TokenProvider tokenProvider) {
+    public FriendshipService(FriendshipRepository friendshipRepository, PersonService personService,
+                             TokenProvider tokenProvider) {
         this.friendshipRepository = friendshipRepository;
         this.personService = personService;
         this.tokenProvider = tokenProvider;
@@ -61,23 +53,9 @@ public class FriendshipService {
         return friendshipRepository.findByFriendsCouple(firstFriend, secondFriend).orElse(null);
     }
 
-    //    @PostConstruct
-//    public void init() {
-//        Friendship friendship = new Friendship();
-//        friendship.setStatusId(14);
-//        friendship.setPersonIdWhoSendFriendship(2);
-//        friendship.setPersonIdWhoTakeFriendship(4);
-//
-//        friendshipRepository.save(friendship);
-//
-//        Friendship friendship1 = new Friendship();
-//        friendship1.setStatusId(15);
-//        friendship1.setPersonIdWhoSendFriendship(16);
-//        friendship1.setPersonIdWhoTakeFriendship(2);
-//
-//        friendshipRepository.save(friendship1);
-//    }
-
+    public Friendship findById(Integer id) {
+        return friendshipRepository.findById(id).orElse(null);
+    }
 
     // Метод Ильи для списка друзей
     public ListResponseDto<Person> getFriendList(String name, Integer offset, Integer itemPerPage, Person person) {
@@ -94,33 +72,11 @@ public class FriendshipService {
                 .collect(Collectors.toList());
         return new ListResponseDto<>((long) filterList.size(), offset, itemPerPage,
                 filterList.subList(offset, Math.min(filterList.size(), itemPerPage)));
-
-        //Sort sort = Sort.by(Sort.Direction.DESC, "time");
-        //Pageable pageable = PageRequest.of(offset, itemPerPage);
-//        int personId = person.getId();
-//        List<Friendship> friendshipList =
-//                friendshipRepository.findAllBySrcPersonOrDstPersonAndStatus(
-//                        person, pageable);
-//
-//        List<Person> personFriendList = friendshipList.stream().map(friendship -> {
-//            Person personFriend;
-//            if (friendship.getSrcPerson().getId() != personId) {
-//                personFriend = friendship.getSrcPerson();
-//            }
-//            else if (friendship.getDstPerson().getId() != personId) {
-//                personFriend = friendship.getDstPerson();
-//            }
-//            else throw new BadRequestException400();
-//            return personFriend;
-//        }).collect(toList());
-//
-//        return new ListResponseDto((long) personFriendList.size(), offset, itemPerPage, personFriendList);
     }
 
     //====================================  FM  ===========================================================
 
-    // Метод получения друзей после добавления связи Person - Friendship; кажется наиболее актуальным,
-    // т.к. проверяет только те френдшипы, в которых присутствует данный пользователь
+    // Метод получения друзей для внутреннего пользования
     public List<Person> getFriendsList(Person person){
         List<Person> friends = person.getSentFriendshipRequests().stream().map(friendship -> {
             Person friend = null;
@@ -170,18 +126,45 @@ public class FriendshipService {
         Friendship friendship = findByFriendsCouple(src, dst);
         if (friendship == null){
             sendRequest(src, dst);
-            Notification notification = new Notification();
-            NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.FRIEND_REQUEST);
-            notification.setMainEntity(src);
-            notification.setPerson(dst);
-            notification.setNotificationType(notificationType);
-            notification.setSentTime(new Date());
-            notificationRepository.save(notification);
+//            Notification notification = new Notification();
+//            NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.FRIEND_REQUEST);
+//            notification.setMainEntity(src);
+//            notification.setPerson(dst);
+//            notification.setNotificationType(notificationType);
+//            notification.setSentTime(new Date());
+//            notificationRepository.save(notification);
         } else if (friendship.getStatus().getCode().equals(FriendshipStatusCode.REQUEST)){
+
+            friendship.getStatus().setName(FriendshipStatusCode.FRIEND.getCode2Name());
             friendship.getStatus().setCode(FriendshipStatusCode.FRIEND);
-            //TODO менять описание статуса
+
+            List<Person> srcFriendList = getFriendsList(src);
+            List<Person> dstFriendList = getFriendsList(dst);
+
+
+            List<Person> friendListBoth = srcFriendList.stream()
+                    .distinct()
+                    .filter(dstFriendList::contains)
+                    .collect(Collectors.toList());
+
+            sendFriendshipAgreementToPersonFriends(friendListBoth, friendship);
         } else {
             throw new IllegalStateException("Fuck you!");
+        }
+    }
+
+    private void sendFriendshipAgreementToPersonFriends(List<Person> friendList, Friendship friendship) {
+        //List<Person> friendList = getFriendsList(person);
+        for (Person friend : friendList) {
+            if (!friend.equals(friendship.getSrcPerson()) && !friend.equals(friendship.getDstPerson())) {
+                Notification notification = new Notification();
+                NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.FRIEND_REQUEST);
+                notification.setMainEntity(friendship);
+                notification.setPerson(friend);
+                notification.setNotificationType(notificationType);
+                notification.setSentTime(new Date());
+                notificationRepository.save(notification);
+            }
         }
     }
 

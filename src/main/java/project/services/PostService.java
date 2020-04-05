@@ -124,7 +124,7 @@ public class PostService {
 
         List<String> tags = dto.getTags();
         if (tags.size() > 0) {
-            tags.stream().forEach(tag -> {
+            tags.forEach(tag -> {
                 Tag tag2DB = new Tag();
                 tag2DB.setTag(tag);
                 int tagId = tagService.addNewTag(tag2DB).getId();
