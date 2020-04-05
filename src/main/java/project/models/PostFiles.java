@@ -6,7 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Entity
@@ -19,8 +19,8 @@ public class PostFiles
 
     @Column(updatable = false, nullable = false)
     @CreationTimestamp
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
-    private LocalDateTime time;
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
+    private Date time;
 
     @Column(name = "post_id")
     private Integer post;

@@ -1,21 +1,20 @@
 package project.services;
 
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.proxy.LazyInitializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import project.dto.PostDto;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.NotificationDto;
-import project.models.*;
+import project.models.MainEntity;
+import project.models.Message;
+import project.models.Notification;
+import project.models.Person;
 import project.models.enums.NotificationTypeEnum;
 import project.repositories.NotificationRepository;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -87,6 +86,7 @@ public class NotificationService {
 
             return notificationDto;
         }).filter(notificationDto -> notificationDto != null && notificationDto.getMainEntity() != null)
+                .sorted(Comparator.comparing(NotificationDto::getSentTime).reversed())
                 .collect(Collectors.toList());
         return new ListResponseDto<>((long) notificationDtoList.size(), offset, itemsPerPage, notificationDtoList);
     }

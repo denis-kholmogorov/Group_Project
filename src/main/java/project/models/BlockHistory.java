@@ -5,7 +5,7 @@ import lombok.Data;
 import project.models.enums.Action;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Entity
@@ -15,8 +15,8 @@ public class BlockHistory {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
-    private LocalDateTime time;
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
+    private Date time;
 
     @Column(name = "person_id")
     private Integer personId;
