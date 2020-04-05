@@ -126,7 +126,7 @@ public class MessageService {
     public Integer getCountSendMessage(HttpServletRequest request) throws BadRequestException400 {
         Person recipient = tokenProvider.getPersonByRequest(request);
         return messageRepository
-                .countByAuthorIdAndReadStatus(recipient.getId(), ReadStatus.SENT);
+                .countByRecipientIdAndReadStatus(recipient.getId(), ReadStatus.SENT);
     }
 
     public ListResponseDto getDialogMessages(

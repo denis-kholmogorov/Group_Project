@@ -99,27 +99,28 @@ public class PostService {
                                                          PostRequestBodyTagsDto dto) throws BadRequestException400 {
         Post post = new Post();
         Person author = personService.findPersonById(authorId);
+        Date publishTime = publishDate == null ? new Date() : getDateFromLong(publishDate + "");
         post.setAuthor(author);
-        post.setTime(publishDate == null ? new Date() : getDateFromLong(publishDate + ""));
+        post.setTime(publishTime);
         post.setTitle(dto.getTitle());
         post.setPostText(dto.getPostText());
         post.setIsBlocked(false);
         Post finalPost = postRepository.save(post);
 
-        List<Person> friendList = friendshipService.getFriendsList(author);
-        friendList.forEach(friend -> {
+        if (publishTime.before(new Date())) {
+            List<Person> friendList = friendshipService.getFriendsList(author);
+            friendList.forEach(friend -> {
 
-            Notification notification = new Notification();
-            NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.POST);
-            notification.setPerson(friend);
-            notification.setContact("Contact");
-            notification.setMainEntity(finalPost);
-            notification.setNotificationType(notificationType);
-            notification.setSentTime(new Date());
-            notificationRepository.save(notification);
-        });
-
-        if (finalPost == null) throw new BadRequestException400();
+                Notification notification = new Notification();
+                NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.POST);
+                notification.setPerson(friend);
+                notification.setContact("Contact");
+                notification.setMainEntity(finalPost);
+                notification.setNotificationType(notificationType);
+                notification.setSentTime(new Date());
+                notificationRepository.save(notification);
+            });
+        }
 
         List<String> tags = dto.getTags();
         if (tags.size() > 0) {

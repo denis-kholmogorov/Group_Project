@@ -91,24 +91,24 @@ public class NotificationService {
         return new ListResponseDto<>((long) notificationDtoList.size(), offset, itemsPerPage, notificationDtoList);
     }
 
-    private MainEntity getEntityById(Integer entityId, NotificationTypeEnum notificationTypeCode) {
-        MainEntity entity = null;
-        switch (notificationTypeCode) {
-            case POST:
-                PostDto postDto = postService.getPostDtoById(entityId, null);
-
-                break;
-            case POST_COMMENTS:
-            case COMMENT_COMMENT:
-                break;
-            case FRIEND_BIRTHDAY:
-                break;
-            case FRIEND_REQUEST:
-                entity = personService.findPersonById(entityId);
-                break;
-            case MESSAGE:
-                break;
-        }
-        return entity;
-    }
+//    private MainEntity getEntityById(Integer entityId, NotificationTypeEnum notificationTypeCode) {
+//        MainEntity entity = null;
+//        switch (notificationTypeCode) {
+//            case POST:
+//                PostDto postDto = postService.getPostDtoById(entityId, null);
+//
+//                break;
+//            case POST_COMMENTS:
+//            case COMMENT_COMMENT:
+//                break;
+//            case FRIEND_BIRTHDAY:
+//                break;
+//            case FRIEND_REQUEST:
+//                entity = personService.findPersonById(entityId);
+//                break;
+//            case MESSAGE:
+//                break;
+//        }
+//        return entity;
+//    }
 }
