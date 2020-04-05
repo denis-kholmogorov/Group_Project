@@ -67,16 +67,19 @@ public class MessageService {
         int listSize =  person.getDialogs().size();
         List<Dialog> dialogList = person.getDialogs().subList(offset, Math.min(toIndex, listSize));
         List<DialogDto> dialogDtoList = dialogList.stream().map(dialog -> {
+            List<Message> messageList = dialog.getListMessage();
+            Comparator<Message> comparator = Comparator.comparing(Message::getTime).reversed();
+            messageList.sort(comparator);
             DialogDto dialogDto = new DialogDto();
             dialogDto.setId(dialog.getId());
             Message message;
-            if (dialog.getListMessage().size() == 0) {
+            if (messageList.size() == 0) {
                 message = sentMessage(
                         dialog.getId(),
                         new MessageRequestDto("Привет! Я " + person.getFirstName() + " " + person.getLastName()),
                         request);
             } else {
-                message = dialog.getListMessage().get(dialog.getListMessage().size() - 1);
+                message = messageList.get(0);//
             }
             dialogDto.setMessage(MessageDto.builder()
                     .id(message.getId())
@@ -87,7 +90,9 @@ public class MessageService {
                     .sentByMe(message.getAuthorId() == person.getId())
                     .time(message.getTime())
                     .build());
-            dialogDto.setUnreadCount(messageRepository.countByAuthorIdAndReadStatusAndDialogId(person.getId(),
+            List<Person> dialogPersons = new ArrayList<>(dialog.getPersons());
+            dialogPersons.remove(person);
+            dialogDto.setUnreadCount(messageRepository.countByAuthorIdAndReadStatusAndDialogId(dialogPersons.get(0).getId(),//
                     ReadStatus.SENT,
                     dialog.getId()));
             return dialogDto;
