@@ -3,16 +3,17 @@ package project.controllers.rest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.LoginRequestDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
-import project.handlerExceptions.UnauthorizationException401;
+import project.models.Person;
+import project.security.TokenProvider;
 import project.services.PersonService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 
 /**
@@ -24,11 +25,13 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/api/v1/auth/")
 public class ApiAuthController {
 
+    private TokenProvider tokenProvider;
 
     private PersonService personService;
 
     @Autowired
-    public ApiAuthController(PersonService personService) {
+    public ApiAuthController(TokenProvider tokenProvider, PersonService personService) {
+        this.tokenProvider = tokenProvider;
         this.personService = personService;
     }
 
@@ -42,8 +45,11 @@ public class ApiAuthController {
 
 
     @PostMapping(value = "logout")
-    ResponseEntity logout() throws BadRequestException400 {
-        return ResponseEntity.ok(new ResponseDto(new MessageResponseDto()));//обработать еще ошибки
+    ResponseEntity logout(HttpServletRequest servletRequest) throws BadRequestException400 {
+        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        person.setLastOnlineTime(new Date());
+        personService.saveLastOnlineTime(person);
+        return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));//обработать еще ошибки
     }
 
 }

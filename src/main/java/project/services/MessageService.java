@@ -147,25 +147,26 @@ public class MessageService {
     }
 
     public Message sentMessage(Integer id, MessageRequestDto dto, HttpServletRequest request) throws BadRequestException400 {
-        Person dstPerson = tokenProvider.getPersonByRequest(request);
+        Person author = tokenProvider.getPersonByRequest(request);
         Dialog dialog = dialogRepository.findById(id).orElseThrow(BadRequestException400::new);
-        Set<Person> personsSet = dialog.getPersons();
-        List<Person> personList = new ArrayList<>(personsSet);
-        personList.remove(dstPerson);
+        List<Person> personList = new ArrayList<>(dialog.getPersons());
+        personList.remove(author);
+        Person recipient = personList.get(0);
+
         Message message = new Message();
         message.setTime(new Date());
-        message.setAuthorId(personList.get(0).getId()); // Перепутаны на фронте
-        message.setRecipientId(dstPerson.getId());         // Перепутаны на фронте
+        message.setAuthorId(author.getId()); // Перепутаны на фронте
+        message.setRecipientId(recipient.getId());         // Перепутаны на фронте
         message.setMessageText(dto.getMessageText());
         message.setReadStatus(ReadStatus.SENT);
         message.setDialog(dialog);
         Message messageSaved = messageRepository.save(message);
-        dialog.getListMessage().add(message);
-        dialogRepository.save(dialog);
+        //dialog.getListMessage().add(message);
+        //dialogRepository.save(dialog);
 
         Notification notification = new Notification();
         NotificationType notificationType = notificationTypeRepository.findByCode(NotificationTypeEnum.MESSAGE);
-        notification.setPerson(dstPerson);
+        notification.setPerson(recipient);
         notification.setContact("Contact");
         notification.setMainEntity(message);
         notification.setNotificationType(notificationType);

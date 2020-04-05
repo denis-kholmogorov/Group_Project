@@ -103,7 +103,8 @@ public class PersonService {
         String email = dto.getEmail();
         Person person = personRepository.findPersonByEmail(email).orElseThrow(BadRequestException400::new);//необходимо оставить
         person.setLastOnlineTime(new Date());
-        personRepository.save(person);
+        saveLastOnlineTime(person);
+
         String token = tokenProvider.createToken(email);//необходимо оставить
         PersonDtoWithToken personDto = new PersonDtoWithToken();
         personDto.setId(person.getId());
@@ -212,6 +213,10 @@ public class PersonService {
         // person.setMessagesPermission(dto.getMessagePermission());
         personRepository.save(person);
         return person;
+    }
+
+    public void saveLastOnlineTime(Person person) {
+        personRepository.save(person);
     }
 
     public void updatePhoto(Person person, String url) {

@@ -12,8 +12,10 @@ import project.models.enums.NotificationTypeEnum;
 import project.repositories.NotificationRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -48,11 +50,9 @@ public class NotificationService {
                 offset, Math.min(itemsPerPage, person.getNotificationList().size()));
         List<NotificationDto> notificationDtoList = notificationList.stream().map(notification -> {
             NotificationDto notificationDto = new NotificationDto();
-            Integer entityId = notification.getMainEntity().getId();
             NotificationTypeEnum notificationTypeCode = notification.getNotificationType().getCode();
-            notificationDto.setId(notification.getId());
-            notificationDto.setNotificationType(notificationTypeCode);
-            notificationDto.setSentTime(notification.getSentTime());
+            Integer entityId = notification.getMainEntity().getId();
+
 
             switch (notificationTypeCode) {
                 case POST:
@@ -74,14 +74,20 @@ public class NotificationService {
                     Message message = messageService.findMessageById(entityId);
                     if (message != null) {
                         Person author = personService.findPersonById(message.getAuthorId());
-                        notificationDto.setMainEntity(author);
+                        notificationDto.setMainEntity(author.getId() != person.getId() ? author : null);
                         notificationDto.setInfo(message.getMessageText());
-                    }
+
+                    } else return null;
                     break;
             }
 
+            notificationDto.setId(notification.getId());
+            notificationDto.setNotificationType(notificationTypeCode);
+            notificationDto.setSentTime(notification.getSentTime());
+
             return notificationDto;
-        }).collect(Collectors.toList());
+        }).filter(notificationDto -> notificationDto != null && notificationDto.getMainEntity() != null)
+                .collect(Collectors.toList());
         return new ListResponseDto<>((long) notificationDtoList.size(), offset, itemsPerPage, notificationDtoList);
     }
 
