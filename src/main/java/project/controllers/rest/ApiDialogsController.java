@@ -15,20 +15,31 @@ import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
 import project.models.Message;
+import project.models.Person;
+import project.security.TokenProvider;
 import project.services.DialogService;
 import project.services.MessageService;
 import project.services.PersonService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/dialogs")
-@AllArgsConstructor
+
 public class ApiDialogsController {
 
-     @Autowired
-    MessageService messageService;
+    private MessageService messageService;
+    private PersonService personService;
+    private TokenProvider tokenProvider;
+
+    @Autowired
+    public ApiDialogsController(MessageService messageService, PersonService personService, TokenProvider tokenProvider) {
+        this.messageService = messageService;
+        this.personService = personService;
+        this.tokenProvider = tokenProvider;
+    }
 
     @Secured("ROLE_USER")
     @GetMapping
@@ -36,6 +47,10 @@ public class ApiDialogsController {
                                            @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset,
                                            @RequestParam(name = "itemPerPage", required = false, defaultValue = "20") Integer itemPerPage,
                                            HttpServletRequest request) {
+
+        Person person = tokenProvider.getPersonByRequest(request);
+        person.setLastOnlineTime(new Date());
+        personService.saveLastOnlineTime(person);
 
         ListResponseDto answer = messageService.getAllDialogs(query, offset, itemPerPage, request);
         log.info(query + " Параметр query в контроллере Dialog");
@@ -73,11 +88,16 @@ public class ApiDialogsController {
                                          @RequestBody MessageRequestDto dto,
                                          HttpServletRequest request){
         log.error("Отработал POst message");
-        Message message = messageService.sentMessage(id,dto,request);
+
+        Person person = tokenProvider.getPersonByRequest(request);
+        person.setLastOnlineTime(new Date());
+        personService.saveLastOnlineTime(person);
+
+        Message message = messageService.sentMessage(id, dto, request);
         return ResponseEntity.ok(new ResponseDto<>(message));
     }
 
-    @Secured("ROLE_ADMIN")
+    @Secured("ROLE_USER")
     @PutMapping("{dialog_id}/messages/{message_id}/read")
     public ResponseEntity<?> readMessage(@PathVariable(value = "dialog_id") Integer dialogId,
                                          @PathVariable(value = "message_id") Integer messageId,

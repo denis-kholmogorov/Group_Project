@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -44,8 +45,12 @@ public class ApiFriendsController {
     @GetMapping
     public ResponseEntity<ListResponseDto> getFriendList(
             @RequestParam(required = false) String name, @RequestParam(defaultValue = "0") Integer offset,
-            @RequestParam(defaultValue = "20") Integer itemPerPage, ServletRequest servletRequest) {
-        Person person = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest);
+            @RequestParam(defaultValue = "20") Integer itemPerPage, HttpServletRequest servletRequest) {
+
+        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        person.setLastOnlineTime(new Date());
+        personService.saveLastOnlineTime(person);
+
         return ResponseEntity.ok(friendshipService.getFriendList(name, offset, itemPerPage, person));
     }
 

@@ -63,9 +63,9 @@ public class MessageService {
     public ListResponseDto<DialogDto> getAllDialogs(String query, Integer offset, Integer itemPerPage,
                                          HttpServletRequest request) throws BadRequestException400 {
         Person person = tokenProvider.getPersonByRequest(request);
-        int toIndex = offset + itemPerPage;
-        int listSize =  person.getDialogs().size();
-        List<Dialog> dialogList = person.getDialogs().subList(offset, Math.min(toIndex, listSize));
+        //int toIndex = offset + itemPerPage;
+        //int listSize =  person.getDialogs().size();
+        List<Dialog> dialogList = person.getDialogs(); //.subList(offset, Math.min(toIndex, listSize));
         List<DialogDto> dialogDtoList = dialogList.stream().map(dialog -> {
             List<Message> messageList = dialog.getListMessage();
             Comparator<Message> comparator = Comparator.comparing(Message::getTime).reversed();
@@ -141,9 +141,9 @@ public class MessageService {
 
     public ListResponseDto getDialogMessages(
             Integer id, Integer offset, Integer itemPerPage, HttpServletRequest servletRequest) {
-        Pageable pageable = PageRequest.of((offset / itemPerPage), itemPerPage);
+        //Pageable pageable = PageRequest.of((offset / itemPerPage), itemPerPage);
         Person author = tokenProvider.getPersonByRequest(servletRequest);
-        List<Message> dialogMessages = messageRepository.findAllByDialogId(id, pageable);
+        List<Message> dialogMessages = messageRepository.findAllByDialogId(id);
         List<MessageDto> messageDtoList = dialogMessages.stream().distinct().map(message -> MessageDto.builder()
                .id(message.getId())
                .author(personRepository.findById(message.getAuthorId()).orElseThrow(BadRequestException400::new))

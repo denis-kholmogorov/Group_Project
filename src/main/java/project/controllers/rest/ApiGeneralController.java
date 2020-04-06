@@ -48,8 +48,14 @@ public class ApiGeneralController {
     public ResponseEntity<ListResponseDto<PostDto>> feeds(
             @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0") Integer offset,
-            @RequestParam(defaultValue = "20") Integer itemPerPage)
+            @RequestParam(defaultValue = "20") Integer itemPerPage,
+            HttpServletRequest servletRequest)
             throws BadRequestException400 {
+
+        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        person.setLastOnlineTime(new Date());
+        personService.saveLastOnlineTime(person);
+
         return ResponseEntity.ok(postService.findAllPosts(name, offset, itemPerPage));
     }
 

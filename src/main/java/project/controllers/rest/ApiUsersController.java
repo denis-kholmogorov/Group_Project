@@ -42,10 +42,10 @@ public class ApiUsersController {
 
     @Secured("ROLE_USER")
     @GetMapping("me")
-    public ResponseEntity<?> getAuthUser(ServletRequest servletRequest) throws UnauthorizationException401 {
-        Person person = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest);
-
+    public ResponseEntity<?> getAuthUser(HttpServletRequest servletRequest) throws UnauthorizationException401 {
+        Person person = tokenProvider.getPersonByRequest(servletRequest);
         person.setLastOnlineTime(new Date());
+        personService.saveLastOnlineTime(person);
         return ResponseEntity.ok(new ResponseDto<>(person));
     }
 
@@ -55,7 +55,6 @@ public class ApiUsersController {
                                                  HttpServletRequest request) throws UnauthorizationException401
     {
         Person person = personService.editBody(updatePersonDto, request);
-        person.setLastOnlineTime(new Date());
         return ResponseEntity.ok(new ResponseDto<>(person));
     }
 
