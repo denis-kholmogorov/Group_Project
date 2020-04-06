@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import project.handlerExceptions.BadRequestException400;
 import project.models.Person;
 import project.models.Role;
 import project.repositories.PersonRepository;
@@ -32,11 +33,9 @@ public class JwtUserDetailService implements UserDetailsService
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Person person = personService.findPersonByEmail(email);
         if(person == null){
-            throw new UsernameNotFoundException("Person with " + email + " not found");
+            throw new BadRequestException400();
         }
-
         JwtUser jwtUser = JwtUserFactory.create(person);
-        log.info("In load by user with email " + jwtUser.getEmail());
         return jwtUser;
     }
 }
