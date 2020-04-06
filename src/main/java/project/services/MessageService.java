@@ -64,7 +64,7 @@ public class MessageService {
                                          HttpServletRequest request) throws BadRequestException400 {
         Person person = tokenProvider.getPersonByRequest(request);
         int toIndex = offset + itemPerPage;
-        int listSize =  person.getDialogs().size();
+        int listSize = person.getDialogs().size();
         List<Dialog> dialogList = person.getDialogs().subList(offset, Math.min(toIndex, listSize));
         List<DialogDto> dialogDtoList = dialogList.stream().map(dialog -> {
             DialogDto dialogDto = new DialogDto();
@@ -80,14 +80,17 @@ public class MessageService {
             }
             dialogDto.setMessage(MessageDto.builder()
                     .id(message.getId())
-                    .author(personRepository.findById(message.getAuthorId()).orElseThrow(BadRequestException400::new))
+
+                    cltkfnm chfdсдеоать сравнение
+
+                    .author(if person.getId()personRepository.findById(message.getAuthorId()).orElseThrow(BadRequestException400::new))
                     .recipient(personRepository.findById(message.getRecipientId()).orElseThrow(BadRequestException400::new))
                     .readStatus(message.getReadStatus())
                     .messageText(message.getMessageText())
                     .sentByMe(message.getAuthorId() == person.getId())
                     .time(message.getTime())
                     .build());
-            dialogDto.setUnreadCount(messageRepository.countByAuthorIdAndReadStatusAndDialogId(person.getId(),
+            dialogDto.setUnreadCount(messageRepository.countByRecipientIdAndReadStatusAndDialogId(person.getId(),
                     ReadStatus.SENT,
                     dialog.getId()));
             return dialogDto;
@@ -126,7 +129,7 @@ public class MessageService {
     public Integer getCountSendMessage(HttpServletRequest request) throws BadRequestException400 {
         Person recipient = tokenProvider.getPersonByRequest(request);
         return messageRepository
-                .countByAuthorIdAndReadStatus(recipient.getId(), ReadStatus.SENT);
+                .countByRecipientIdAndReadStatus(recipient.getId(), ReadStatus.SENT);
     }
 
     public ListResponseDto getDialogMessages(
@@ -154,8 +157,8 @@ public class MessageService {
         personList.remove(dstPerson);
         Message message = new Message();
         message.setTime(new Date());
-        message.setAuthorId(personList.get(0).getId()); // Перепутаны на фронте
-        message.setRecipientId(dstPerson.getId());         // Перепутаны на фронте
+        message.setAuthorId(dstPerson.getId()); // Перепутаны на фронте
+        message.setRecipientId(personList.get(0).getId());         // Перепутаны на фронте
         message.setMessageText(dto.getMessageText());
         message.setReadStatus(ReadStatus.SENT);
         message.setDialog(dialog);

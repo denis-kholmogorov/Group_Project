@@ -16,9 +16,9 @@ public interface MessageRepository extends CrudRepository<Message, Integer>
     @Query(value ="SELECT m FROM Message m WHERE m.authorId = :authorId OR m.recipientId = :authorId")
     List<Message> findAllByAuthorIdOrRecipientId(Integer authorId, Pageable pageable);
 
-    Integer countByAuthorIdAndReadStatusAndDialogId(Integer AuthorId, ReadStatus readStatus, Integer dialogId);
+    Integer countByRecipientIdAndReadStatusAndDialogId(Integer AuthorId, ReadStatus readStatus, Integer dialogId);
 
-    Integer countByAuthorIdAndReadStatus(Integer AuthorId, ReadStatus readStatus);
+    Integer countByRecipientIdAndReadStatus(Integer AuthorId, ReadStatus readStatus);
 
     List<Message> findAllByDialogId(Integer dialogId, Pageable pageable);
 
