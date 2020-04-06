@@ -81,10 +81,12 @@ public class MessageService {
             } else {
                 message = messageList.get(0);//
             }
+            Person author = personService.findPersonById(message.getAuthorId());
+            Person recipient = personService.findPersonById(message.getRecipientId());
             dialogDto.setMessage(MessageDto.builder()
                     .id(message.getId())
-                    .author(personRepository.findById(message.getAuthorId()).orElseThrow(BadRequestException400::new))
-                    .recipient(personRepository.findById(message.getRecipientId()).orElseThrow(BadRequestException400::new))
+                    .author(author == person ? author : recipient)
+                    .recipient(recipient == person ? author : recipient)
                     .readStatus(message.getReadStatus())
                     .messageText(message.getMessageText())
                     .sentByMe(message.getAuthorId() == person.getId())
