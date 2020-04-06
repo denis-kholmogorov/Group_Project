@@ -20,7 +20,7 @@ public interface MessageRepository extends CrudRepository<Message, Integer>
 
     Integer countByRecipientIdAndReadStatus(Integer AuthorId, ReadStatus readStatus);
 
-    List<Message> findAllByDialogId(Integer dialogId, Pageable pageable);
+    List<Message> findAllByDialogId(Integer dialogId);
 
     Optional<Message> findByIdAndDialogId(Integer messageId, Integer dialogId);
 }

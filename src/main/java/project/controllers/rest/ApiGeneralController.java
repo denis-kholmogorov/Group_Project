@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import project.dto.PostDto;
 import project.dto.responseDto.FileUploadResponseDto;
 import project.dto.responseDto.ListResponseDto;
+import project.dto.responseDto.NotificationDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
 import project.models.Image;
@@ -25,6 +26,7 @@ import project.services.PostService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 
 @Slf4j
@@ -46,8 +48,14 @@ public class ApiGeneralController {
     public ResponseEntity<ListResponseDto<PostDto>> feeds(
             @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0") Integer offset,
-            @RequestParam(defaultValue = "20") Integer itemPerPage)
+            @RequestParam(defaultValue = "20") Integer itemPerPage,
+            HttpServletRequest servletRequest)
             throws BadRequestException400 {
+
+        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        person.setLastOnlineTime(new Date());
+        personService.saveLastOnlineTime(person);
+
         return ResponseEntity.ok(postService.findAllPosts(name, offset, itemPerPage));
     }
 
@@ -65,8 +73,8 @@ public class ApiGeneralController {
                                                @RequestParam(required = false) Boolean all,
                                                HttpServletRequest servletRequest) {
         Person person = tokenProvider.getPersonByRequest(servletRequest);
-        return ResponseEntity.ok(
-                notificationService.findAllNotificationsByPersonId(person, 0, 20));
+        return ResponseEntity.ok(new ListResponseDto<>((long) 0, 0, 0, new ArrayList<>()));
+                //notificationService.findAllNotificationsByPersonId(person, 0, 20));
     }
 
     @PostMapping("storage")

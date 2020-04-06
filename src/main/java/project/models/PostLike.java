@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @Entity
@@ -16,7 +16,7 @@ public class PostLike
 
     @Column(updatable = false, nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
-    private LocalDateTime time;
+    private Date time;
 
     @Column(name = "person_id")
     private Integer personId;
