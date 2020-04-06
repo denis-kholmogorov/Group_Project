@@ -16,11 +16,13 @@ public interface MessageRepository extends CrudRepository<Message, Integer>
     @Query(value ="SELECT m FROM Message m WHERE m.authorId = :authorId OR m.recipientId = :authorId")
     List<Message> findAllByAuthorIdOrRecipientId(Integer authorId, Pageable pageable);
 
-    Integer countByRecipientIdAndReadStatusAndDialogId(Integer AuthorId, ReadStatus readStatus, Integer dialogId);
+   // Integer countByRecipientIdAndReadStatusAndDialogId(Integer AuthorId, ReadStatus readStatus, Integer dialogId);
 
     Integer countByRecipientIdAndReadStatus(Integer AuthorId, ReadStatus readStatus);
 
     List<Message> findAllByDialogId(Integer dialogId);
 
     Optional<Message> findByIdAndDialogId(Integer messageId, Integer dialogId);
+
+    Integer countByAuthorIdAndReadStatusAndDialogId(Integer id, ReadStatus sent, Integer id1);
 }

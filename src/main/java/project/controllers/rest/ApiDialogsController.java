@@ -48,6 +48,7 @@ public class ApiDialogsController {
                                            @RequestParam(name = "itemPerPage", required = false, defaultValue = "20") Integer itemPerPage,
                                            HttpServletRequest request) {
 
+
         Person person = tokenProvider.getPersonByRequest(request);
         person.setLastOnlineTime(new Date());
         personService.saveLastOnlineTime(person);

@@ -9,13 +9,16 @@ import project.dto.error.Error;
 import project.dto.error.enums.ErrorDescriptionEnum;
 import project.dto.error.enums.ErrorEnum;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+
 @Slf4j
 @RestController
 public class ErrorController {
 
     @GetMapping("/error")
-    public ResponseEntity<?> getError(){
-        log.info("Срабатывает в контроллере ошибок");
-        return ResponseEntity.ok(new Error(ErrorEnum.UNAUTHORIZED.getError(), ErrorDescriptionEnum.UNAUTHORIZED.getError()));
+    public ResponseEntity<?> getError(HttpServletRequest request, ServletRequest requestSerc){
+        log.info("Неавторизованный пользователь");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new Error(ErrorEnum.UNAUTHORIZED.getError(), ErrorDescriptionEnum.UNAUTHORIZED.getError()));
     }
 }
