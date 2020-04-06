@@ -6,6 +6,8 @@ import project.models.PostLike;
 import project.repositories.PostLikeRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PostLikeService {
@@ -36,5 +38,12 @@ public class PostLikeService {
         postLikeRepository.deleteByPostIdAndPersonId(postId, personId);
 
         return postLikeRepository.countAllByPostId(postId);
+    }
+
+    public List<Integer> getAllPersonIdWhoLikedPost(Integer postId){
+
+       List<PostLike> postLikeList = postLikeRepository.findAllByPostId(postId);
+
+       return postLikeList.stream().map(PostLike::getPersonId).collect(Collectors.toList());
     }
 }

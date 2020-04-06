@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.AddLike;
+import project.dto.responseDto.GetLikesResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.models.Person;
 import project.models.PostLike;
@@ -13,6 +14,7 @@ import project.services.PostLikeService;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/likes")
@@ -21,6 +23,18 @@ public class ApiLikesController {
 
     private PostLikeService postLikeService;
     private TokenProvider tokenProvider;
+
+    @Secured("ROLE_USER")
+    @GetMapping
+    public ResponseEntity<?> getAllLikesFromObject(@RequestParam(value = "item_id") Integer itemId,
+                                                   @RequestParam(value = "type") String objectType){
+
+        Integer likeCount = postLikeService.countLikesByPostId(itemId);
+
+        List<Integer> personsWhoLikedPost = postLikeService.getAllPersonIdWhoLikedPost(itemId);
+
+        return ResponseEntity.ok(new ResponseDto<>(new GetLikesResponseDto(likeCount, personsWhoLikedPost)));
+    }
 
     @Secured("ROLE_USER")
     @PutMapping
