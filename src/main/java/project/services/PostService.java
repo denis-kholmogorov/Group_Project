@@ -127,7 +127,7 @@ public class PostService {
             tags.forEach(tag -> {
                 Tag tag2DB = new Tag();
                 tag2DB.setTag(tag);
-                int tagId = tagService.addNewTag(tag2DB).getId();
+                int tagId = tagService.createTag(tag2DB.getTag()).getId();
                 Post2Tag post2Tag = new Post2Tag();
                 post2Tag.setPostId(finalPost.getId());
                 post2Tag.setTagId(tagId);
