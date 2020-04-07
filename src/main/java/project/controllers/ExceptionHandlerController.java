@@ -8,8 +8,6 @@ import project.dto.error.Error;
 import project.dto.error.enums.ErrorDescriptionEnum;
 import project.dto.error.enums.ErrorEnum;
 import project.handlerExceptions.BadRequestException400;
-import project.handlerExceptions.NotFoundException404;
-import project.handlerExceptions.UnauthorizationException401;
 
 
 @ControllerAdvice
