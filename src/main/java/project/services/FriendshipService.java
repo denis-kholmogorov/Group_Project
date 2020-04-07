@@ -102,6 +102,16 @@ public class FriendshipService {
                 .collect(Collectors.toList());
     }
 
+    public void getFriendRecursively(Person person, List<Person> resultList, int deep) {
+        List<Person> friendList = getFriendsList(person);
+        friendList.forEach(p -> {
+            if (!resultList.contains(p))
+                resultList.add(p);
+        });
+        if (deep > 0)
+            friendList.forEach(f -> getFriendRecursively(f, resultList, deep - 1));
+    }
+
     //=======================
 
     // Метод, возвращающий имеющиеся у пользователя заявки в друзья от других пользователей
