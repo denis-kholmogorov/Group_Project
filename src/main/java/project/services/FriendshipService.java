@@ -97,8 +97,9 @@ public class FriendshipService {
                 .collect(Collectors.toList());
 
         friends.addAll(friends1);
-
-        return friends;
+        return friends.stream()
+                .filter(friend -> friend.getBlockedBy() == null || !friend.getBlockedBy().equals(person.getId()))
+                .collect(Collectors.toList());
     }
 
     //=======================

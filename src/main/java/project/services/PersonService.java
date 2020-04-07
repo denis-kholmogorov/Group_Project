@@ -178,12 +178,11 @@ public class PersonService {
         return optionalPerson.orElse(null);
     }
 
-    public boolean blockPersonById(Integer id, Boolean block) throws BadRequestException400 {
+    public void blockPersonById(Integer id, Boolean block, Integer blockerId) throws BadRequestException400 {
         Person person = findPersonById(id);
         if (person == null) throw new BadRequestException400();
-        person.setBlocked(block);
+        person.setBlockedBy(block ? blockerId : null);
         personRepository.save(person);
-        return true;
     }
 
     public void deletePersonByEmail(String email){
