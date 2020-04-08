@@ -2,10 +2,10 @@ package project.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import project.models.Person;
 import project.models.PostLike;
 import project.repositories.PostLikeRepository;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,10 +14,12 @@ import java.util.stream.Collectors;
 public class PostLikeService {
 
     private PostLikeRepository postLikeRepository;
+    private PersonService personService;
 
     @Autowired
-    public PostLikeService(PostLikeRepository postLikeRepository) {
+    public PostLikeService(PostLikeRepository postLikeRepository, PersonService personService) {
         this.postLikeRepository = postLikeRepository;
+        this.personService = personService;
     }
 
     public Integer countLikesByPostId (Integer postId){

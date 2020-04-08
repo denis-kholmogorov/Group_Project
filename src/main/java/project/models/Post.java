@@ -2,6 +2,7 @@ package project.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Data
 @Entity
+@ToString(exclude = "tagList")
 @Table(name = "post")
 public class Post extends MainEntity {
 //    @Id
@@ -20,7 +22,6 @@ public class Post extends MainEntity {
     @Column(updatable = false)
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Date time;
-
 
     @ManyToOne
     @JoinColumn(name = "author_Id", nullable = false)
@@ -42,7 +43,7 @@ public class Post extends MainEntity {
     List<Tag> tagList = new ArrayList<>();
 
     @PreRemove
-    public void removeTag() {
+    public void removeTags() {
         tagList.forEach(tag -> tag.getPostList().remove(this));
     }
 }

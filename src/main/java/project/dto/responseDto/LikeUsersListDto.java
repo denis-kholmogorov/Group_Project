@@ -2,6 +2,7 @@ package project.dto.responseDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import project.models.Person;
 
 import java.util.List;
 

@@ -134,8 +134,6 @@ public class PostService {
                     tag2DB = tagService.saveTag(tag);
                 }
 
-
-
                 if (!post.getTagList().contains(tag2DB)) {
                     Post2Tag post2Tag = new Post2Tag();
                     post2Tag.setPostId(post.getId());

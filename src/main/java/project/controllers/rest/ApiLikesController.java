@@ -41,15 +41,17 @@ public class ApiLikesController {
 
     @Secured("ROLE_USER")
     @PutMapping
-    public ResponseEntity<?> takeLikeTo(@RequestBody AddLikeDto addLikeDto, HttpServletRequest servletRequest){
+    public ResponseEntity<?> addLike(@RequestBody AddLikeDto addLikeDto, HttpServletRequest servletRequest){
 
         Person person = tokenProvider.getPersonByRequest(servletRequest);
 
-        PostLike postLike = postLikeService.addLike(person.getId(), addLikeDto.getItemId());
-
-        if (postLike == null) throw new BadRequestException400();
-
         List<Integer> personsWhoLikedPost = postLikeService.getAllPersonIdWhoLikedPost(addLikeDto.getItemId());
+
+        if (personsWhoLikedPost.contains(person.getId())) throw new BadRequestException400();
+
+        postLikeService.addLike(person.getId(), addLikeDto.getItemId());
+
+        personsWhoLikedPost.add(person.getId());
 
         return ResponseEntity.ok(
                 new ResponseDto<>(
