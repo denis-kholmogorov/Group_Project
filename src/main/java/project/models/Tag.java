@@ -1,12 +1,16 @@
 package project.models;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
+@EqualsAndHashCode(exclude = "postList")
 @Entity
 @Table(name = "tag")
 public class Tag
@@ -19,5 +23,5 @@ public class Tag
     private String tag;
 
     @ManyToMany(mappedBy = "tagList", fetch = FetchType.LAZY)
-    private List<Post> postList = new ArrayList<>();
+    private Set<Post> postList = new HashSet<>();
 }

@@ -2,15 +2,15 @@ package project.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Data
+@EqualsAndHashCode(exclude = "tagList")
 @Entity
 @ToString(exclude = "tagList")
 @Table(name = "post")
@@ -40,7 +40,7 @@ public class Post extends MainEntity {
     @JoinTable(name = "post2tag",
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    List<Tag> tagList = new ArrayList<>();
+    Set<Tag> tagList = new HashSet<>();
 
     @PreRemove
     public void removeTags() {
