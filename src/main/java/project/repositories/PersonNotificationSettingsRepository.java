@@ -12,11 +12,7 @@ import java.util.Optional;
 @Repository
 public interface PersonNotificationSettingsRepository extends CrudRepository<PersonNotificationSetting, Integer> {
 
-    List<PersonNotificationSetting> findAllByPersonId(Integer personId);
+    List<PersonNotificationSetting> findAllByPerson(Person person);
 
-    //List<PersonNotificationSetting> findAllByPerson(Person person);
-
-    //Optional<PersonNotificationSetting> findByNotificationTypeAndPerson(NotificationType notificationType, Person person);
-
-    Optional<PersonNotificationSetting> findByNotificationTypeAndPersonId(NotificationType notificationType, Integer personId);
+    Optional<PersonNotificationSetting> findByNotificationTypeAndPerson(NotificationType notificationType, Person person);
 }

@@ -16,9 +16,10 @@ public class PersonNotificationSetting {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
 
-    @Column(name = "person_id")
-    //@ManyToOne(fetch = FetchType.LAZY)
-    private Integer personId;
+
+    @ManyToOne
+    @JoinColumn(name = "person_id")
+    private Person person;
 
     @OneToOne
     @JoinColumn(name = "notification_type_id")
@@ -28,8 +29,8 @@ public class PersonNotificationSetting {
     @Type(type = "yes_no")
     private Boolean enable;
 
-    public PersonNotificationSetting(Integer personId, NotificationType notificationType, Boolean enable) {
-        this.personId = personId;
+    public PersonNotificationSetting(Person person, NotificationType notificationType, Boolean enable) {
+        this.person = person;
         this.notificationType = notificationType;
         this.enable = enable;
     }

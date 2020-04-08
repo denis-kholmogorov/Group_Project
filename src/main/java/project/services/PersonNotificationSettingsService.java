@@ -22,8 +22,8 @@ public class PersonNotificationSettingsService {
 
     PersonNotificationSettingsRepository personNotificationSettingsRepository;
 
-    public ResponseDto<List<NotificationSettingsResponseDto>> findAllByPerson(Integer personId) {
-        List<PersonNotificationSetting> settingList = personNotificationSettingsRepository.findAllByPersonId(personId); //person.getNotificationSettings();
+    public ResponseDto<List<NotificationSettingsResponseDto>> findAllByPerson(Person person) {
+        List<PersonNotificationSetting> settingList = person.getNotificationSettings();
         List<NotificationSettingsResponseDto> dtoSettingList = settingList.stream().map(
                     setting -> new NotificationSettingsResponseDto(
                             "",
@@ -35,11 +35,11 @@ public class PersonNotificationSettingsService {
     }
 
     public ResponseDto<PersonNotificationSetting> updateNotificationSetting(
-            Integer personId, NotificationType notificationType, Boolean enable) {
+            Person person, NotificationType notificationType, Boolean enable) {
         PersonNotificationSetting setting = personNotificationSettingsRepository
-                .findByNotificationTypeAndPersonId(notificationType, personId).orElse(null);
+                .findByNotificationTypeAndPerson(notificationType, person).orElse(null);
         if (setting != null) setting.setEnable(enable);
-        else setting = new PersonNotificationSetting(personId, notificationType, enable);
+        else setting = new PersonNotificationSetting(person, notificationType, enable);
         return new ResponseDto<>(personNotificationSettingsRepository.save(setting));
     }
 }
