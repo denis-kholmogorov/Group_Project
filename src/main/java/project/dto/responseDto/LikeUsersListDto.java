@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class GetLikesResponseDto {
+public class LikeUsersListDto {
 
     private Integer likes;
 

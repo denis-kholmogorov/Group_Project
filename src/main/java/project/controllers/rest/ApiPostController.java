@@ -8,6 +8,7 @@ import project.dto.CommentDto;
 import project.dto.CommentModelDto;
 import project.dto.PostDto;
 import project.dto.requestDto.PostRequestBodyDto;
+import project.dto.requestDto.PostRequestBodyTagsDto;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
@@ -41,7 +42,7 @@ public class ApiPostController {
     @PutMapping("{id}")
     public ResponseEntity<ResponseDto<PostDto>> editPostById(
             @PathVariable Integer id, @RequestParam(value = "publish_date", required = false) Long publishDate,
-            @RequestBody PostRequestBodyDto dto) throws BadRequestException400 {
+            @RequestBody PostRequestBodyTagsDto dto) throws BadRequestException400 {
         return ResponseEntity.ok(postService.editPostById(id, publishDate, dto));
     }
 

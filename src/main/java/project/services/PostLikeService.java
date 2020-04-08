@@ -6,6 +6,7 @@ import project.models.PostLike;
 import project.repositories.PostLikeRepository;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,10 +28,8 @@ public class PostLikeService {
         PostLike postLike = new PostLike();
         postLike.setPersonId(personId);
         postLike.setPostId(postId);
-        postLike.setTime(LocalDateTime.now());
-        postLikeRepository.save(postLike);
-
-        return postLike;
+        postLike.setTime(new Date());
+        return postLikeRepository.save(postLike);
     }
 
     public Integer deleteLike(Integer postId, Integer personId){

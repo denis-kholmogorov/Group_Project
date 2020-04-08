@@ -1,5 +1,6 @@
 package project.dto.requestDto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,9 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddLike {
+public class AddLikeDto {
 
-    private Integer item_id;
+    @JsonProperty("item_id")
+    private Integer itemId;
 
     private String type;
 }

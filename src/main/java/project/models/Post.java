@@ -5,7 +5,9 @@ import lombok.Data;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Entity
@@ -32,4 +34,15 @@ public class Post extends MainEntity {
     @Column(name = "id_blocked")
     @Type(type = "yes_no")
     private Boolean isBlocked;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "post2tag",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    List<Tag> tagList = new ArrayList<>();
+
+    @PreRemove
+    public void removeTag() {
+        tagList.forEach(tag -> tag.getPostList().remove(this));
+    }
 }

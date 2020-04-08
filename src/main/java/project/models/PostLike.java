@@ -15,7 +15,7 @@ public class PostLike
     private Integer id;
 
     @Column(updatable = false, nullable = false)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Date time;
 
     @Column(name = "person_id")

@@ -46,19 +46,22 @@ public class ApiAccountController {
 
 
     @PostMapping(value = "register")
-    public ResponseEntity<ResponseDto<MessageResponseDto>> register(@RequestBody RegistrationRequestDto dto) throws BadRequestException400 {
+    public ResponseEntity<ResponseDto<MessageResponseDto>> register(@RequestBody RegistrationRequestDto dto)
+            throws BadRequestException400 {
         log.info("контроллер Register отработал");
         personService.registrationPerson(dto);
-        return ResponseEntity.ok(new ResponseDto(new MessageResponseDto()));
+        return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
     @PutMapping(value = "password/recovery")
-    public ResponseEntity<ResponseDto<MessageResponseDto>> sendRecoveryEmail(@RequestBody Map<String, String> email) throws BadRequestException400 {
+    public ResponseEntity<ResponseDto<MessageResponseDto>> sendRecoveryEmail(@RequestBody Map<String, String> email)
+            throws BadRequestException400 {
         return ResponseEntity.ok(personService.sendRecoveryPasswordEmail(email.get("email")));
     }
 
     @PutMapping("password/set")
-    public ResponseEntity<ResponseDto<MessageResponseDto>> setNewPassword(@RequestBody PasswordSetDto passwordSetDto, HttpServletRequest request) throws BadRequestException400 {
+    public ResponseEntity<ResponseDto<MessageResponseDto>> setNewPassword(
+            @RequestBody PasswordSetDto passwordSetDto, HttpServletRequest request) throws BadRequestException400 {
         return ResponseEntity.ok(personService.setNewPassword(passwordSetDto, request));
     }
 

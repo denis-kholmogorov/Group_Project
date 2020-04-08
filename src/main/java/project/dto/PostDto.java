@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import project.models.Person;
+import project.models.Tag;
 
 import javax.persistence.Column;
 import java.util.Date;
@@ -34,4 +35,6 @@ public class PostDto {
     private Integer likes;
 
     private List<CommentDto> comments;
+
+    private List<String> tags;
 }

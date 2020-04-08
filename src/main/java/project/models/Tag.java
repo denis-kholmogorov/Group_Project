@@ -3,6 +3,8 @@ package project.models;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -13,6 +15,9 @@ public class Tag
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "tag", nullable = false)
+    @Column(nullable = false)
     private String tag;
+
+    @ManyToMany(mappedBy = "tagList", fetch = FetchType.LAZY)
+    private List<Post> postList = new ArrayList<>();
 }

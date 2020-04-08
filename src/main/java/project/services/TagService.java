@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import project.dto.TagDto;
 import project.models.Tag;
 import project.repositories.TagRepository;
 
@@ -28,12 +27,14 @@ public class TagService {
         return tagRepository.findAllByTagContaining(tagName, pageable);
     }
 
-    public TagDto createTag(String tagName){
+    public Tag saveTag(String tagName){
         Tag tag = new Tag();
         tag.setTag(tagName);
-        tagRepository.save(tag);
+        return tagRepository.save(tag);
+    }
 
-        return new TagDto(tag.getId(), tag.getTag());
+    public Tag findByTagName(String tagName) {
+        return tagRepository.findByTag(tagName).orElse(null);
     }
 
     public void deleteTag(Integer tagId){

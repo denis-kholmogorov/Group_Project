@@ -156,7 +156,6 @@ public class FriendshipService {
             List<Person> srcFriendList = getFriendsList(src);
             List<Person> dstFriendList = getFriendsList(dst);
 
-
             List<Person> friendListBoth = srcFriendList.stream()
                     .distinct()
                     .filter(dstFriendList::contains)
