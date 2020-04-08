@@ -10,7 +10,6 @@ import project.models.Person;
 import project.models.PersonNotificationSetting;
 import project.repositories.PersonNotificationSettingsRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -31,15 +30,23 @@ public class PersonNotificationSettingsService {
                             setting.getNotificationType().getCode(),
                             setting.getEnable()))
                     .collect(toList());
+        dtoSettingList.forEach(setting -> {
+            log.info(setting.toString());
+        });
         return new ResponseDto<>(dtoSettingList);
     }
 
     public ResponseDto<PersonNotificationSetting> updateNotificationSetting(
-            Person person, NotificationType notificationType, Boolean enable) {
+            Person person, NotificationType notificationType) {
         PersonNotificationSetting setting = personNotificationSettingsRepository
                 .findByNotificationTypeAndPerson(notificationType, person).orElse(null);
-        if (setting != null) setting.setEnable(enable);
-        else setting = new PersonNotificationSetting(person, notificationType, enable);
+        if (setting != null){
+            if (setting.getEnable()) {
+                setting.setEnable(false);
+            } else {
+                setting.setEnable(true);
+            }
+        }
         return new ResponseDto<>(personNotificationSettingsRepository.save(setting));
     }
 }

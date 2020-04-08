@@ -79,7 +79,7 @@ public class ApiAccountController {
         Person person = tokenProvider.getPersonByRequest(servletRequest);
         NotificationType notificationType = notificationTypeService.findByCode(dto.getNotificationType());
         return ResponseEntity.ok(personNotificationSettingsService.
-                updateNotificationSetting(person, notificationType, dto.getEnable()));
+                updateNotificationSetting(person, notificationType));
     }
 }
 
