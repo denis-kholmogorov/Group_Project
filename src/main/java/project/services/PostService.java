@@ -22,6 +22,7 @@ import project.repositories.NotificationTypeRepository;
 import project.repositories.PostRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -89,7 +90,11 @@ public class PostService {
         List<String> tags = post.getTagList().stream().map(Tag::getTag).collect(toList());
 
         return new PostDto(post.getId(), post.getTime(), post.getAuthor(), post.getTitle(),
-                post.getPostText(), post.getIsBlocked(), countLikes, comments, tags);
+                post.getPostText(), post.getIsBlocked(), countLikes, comments, tags,
+                post.getTime().before(new Date()) ?
+                                PostTypeEnum.POSTED.getType()
+                                :
+                                PostTypeEnum.QUEUED.getType());
     }
 
 
@@ -156,22 +161,11 @@ public class PostService {
                 postRepository.findAllByAuthorIdAndIsBlocked(authorId, false, pageable);
         if (wallPostList == null) throw new BadRequestException400();
 
-        List<PersonsWallPostDto> personsWallPostDtoList = wallPostList.stream().map(wallPost -> {
-            PersonsWallPostDto personsWallPostDto = new PersonsWallPostDto();
-            personsWallPostDto.setId(wallPost.getId());
-            personsWallPostDto.setTime(wallPost.getTime());
-            personsWallPostDto.setAuthor(wallPost.getAuthor());
-            personsWallPostDto.setTitle(wallPost.getTitle());
-            personsWallPostDto.setPostText(wallPost.getPostText());
-            personsWallPostDto.setIsBlocked(wallPost.getIsBlocked());
-            personsWallPostDto.setLikes(postLikeService.countLikesByPostId(wallPost.getId()));
-            personsWallPostDto.setComments(postCommentsService.getListCommentsDto(wallPost.getId()));
-            personsWallPostDto.setType(wallPost.getTime().before(new Date()) ? PostTypeEnum.POSTED.getType()
-                    : PostTypeEnum.QUEUED.getType());
-            return personsWallPostDto;
-        }).collect(toList());
+        List<PostDto> personsWallPostDtoList = wallPostList.stream()
+                .map(post -> getPostDtoById(null, post))
+                .collect(Collectors.toList());
 
-        return new ListResponseDto((long) personsWallPostDtoList.size(), offset, limit, personsWallPostDtoList);
+        return new ListResponseDto<>((long) personsWallPostDtoList.size(), offset, limit, personsWallPostDtoList);
     }
 
     @SneakyThrows

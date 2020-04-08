@@ -37,4 +37,6 @@ public class PostDto {
     private List<CommentDto> comments;
 
     private List<String> tags;
+
+    private String type;
 }
