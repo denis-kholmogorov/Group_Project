@@ -24,17 +24,13 @@ public class PersonNotificationSettingsService {
 
     public ResponseDto<List<NotificationSettingsResponseDto>> findAllByPerson(Person person) {
         List<PersonNotificationSetting> settingList = person.getNotificationSettings();
-        List<NotificationSettingsResponseDto> dtoSettingList = new ArrayList<>();
-        if (settingList.size() != 0) {
-            log.info(String.valueOf(settingList.size()));
-            dtoSettingList = settingList.stream().map(
+        List<NotificationSettingsResponseDto> dtoSettingList = settingList.stream().map(
                     setting -> new NotificationSettingsResponseDto(
                             "",
                             setting.getNotificationType().getName(),
                             setting.getNotificationType().getCode(),
                             setting.getEnable()))
                     .collect(toList());
-        }
         return new ResponseDto<>(dtoSettingList);
     }
 
