@@ -223,7 +223,7 @@ public class PostService {
 
 
     public Date getDateFromLong(String date) {
-        if (!date.isEmpty()) {
+        if (!date.isEmpty() && !date.equals("null")) {
             Calendar calendar = Calendar.getInstance();
             long dateLong = Long.parseLong(date);
             calendar.setTimeInMillis(dateLong);
