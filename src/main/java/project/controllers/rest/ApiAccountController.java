@@ -68,18 +68,18 @@ public class ApiAccountController {
     @GetMapping("notifications")
     public ResponseEntity<?> getNotificationSettings(HttpServletRequest servletRequest) {
         log.info("trig get");
-        Person person = tokenProvider.getPersonByRequest(servletRequest);
-        return ResponseEntity.ok(personNotificationSettingsService.findAllByPerson(person));
+        Integer personId = tokenProvider.getPersonByRequest(servletRequest).getId();
+        return ResponseEntity.ok(personNotificationSettingsService.findAllByPerson(personId));
     }
 
     @PutMapping("notifications")
     public ResponseEntity<ResponseDto<PersonNotificationSetting>> updatePersonNotificationSettings(
             @RequestBody NotificationSettingDto dto, HttpServletRequest servletRequest) {
         log.info("trig put");
-        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        Integer personId = tokenProvider.getPersonByRequest(servletRequest).getId();
         NotificationType notificationType = notificationTypeService.findByCode(dto.getNotificationType());
         return ResponseEntity.ok(personNotificationSettingsService.
-                updateNotificationSetting(person, notificationType, dto.getEnable()));
+                updateNotificationSetting(personId, notificationType, dto.getEnable()));
     }
 }
 

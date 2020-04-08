@@ -16,7 +16,7 @@ import java.util.*;
 @EqualsAndHashCode(
         callSuper = false)
 @ToString(exclude = {"sentFriendshipRequests", "receivedFriendshipRequests",
-        "notificationList", "notificationSettings", "postList", "dialogs"})
+        "notificationList", "postList", "dialogs"})
 @Entity
 @Table(name = "person")
 public class Person extends MainEntity {
@@ -114,9 +114,9 @@ public class Person extends MainEntity {
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private List<Notification> notificationList = new ArrayList<>();
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "person")
-    private List<PersonNotificationSetting> notificationSettings = new ArrayList<>();
+//    @JsonIgnore
+//    @OneToMany(mappedBy = "person")
+//    private List<PersonNotificationSetting> notificationSettings = new ArrayList<>();
 
     @PreRemove
     public void removeUser() {

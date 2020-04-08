@@ -22,28 +22,24 @@ public class PersonNotificationSettingsService {
 
     PersonNotificationSettingsRepository personNotificationSettingsRepository;
 
-    public ResponseDto<List<NotificationSettingsResponseDto>> findAllByPerson(Person person) {
-        List<PersonNotificationSetting> settingList = person.getNotificationSettings();
-        List<NotificationSettingsResponseDto> dtoSettingList = new ArrayList<>();
-        if (settingList.size() != 0) {
-            log.info(String.valueOf(settingList.size()));
-            dtoSettingList = settingList.stream().map(
+    public ResponseDto<List<NotificationSettingsResponseDto>> findAllByPerson(Integer personId) {
+        List<PersonNotificationSetting> settingList = personNotificationSettingsRepository.findAllByPersonId(personId); //person.getNotificationSettings();
+        List<NotificationSettingsResponseDto> dtoSettingList = settingList.stream().map(
                     setting -> new NotificationSettingsResponseDto(
                             "",
                             setting.getNotificationType().getName(),
                             setting.getNotificationType().getCode(),
                             setting.getEnable()))
                     .collect(toList());
-        }
         return new ResponseDto<>(dtoSettingList);
     }
 
     public ResponseDto<PersonNotificationSetting> updateNotificationSetting(
-            Person person, NotificationType notificationType, Boolean enable) {
+            Integer personId, NotificationType notificationType, Boolean enable) {
         PersonNotificationSetting setting = personNotificationSettingsRepository
-                .findByNotificationTypeAndPerson(notificationType, person).orElse(null);
+                .findByNotificationTypeAndPersonId(notificationType, personId).orElse(null);
         if (setting != null) setting.setEnable(enable);
-        else setting = new PersonNotificationSetting(person, notificationType, enable);
+        else setting = new PersonNotificationSetting(personId, notificationType, enable);
         return new ResponseDto<>(personNotificationSettingsRepository.save(setting));
     }
 }
