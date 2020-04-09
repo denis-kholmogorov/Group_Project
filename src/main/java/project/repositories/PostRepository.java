@@ -11,6 +11,7 @@ import java.util.List;
 
 @Repository
 public interface PostRepository extends CrudRepository<Post, Integer> {
+
     List<Post> findAllByAuthorIdAndIsBlocked(Integer authorId, Boolean isBlocked, Pageable pageable);
 
     List<Post> findAllByAuthorIdAndTimeBeforeAndIsBlocked(Integer authorId, Date dateTo, Boolean isBlocked,

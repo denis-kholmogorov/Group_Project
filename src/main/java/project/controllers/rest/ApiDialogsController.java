@@ -1,6 +1,5 @@
 package project.controllers.rest;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,6 @@ import project.handlerExceptions.BadRequestException400;
 import project.models.Message;
 import project.models.Person;
 import project.security.TokenProvider;
-import project.services.DialogService;
 import project.services.MessageService;
 import project.services.PersonService;
 
