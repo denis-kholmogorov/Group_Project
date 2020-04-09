@@ -19,6 +19,8 @@ import javax.validation.ConstraintViolationException;
 @ControllerAdvice
 public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
 
+/** контроллер отлавливает ошибку 400*/
+
     @ExceptionHandler(BadRequestException400.class)
     public ResponseEntity<?> badRequestException() {
         Error error = new Error(ErrorEnum.INVALID_REQUEST.getError(), ErrorDescriptionEnum.BAD_REQUEST.getError());

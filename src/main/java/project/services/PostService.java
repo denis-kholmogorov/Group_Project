@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import project.dto.CommentDto;
 import project.dto.PersonsWallPostDto;
 import project.dto.PostDto;
-import project.dto.requestDto.PostRequestBodyDto;
 import project.dto.requestDto.PostRequestBodyTagsDto;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
@@ -22,10 +21,8 @@ import project.repositories.NotificationRepository;
 import project.repositories.NotificationTypeRepository;
 import project.repositories.PostRepository;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -54,7 +51,7 @@ public class PostService {
         if (postList == null) throw new BadRequestException400();
         List<PostDto> postDtoList = postList.stream().map(post -> getPostDtoById(null, post)).collect(toList());
 
-        return new ListResponseDto((long) postDtoList.size(), offset, itemPerPage, postDtoList);
+        return new ListResponseDto<>((long) postDtoList.size(), offset, itemPerPage, postDtoList);
     }
 
     public Post getPostById(Integer id) throws BadRequestException400 {
@@ -63,20 +60,21 @@ public class PostService {
         return optionalPost.orElse(null);
     }
 
-    public ResponseDto<PostDto> editPostById(Integer id, Long publishDate, PostRequestBodyDto dto)
+    public ResponseDto<PostDto> editPostById(Integer id, Long publishDate, PostRequestBodyTagsDto dto)
             throws BadRequestException400 {
         Post post = getPostById(id);
         if (post == null) throw new BadRequestException400();
         post.setTitle(dto.getTitle());
-        //post.setTime(publishDate == null ? new Date() : getDateFromLong(publishDate + ""));
         post.setPostText(dto.getPostText());
         Post postDB = postRepository.save(post);
+
+        saveTags(dto.getTags(), postDB);
 
         return new ResponseDto<>(getPostDtoById(null, postDB));
     }
 
     public ResponseDto<Integer> deletePostById(@PathVariable Integer id) {
-        postRepository.deleteById(id);  //как правильно обработать 400?
+        postRepository.deleteById(id);
         return new ResponseDto<>(id);
     }
 
@@ -89,8 +87,14 @@ public class PostService {
 
         List<CommentDto> comments = postCommentsService.getListCommentsDto(post.getId());
 
+        List<String> tags = post.getTagList().stream().map(Tag::getTag).collect(toList());
+
         return new PostDto(post.getId(), post.getTime(), post.getAuthor(), post.getTitle(),
-                post.getPostText(), post.getIsBlocked(), countLikes, comments);
+                post.getPostText(), post.getIsBlocked(), countLikes, comments, tags,
+                post.getTime().before(new Date()) ?
+                                PostTypeEnum.POSTED.getType()
+                                :
+                                PostTypeEnum.QUEUED.getType());
     }
 
 
@@ -122,20 +126,27 @@ public class PostService {
             });
         }
 
-        List<String> tags = dto.getTags();
-        if (tags.size() > 0) {
-            tags.forEach(tag -> {
-                Tag tag2DB = new Tag();
-                tag2DB.setTag(tag);
-                int tagId = tagService.addNewTag(tag2DB).getId();
-                Post2Tag post2Tag = new Post2Tag();
-                post2Tag.setPostId(finalPost.getId());
-                post2Tag.setTagId(tagId);
-                post2TagService.addNewPost2Tag(post2Tag);
-            });
-        }
+        saveTags(dto.getTags(), finalPost);
 
         return new ResponseDto<>(getPostDtoById(null, finalPost));
+    }
+
+    private void saveTags(List<String> tags, Post post) {
+        if (tags.size() > 0) {
+            tags.forEach(tag -> {
+                Tag tag2DB = tagService.findByTagName(tag);
+                if (tag2DB == null) {
+                    tag2DB = tagService.saveTag(tag);
+                }
+
+                if (!post.getTagList().contains(tag2DB)) {
+                    Post2Tag post2Tag = new Post2Tag();
+                    post2Tag.setPostId(post.getId());
+                    post2Tag.setTag(tag2DB.getId());
+                    post2TagService.addNewPost2Tag(post2Tag);
+                }
+            });
+        }
     }
 
     public ListResponseDto findAllByAuthorId(
@@ -150,22 +161,11 @@ public class PostService {
                 postRepository.findAllByAuthorIdAndIsBlocked(authorId, false, pageable);
         if (wallPostList == null) throw new BadRequestException400();
 
-        List<PersonsWallPostDto> personsWallPostDtoList = wallPostList.stream().map(wallPost -> {
-            PersonsWallPostDto personsWallPostDto = new PersonsWallPostDto();
-            personsWallPostDto.setId(wallPost.getId());
-            personsWallPostDto.setTime(wallPost.getTime());
-            personsWallPostDto.setAuthor(wallPost.getAuthor());
-            personsWallPostDto.setTitle(wallPost.getTitle());
-            personsWallPostDto.setPostText(wallPost.getPostText());
-            personsWallPostDto.setIsBlocked(wallPost.getIsBlocked());
-            personsWallPostDto.setLikes(postLikeService.countLikesByPostId(wallPost.getId()));
-            personsWallPostDto.setComments(postCommentsService.getListCommentsDto(wallPost.getId()));
-            personsWallPostDto.setType(wallPost.getTime().before(new Date()) ? PostTypeEnum.POSTED.getType()
-                    : PostTypeEnum.QUEUED.getType());
-            return personsWallPostDto;
-        }).collect(toList());
+        List<PostDto> personsWallPostDtoList = wallPostList.stream()
+                .map(post -> getPostDtoById(null, post))
+                .collect(Collectors.toList());
 
-        return new ListResponseDto((long) personsWallPostDtoList.size(), offset, limit, personsWallPostDtoList);
+        return new ListResponseDto<>((long) personsWallPostDtoList.size(), offset, limit, personsWallPostDtoList);
     }
 
     @SneakyThrows
@@ -217,7 +217,7 @@ public class PostService {
 
 
     public Date getDateFromLong(String date) {
-        if (!date.isEmpty()) {
+        if (!date.isEmpty() && !date.equals("null")) {
             Calendar calendar = Calendar.getInstance();
             long dateLong = Long.parseLong(date);
             calendar.setTimeInMillis(dateLong);

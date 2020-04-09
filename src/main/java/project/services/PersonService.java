@@ -178,12 +178,11 @@ public class PersonService {
         return optionalPerson.orElse(null);
     }
 
-    public boolean blockPersonById(Integer id, Boolean block) throws BadRequestException400 {
+    public void blockPersonById(Integer id, Boolean block, Integer blockerId) throws BadRequestException400 {
         Person person = findPersonById(id);
         if (person == null) throw new BadRequestException400();
-        person.setBlocked(block);
+        person.setBlockedBy(block ? blockerId : null);
         personRepository.save(person);
-        return true;
     }
 
     public void deletePersonByEmail(String email){
@@ -247,6 +246,7 @@ public class PersonService {
         return personRepository.searchCount(person.getId(), firstName, lastName, ageFrom, ageTo, country, city);
     }
 
+    @Deprecated
     public List<Person> recommendations(Person person, Integer offset, Integer itemPerPage) {
         if (person.getCity() != null && person.getBirthDate() != null) {
             Pageable pageable = PageRequest.of(offset, itemPerPage);
@@ -261,6 +261,7 @@ public class PersonService {
         return new ArrayList<>();
     }
 
+    @Deprecated
     public long recommendationsCount(Person person) {
         if (person.getCity() != null && person.getBirthDate() != null) {
             Calendar calendar = Calendar.getInstance();

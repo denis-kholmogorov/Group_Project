@@ -28,7 +28,7 @@ public class MessageDto
     private Person recipient;
 
     @JsonProperty(value = "message_text")
-    private String messageText = "Привет!";
+    private String messageText;
 
     @JsonProperty(value = "isSentByMe")
     private Boolean sentByMe;

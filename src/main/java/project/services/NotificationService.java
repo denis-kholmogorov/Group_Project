@@ -13,7 +13,6 @@ import project.repositories.NotificationRepository;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -63,7 +62,7 @@ public class NotificationService {
                                     postDto.getTitle()
                             ));
                             break;
-                        case POST_COMMENTS:
+                        case POST_COMMENT:
                         case COMMENT_COMMENT:
                             break;
                         case FRIEND_BIRTHDAY:

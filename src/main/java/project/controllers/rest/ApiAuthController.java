@@ -39,7 +39,7 @@ public class ApiAuthController {
     @PostMapping(value = "login")
     ResponseEntity login(@RequestBody LoginRequestDto loginRequestDto) throws BadRequestException400 {
         ResponseDto responseDto = personService.login(loginRequestDto);
-        if(responseDto == null) throw new BadRequestException400();//изменить ошибку
+        if(responseDto == null) throw new BadRequestException400();
         return ResponseEntity.ok(responseDto);//необходимо оставить, обработать еще ошибки
     }
 

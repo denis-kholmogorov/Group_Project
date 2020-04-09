@@ -69,17 +69,20 @@ public class ApiUsersController {
 
     @Secured("ROLE_USER")
     @GetMapping("{id}")
-    public ResponseEntity<?> getPersonById(@PathVariable Integer id) {
-        Person person = personService.findPersonById(id);
-        return ResponseEntity.ok(new ResponseDto<>(person));
+    public ResponseEntity<?> getPersonById(@PathVariable Integer id, HttpServletRequest servletRequest) {
+        Person personResponse = personService.findPersonById(id);
+        Integer blockerId = tokenProvider.getPersonByRequest(servletRequest).getId();
+        Integer blockedBy = personResponse.getBlockedBy();
+        if (blockedBy != null && blockedBy.equals(blockerId)) personResponse.setBlocked(true);
+        return ResponseEntity.ok(new ResponseDto<>(personResponse));
     }
 
     @Secured("ROLE_USER")
     @GetMapping("{id}/wall")
     public ResponseEntity<?> getWallPostsById(
             @PathVariable Integer id, @RequestParam(defaultValue = "0") Integer offset,
-            @RequestParam(defaultValue = "20") Integer itemPerPage, ServletRequest servletRequest) throws BadRequestException400 {
-        int compareId = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest).getId();
+            @RequestParam(defaultValue = "20") Integer itemPerPage, HttpServletRequest servletRequest) throws BadRequestException400 {
+        int compareId = tokenProvider.getPersonByRequest(servletRequest).getId();
         return ResponseEntity.ok(postService.findAllByAuthorId(id, offset, itemPerPage, compareId));
     }
 
@@ -93,15 +96,17 @@ public class ApiUsersController {
 
     @Secured("ROLE_USER")
     @PutMapping("block/{id}")
-    public ResponseEntity<?> blockPersonById(@PathVariable Integer id) throws BadRequestException400 {    //обработать 400 и 401
-        personService.blockPersonById(id, true);
+    public ResponseEntity<?> blockPersonById(@PathVariable Integer id, HttpServletRequest servletRequest) throws BadRequestException400 {    //обработать 400 и 401
+        Person blocker = tokenProvider.getPersonByRequest(servletRequest);
+        personService.blockPersonById(id, true, blocker.getId());
         return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
     @Secured("ROLE_USER")
     @DeleteMapping("block/{id}")
-    public ResponseEntity<?> unblockPersonById(@PathVariable Integer id) throws BadRequestException400 { //обработать 400 и 401
-        personService.blockPersonById(id, false);
+    public ResponseEntity<?> unblockPersonById(@PathVariable Integer id, HttpServletRequest servletRequest) throws BadRequestException400 { //обработать 400 и 401
+        Person blocker = tokenProvider.getPersonByRequest(servletRequest);
+        personService.blockPersonById(id, false, blocker.getId());
         return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 

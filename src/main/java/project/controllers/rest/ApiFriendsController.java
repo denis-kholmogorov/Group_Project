@@ -1,28 +1,21 @@
 package project.controllers.rest;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.models.Person;
-import project.repositories.FriendshipRepository;
 import project.security.TokenProvider;
 import project.services.FriendshipService;
 import project.services.PersonService;
 
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -70,7 +63,6 @@ public class ApiFriendsController {
     public ResponseEntity getFriendRequests(
             @RequestParam(required = false, name = "name") String name, @RequestParam(defaultValue = "0") Integer offset,
             @RequestParam(defaultValue = "20") Integer itemPerPage, HttpServletRequest request){
-
         Person person = tokenProvider.getPersonByRequest(request);
         log.info(person.getLastName());
         return ResponseEntity.ok(friendshipService.getFriendRequests(name, offset, itemPerPage, person));
@@ -81,9 +73,25 @@ public class ApiFriendsController {
                                    @RequestParam(required = false, defaultValue = "20") @Positive @Max(20) Integer itemPerPage,
                                    HttpServletRequest request) {
         Person person = tokenProvider.getPersonByRequest(request);
-        long total = personService.recommendationsCount(person);
-        List<Person> list = personService.recommendations(person, offset, itemPerPage);
-        ListResponseDto<Person> response = new ListResponseDto<>(total, offset, itemPerPage, list);
+        List<Person> friendList = friendshipService.getFriendsList(person);
+        List<Person> resultList = new ArrayList<>();
+        for(Person friend : friendList)
+            friendshipService.getFriendRecursively(friend, resultList, 1);
+        resultList.remove(person);
+        resultList.removeAll(friendList);
+
+        ListResponseDto<Person> response;
+        if (offset <= resultList.size() - 1) {
+            response = new ListResponseDto<>(
+                    (long) resultList.size(),
+                    offset,
+                    itemPerPage,
+                    resultList.subList(offset, Math.min(resultList.size(), itemPerPage))
+            );
+        } else {
+            response = new ListResponseDto<>((long) resultList.size(), offset, itemPerPage, new ArrayList<>());
+        }
+
         return ResponseEntity.ok(response);
     }
 }

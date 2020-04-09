@@ -2,13 +2,17 @@ package project.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.util.*;
 
 @Data
+@EqualsAndHashCode(exclude = "tagList")
 @Entity
+@ToString(exclude = "tagList")
 @Table(name = "post")
 public class Post extends MainEntity {
 //    @Id
@@ -18,7 +22,6 @@ public class Post extends MainEntity {
     @Column(updatable = false)
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     private Date time;
-
 
     @ManyToOne
     @JoinColumn(name = "author_Id", nullable = false)
@@ -32,4 +35,15 @@ public class Post extends MainEntity {
     @Column(name = "id_blocked")
     @Type(type = "yes_no")
     private Boolean isBlocked;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "post2tag",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    Set<Tag> tagList = new HashSet<>();
+
+    @PreRemove
+    public void removeTags() {
+        tagList.forEach(tag -> tag.getPostList().remove(this));
+    }
 }

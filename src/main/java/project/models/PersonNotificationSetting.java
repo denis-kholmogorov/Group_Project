@@ -16,8 +16,9 @@ public class PersonNotificationSetting {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer Id;
 
+
+    @ManyToOne
     @JoinColumn(name = "person_id")
-    @ManyToOne(fetch = FetchType.LAZY)
     private Person person;
 
     @OneToOne

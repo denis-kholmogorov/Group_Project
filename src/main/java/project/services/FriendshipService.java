@@ -97,8 +97,19 @@ public class FriendshipService {
                 .collect(Collectors.toList());
 
         friends.addAll(friends1);
+        return friends.stream()
+                .filter(friend -> friend.getBlockedBy() == null || !friend.getBlockedBy().equals(person.getId()))
+                .collect(Collectors.toList());
+    }
 
-        return friends;
+    public void getFriendRecursively(Person person, List<Person> resultList, int deep) {
+        List<Person> friendList = getFriendsList(person);
+        friendList.forEach(p -> {
+            if (!resultList.contains(p))
+                resultList.add(p);
+        });
+        if (deep > 0)
+            friendList.forEach(f -> getFriendRecursively(f, resultList, deep - 1));
     }
 
     //=======================
@@ -144,7 +155,6 @@ public class FriendshipService {
 
             List<Person> srcFriendList = getFriendsList(src);
             List<Person> dstFriendList = getFriendsList(dst);
-
 
             List<Person> friendListBoth = srcFriendList.stream()
                     .distinct()

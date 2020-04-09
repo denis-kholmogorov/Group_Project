@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import project.dto.LikedDto;
 import project.dto.PostDto;
 import project.dto.responseDto.FileUploadResponseDto;
 import project.dto.responseDto.ListResponseDto;
@@ -19,22 +20,19 @@ import project.models.Image;
 import project.models.Person;
 import project.models.util.entity.ImagePath;
 import project.security.TokenProvider;
-import project.services.GeneralService;
-import project.services.NotificationService;
-import project.services.PersonService;
-import project.services.PostService;
+import project.services.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/")
 @AllArgsConstructor
 public class ApiGeneralController {
-    //liked, likes, feeds, notifications, tags, storage
 
     private PostService postService;
     private PersonService personService;
@@ -42,7 +40,21 @@ public class ApiGeneralController {
     private TokenProvider tokenProvider;
     private ImagePath imagePath;
     private NotificationService notificationService;
+    private PostLikeService postLikeService;
 
+    @GetMapping("liked")
+    public ResponseEntity<?> liked(
+            @RequestParam(value = "user_id", required = false) Integer userId,
+            @RequestParam(value = "item_id") Integer itemId,
+            @RequestParam(value = "type") String objectType) {
+
+        if (objectType.equals("Post")) {
+            List<Integer> likedPersons = postLikeService.getAllPersonIdWhoLikedPost(itemId);
+            return ResponseEntity.ok(new LikedDto(likedPersons.contains(userId)));
+        } else {
+            return ResponseEntity.ok("null");
+        }
+    }
 
     @GetMapping("feeds")
     public ResponseEntity<ListResponseDto<PostDto>> feeds(
