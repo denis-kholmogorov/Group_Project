@@ -8,4 +8,6 @@ import project.models.enums.NotificationTypeEnum;
 @Repository
 public interface NotificationTypeRepository extends CrudRepository<NotificationType, Integer> {
     NotificationType findByCode(NotificationTypeEnum code);
+
+
 }

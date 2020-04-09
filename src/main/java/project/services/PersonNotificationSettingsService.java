@@ -21,6 +21,10 @@ public class PersonNotificationSettingsService {
 
     PersonNotificationSettingsRepository personNotificationSettingsRepository;
 
+    public void save(PersonNotificationSetting notificationSetting){
+        personNotificationSettingsRepository.save(notificationSetting);
+    }
+
     public ResponseDto<List<NotificationSettingsResponseDto>> findAllByPerson(Person person) {
         List<PersonNotificationSetting> settingList = person.getNotificationSettings();
         List<NotificationSettingsResponseDto> dtoSettingList = settingList.stream().map(
@@ -30,9 +34,6 @@ public class PersonNotificationSettingsService {
                             setting.getNotificationType().getCode(),
                             setting.getEnable()))
                     .collect(toList());
-        dtoSettingList.forEach(setting -> {
-            log.info(setting.toString());
-        });
         return new ResponseDto<>(dtoSettingList);
     }
 
