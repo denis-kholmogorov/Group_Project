@@ -33,7 +33,8 @@ public class JwtUserDetailService implements UserDetailsService
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Person person = personService.findPersonByEmail(email);
         if(person == null){
-            throw new BadRequestException400();
+            //throw new BadRequestException400();
+            log.info("UserDetails Not Found");
         }
         JwtUser jwtUser = JwtUserFactory.create(person);
         return jwtUser;
