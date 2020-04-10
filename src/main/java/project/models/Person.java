@@ -99,11 +99,11 @@ public class Person extends MainEntity {
     private List<Dialog> dialogs;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<Post> postList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<PostComment> commentList = new ArrayList<>();
 
     @JsonIgnore
