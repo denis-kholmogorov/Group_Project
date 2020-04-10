@@ -16,4 +16,8 @@ public class NotificationTypeService {
     public NotificationType findByCode(NotificationTypeEnum code) {
         return notificationTypeRepository.findByCode(code);
     }
+
+    public NotificationType findById(Integer id){
+        return notificationTypeRepository.findById(id).orElse(null);
+    }
 }

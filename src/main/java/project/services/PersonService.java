@@ -16,9 +16,7 @@ import project.dto.responseDto.PersonDtoWithToken;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
 import project.handlerExceptions.UnauthorizationException401;
-import project.models.Person;
-import project.models.Role;
-import project.models.VerificationToken;
+import project.models.*;
 import project.models.enums.MessagesPermission;
 import project.models.util.entity.ImagePath;
 import project.repositories.PersonRepository;
@@ -57,6 +55,12 @@ public class PersonService {
 
     @Autowired
     private ImagePath imagePath;
+
+    @Autowired
+    private PersonNotificationSettingsService notificationSettingsService;
+
+    @Autowired
+    private NotificationTypeService notificationTypeService;
 
     //    @PostConstruct
 //    public void init() {
@@ -122,6 +126,14 @@ public class PersonService {
         personDto.setLastOnlineTime(person.getLastOnlineTime());
         personDto.setBlocked(person.isBlocked());
         personDto.setToken(token);
+
+        for (int i = 2; i < 7; i++) {
+            PersonNotificationSetting notificationSetting = new PersonNotificationSetting();
+            notificationSetting.setEnable(false);
+            notificationSetting.setNotificationType(notificationTypeService.findById(i));
+            notificationSetting.setPerson(person);
+            notificationSettingsService.save(notificationSetting);
+        }
         return new ResponseDto<>(personDto);
     }
 
