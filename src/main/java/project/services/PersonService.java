@@ -100,6 +100,15 @@ public class PersonService {
         person.setRegDate(new Date());
         person.setRoles(Collections.singleton(role));
         personRepository.save(person);
+
+        for (int i = 2; i < 7; i++) {
+            PersonNotificationSetting notificationSetting = new PersonNotificationSetting();
+            notificationSetting.setEnable(false);
+            notificationSetting.setNotificationType(notificationTypeService.findById(i));
+            notificationSetting.setPerson(person);
+            notificationSettingsService.save(notificationSetting);
+        }
+
         return true;
     }
 
@@ -126,14 +135,6 @@ public class PersonService {
         personDto.setLastOnlineTime(person.getLastOnlineTime());
         personDto.setBlocked(person.isBlocked());
         personDto.setToken(token);
-
-        for (int i = 2; i < 7; i++) {
-            PersonNotificationSetting notificationSetting = new PersonNotificationSetting();
-            notificationSetting.setEnable(false);
-            notificationSetting.setNotificationType(notificationTypeService.findById(i));
-            notificationSetting.setPerson(person);
-            notificationSettingsService.save(notificationSetting);
-        }
         return new ResponseDto<>(personDto);
     }
 

@@ -119,7 +119,7 @@ public class Person extends MainEntity {
     private List<Notification> notificationList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "person")
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private List<PersonNotificationSetting> notificationSettings = new ArrayList<>();
 
     @PreRemove
