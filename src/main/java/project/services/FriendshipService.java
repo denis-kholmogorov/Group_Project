@@ -67,7 +67,8 @@ public class FriendshipService {
             return new ListResponseDto<>((long) friendList.size(), offset, itemPerPage,
                     friendList.subList(offset, Math.min(friendList.size(), itemPerPage)));
         }
-        List<Person> filterList = friendList.stream().filter(
+
+        List<Person> filterList = friendList.size() == 0 ? new ArrayList<>() : friendList.stream().filter(
                 person1 -> person1.getFirstName().contains(name)
                         || person1.getLastName().contains(name))
                 .collect(Collectors.toList());
