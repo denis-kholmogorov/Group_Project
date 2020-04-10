@@ -47,16 +47,15 @@ public class ApiAuthController {
 
     @PostMapping(value = "logout")
     ResponseEntity logout(HttpServletRequest servletRequest) {
-//        try {
-//            Person person = tokenProvider.getPersonByRequest(servletRequest);
-//            person.setLastOnlineTime(new Date());
-//            personService.saveLastOnlineTime(person);
-//        }
-//        catch (Exception ex) {
-//            log.info("user was deleted");
-//        }
-            return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
-
+        try {
+            Person person = tokenProvider.getPersonByRequest(servletRequest);
+            person.setLastOnlineTime(new Date());
+            personService.saveLastOnlineTime(person);
+        }
+        catch (Exception ex) {
+            log.info("user was deleted");
+        }
+        return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
 }
