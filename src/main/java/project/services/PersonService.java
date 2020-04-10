@@ -16,9 +16,7 @@ import project.dto.responseDto.PersonDtoWithToken;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
 import project.handlerExceptions.UnauthorizationException401;
-import project.models.Person;
-import project.models.Role;
-import project.models.VerificationToken;
+import project.models.*;
 import project.models.enums.MessagesPermission;
 import project.models.util.entity.ImagePath;
 import project.repositories.PersonRepository;
@@ -58,6 +56,12 @@ public class PersonService {
     @Autowired
     private ImagePath imagePath;
 
+    @Autowired
+    private PersonNotificationSettingsService notificationSettingsService;
+
+    @Autowired
+    private NotificationTypeService notificationTypeService;
+
     //    @PostConstruct
 //    public void init() {
 //        Person person = new Person();
@@ -96,6 +100,15 @@ public class PersonService {
         person.setRegDate(new Date());
         person.setRoles(Collections.singleton(role));
         personRepository.save(person);
+
+        for (int i = 2; i < 7; i++) {
+            PersonNotificationSetting notificationSetting = new PersonNotificationSetting();
+            notificationSetting.setEnable(false);
+            notificationSetting.setNotificationType(notificationTypeService.findById(i));
+            notificationSetting.setPerson(person);
+            notificationSettingsService.save(notificationSetting);
+        }
+
         return true;
     }
 
@@ -131,7 +144,8 @@ public class PersonService {
         if (person != null) {
             String token = UUID.randomUUID().toString();
             VerificationToken verificationToken = new VerificationToken(token, person.getId(), 20);
-            String link = "http://localhost/change-password?token=" + token;
+            //String link = "http://localhost/change-password?token=" + token;
+            String link = "http://176.118.165.204/change-password?token=" + token;
             String message = String.format("Для восстановления пароля перейдите по ссылке %s", link );
             verificationTokenService.save(verificationToken);
             emailService.send(email, "Password recovery", message);

@@ -1,9 +1,11 @@
 package project.models;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
 @Table(name = "friendship")
@@ -18,10 +20,10 @@ public class Friendship extends MainEntity {
     private FriendshipStatus status;
 
     @JoinColumn(name = "src_person_id", referencedColumnName = "id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Person srcPerson;
 
-    @JoinColumn(name = "dst_person_id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dst_person_id", referencedColumnName = "id")
+    @ManyToOne
     private Person dstPerson;
 }

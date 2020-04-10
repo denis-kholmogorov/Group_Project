@@ -22,7 +22,8 @@ public interface PersonRepository extends CrudRepository<Person, Integer> {
 
     @Query("Select p from Person p where p.email = :email")
     Optional<Person> findPersonByEmail(String email);
-    
+
+    @Transactional
     void deleteByEmail(String email);
 
     // Поиск друзей пользователя (не нужен после добавления связей в Person, к удалению)

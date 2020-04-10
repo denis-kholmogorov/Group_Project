@@ -8,7 +8,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import project.dto.CommentDto;
-import project.dto.PersonsWallPostDto;
 import project.dto.PostDto;
 import project.dto.requestDto.PostRequestBodyTagsDto;
 import project.dto.responseDto.ListResponseDto;
@@ -85,7 +84,7 @@ public class PostService {
 
         Integer countLikes = postLikeService.countLikesByPostId(post.getId());
 
-        List<CommentDto> comments = postCommentsService.getListCommentsDto(post.getId());
+        List<PostComment> comments = postCommentsService.getListComments(post.getId());
 
         List<String> tags = post.getTagList().stream().map(Tag::getTag).collect(toList());
 
