@@ -99,19 +99,19 @@ public class Person extends MainEntity {
     private List<Dialog> dialogs;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Post> postList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<PostComment> commentList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "srcPerson")
+    @OneToMany(mappedBy = "srcPerson", cascade = CascadeType.ALL)
     private List<Friendship> sentFriendshipRequests = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "dstPerson")
+    @OneToMany(mappedBy = "dstPerson", cascade = CascadeType.ALL)
     private List<Friendship> receivedFriendshipRequests = new ArrayList<>();
 
     @JsonIgnore
@@ -125,5 +125,6 @@ public class Person extends MainEntity {
     @PreRemove
     public void removeUser() {
         roles.forEach(role -> role.getUsers().remove(this));
+        dialogs.forEach(dialog -> dialog.getPersons().remove(this));
     }
 }
