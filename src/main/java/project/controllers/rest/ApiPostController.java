@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-import project.dto.CommentDto;
 import project.dto.CommentModelDto;
 import project.dto.PostDto;
 import project.dto.requestDto.PostRequestBodyTagsDto;
@@ -18,7 +17,6 @@ import project.security.TokenProvider;
 import project.services.PostCommentsService;
 import project.services.PostService;
 
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Positive;
@@ -78,30 +76,28 @@ public class ApiPostController {
     @GetMapping("{id}/comments")
     public ResponseEntity<?> getAllComments
             (@PathVariable(value = "id") Integer postId,
-             @RequestParam(required = false) Integer offsetParam,
-             @RequestParam(required = false) Integer limitParam){
+             @RequestParam(defaultValue = "0") Integer offsetParam,
+             @RequestParam(defaultValue = "20") Integer limitParam){
 
-        List<CommentDto> commentDtoList = postCommentsService.getListCommentsDto(postId);
+        List<PostComment> comments = postCommentsService.getListComments(postId);
 
-        ListResponseDto<CommentDto> commentList = new ListResponseDto<>((long)commentDtoList.size(), offsetParam,
-                limitParam, commentDtoList);
+        ListResponseDto<PostComment> commentList = new ListResponseDto<>((long) comments.size(), offsetParam,
+                limitParam, comments);
 
         return ResponseEntity.ok(commentList);
     }
 
     @Secured("ROLE_USER")
     @PostMapping("{id}/comments")
-    public ResponseEntity<ResponseDto<CommentDto>> addNewComent(@PathVariable(value = "id") Integer postId,
+    public ResponseEntity<ResponseDto<PostComment>> addNewComent(@PathVariable(value = "id") Integer postId,
                                                                 @RequestBody CommentModelDto commentModelDto,
-                                                                ServletRequest servletRequest){
+                                                                HttpServletRequest servletRequest){
 
-        Person person = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest);
-        PostComment postComment = postCommentsService.addNewCommentToPost(postId, commentModelDto, person.getId());
+        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        PostComment postComment = postCommentsService.addNewCommentToPost(postId, commentModelDto, person);
 
 
-        return ResponseEntity.ok
-                (new ResponseDto<>(new CommentDto(commentModelDto.getParentId(), commentModelDto.getCommentText(),
-                        postComment.getId(), postId, postComment.getTime(), postComment.getAuthorId(), postComment.getIsBlocked())));
+        return ResponseEntity.ok(new ResponseDto<>(postComment));
     }
 
 }

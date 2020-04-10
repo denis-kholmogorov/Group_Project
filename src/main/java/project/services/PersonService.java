@@ -143,7 +143,8 @@ public class PersonService {
         if (person != null) {
             String token = UUID.randomUUID().toString();
             VerificationToken verificationToken = new VerificationToken(token, person.getId(), 20);
-            String link = "http://localhost/change-password?token=" + token;
+            //String link = "http://localhost/change-password?token=" + token;
+            String link = "http://176.118.165.204/change-password?token=" + token;
             String message = String.format("Для восстановления пароля перейдите по ссылке %s", link );
             verificationTokenService.save(verificationToken);
             emailService.send(email, "Password recovery", message);
