@@ -170,7 +170,7 @@ public class MessageService {
         message.setMessageText(dto.getMessageText());
         message.setReadStatus(ReadStatus.SENT);
         message.setDialog(dialog);
-        Message messageSaved = messageRepository.save(message);
+        messageRepository.save(message);
         //dialog.getListMessage().add(message);
         //dialogRepository.save(dialog);
 
@@ -183,7 +183,7 @@ public class MessageService {
         notification.setSentTime(new Date());
         notificationRepository.save(notification);
 
-        return messageSaved;
+        return message;
     }
 
     public void readMessage(Integer dialogId, Integer messageId, HttpServletRequest request){

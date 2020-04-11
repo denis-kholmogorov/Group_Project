@@ -30,7 +30,7 @@ import static java.util.stream.Collectors.toList;
 public class PostService {
     private PostRepository postRepository;
     private TagService tagService;
-    private Post2TagService post2TagService;
+
     private PostLikeService postLikeService;
     private PersonService personService;
     private PostCommentsService postCommentsService;
@@ -139,10 +139,12 @@ public class PostService {
                 }
 
                 if (!post.getTagList().contains(tag2DB)) {
-                    Post2Tag post2Tag = new Post2Tag();
-                    post2Tag.setPostId(post.getId());
-                    post2Tag.setTag(tag2DB.getId());
-                    post2TagService.addNewPost2Tag(post2Tag);
+//                    Post2Tag post2Tag = new Post2Tag();
+//                    post2Tag.setPostId(post.getId());
+//                    post2Tag.setTag(tag2DB.getId());
+//                    post2TagService.addNewPost2Tag(post2Tag);
+                    post.getTagList().add(tag2DB);
+                    postRepository.save(post);
                 }
             });
         }

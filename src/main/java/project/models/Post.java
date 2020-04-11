@@ -10,7 +10,7 @@ import javax.persistence.*;
 import java.util.*;
 
 @Data
-@EqualsAndHashCode(exclude = "tagList")
+@EqualsAndHashCode(exclude = "tagList", callSuper = false)
 @Entity
 @ToString(exclude = "tagList")
 @Table(name = "post")
@@ -36,7 +36,7 @@ public class Post extends MainEntity {
     @Type(type = "yes_no")
     private Boolean isBlocked;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "post2tag",
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
