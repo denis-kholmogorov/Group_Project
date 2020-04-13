@@ -89,7 +89,7 @@ public class PostService {
         List<String> tags = post.getTagList().stream().map(Tag::getTag).collect(toList());
 
         return new PostDto(post.getId(), post.getTime(), post.getAuthor(), post.getTitle(),
-                post.getPostText(), post.getIsBlocked(), countLikes, comments, tags,
+                post.getPostText(), post.getIsBlocked(), countLikes, post.getMyLike(), comments, tags,
                 post.getTime().before(new Date()) ?
                                 PostTypeEnum.POSTED.getType()
                                 :
@@ -108,6 +108,7 @@ public class PostService {
         post.setTitle(dto.getTitle());
         post.setPostText(dto.getPostText());
         post.setIsBlocked(false);
+        post.setMyLike(false);
         Post finalPost = postRepository.save(post);
 
         if (publishTime.before(new Date())) {
@@ -215,8 +216,6 @@ public class PostService {
         postRepository.deleteAllByAuthorId(id);
     }
 
-
-
     public Date getDateFromLong(String date) {
         if (!date.isEmpty() && !date.equals("null")) {
             Calendar calendar = Calendar.getInstance();
@@ -225,5 +224,11 @@ public class PostService {
             return calendar.getTime();
         }
         return null;
+    }
+
+    public void setMyLike(Integer postId, Boolean isLiked) {
+        Post post = getPostById(postId);
+        post.setMyLike(isLiked);
+        postRepository.save(post);
     }
 }

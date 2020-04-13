@@ -1,6 +1,7 @@
 package project.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -35,6 +36,9 @@ public class Post extends MainEntity {
     @Column(name = "id_blocked")
     @Type(type = "yes_no")
     private Boolean isBlocked;
+
+    @JsonProperty("my_like")
+    private Boolean myLike;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "post2tag",

@@ -35,6 +35,9 @@ public class PostDto {
 
     private Integer likes;
 
+    @JsonProperty("my_like")
+    private Boolean myLike;
+
     private List<PostComment> comments;
 
     private List<String> tags;
