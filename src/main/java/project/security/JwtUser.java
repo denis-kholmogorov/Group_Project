@@ -43,7 +43,7 @@ public class JwtUser implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return isBlocked;
+        return false;
     }
 
     @Override
@@ -53,6 +53,6 @@ public class JwtUser implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return !isBlocked;
     }
 }

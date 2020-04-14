@@ -8,7 +8,6 @@ import project.dto.requestDto.LoginRequestDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
-import project.handlerExceptions.UnauthorizationException401;
 import project.models.Person;
 import project.security.TokenProvider;
 import project.services.PersonService;

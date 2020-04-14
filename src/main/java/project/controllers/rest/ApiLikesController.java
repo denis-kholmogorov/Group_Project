@@ -2,15 +2,11 @@ package project.controllers.rest;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.AddLikeDto;
 import project.dto.responseDto.LikeUsersListDto;
 import project.dto.responseDto.ResponseDto;
-import project.handlerExceptions.BadRequestException400;
 import project.models.Person;
-import project.models.Post;
-import project.models.PostLike;
 import project.security.TokenProvider;
 import project.services.PostLikeService;
 import project.services.PostService;
@@ -29,7 +25,6 @@ public class ApiLikesController {
     private PostLikeService postLikeService;
     private TokenProvider tokenProvider;
 
-    @Secured("ROLE_USER")
     @GetMapping
     public ResponseEntity<?> getAllLikesFromObject(@RequestParam(value = "item_id") Integer itemId,
                                                    @RequestParam(value = "type") String objectType){
@@ -43,7 +38,6 @@ public class ApiLikesController {
                 new LikeUsersListDto(personsWhoLikedPost.size(), personsWhoLikedPost)));
     }
 
-    @Secured("ROLE_USER")
     @PutMapping
     public ResponseEntity<?> addLike(@RequestBody AddLikeDto addLikeDto, HttpServletRequest servletRequest){
 
@@ -65,7 +59,6 @@ public class ApiLikesController {
                 new LikeUsersListDto(personsWhoLikedItem.size(), personsWhoLikedItem)));
     }
 
-    @Secured("ROLE_USER")
     @DeleteMapping
     public ResponseEntity<?> unLike(@RequestBody AddLikeDto addLikeDto, ServletRequest servletRequest){
 
@@ -82,5 +75,4 @@ public class ApiLikesController {
 
         return ResponseEntity.ok(new ResponseDto<>(likeCount));
     }
-
 }
