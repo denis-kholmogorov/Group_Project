@@ -30,7 +30,7 @@ import static java.util.stream.Collectors.toList;
 public class PostService {
     private PostRepository postRepository;
     private TagService tagService;
-    private Post2TagService post2TagService;
+
     private PostLikeService postLikeService;
     private PersonService personService;
     private PostCommentsService postCommentsService;
@@ -89,7 +89,7 @@ public class PostService {
         List<String> tags = post.getTagList().stream().map(Tag::getTag).collect(toList());
 
         return new PostDto(post.getId(), post.getTime(), post.getAuthor(), post.getTitle(),
-                post.getPostText(), post.getIsBlocked(), countLikes, comments, tags,
+                post.getPostText(), post.getIsBlocked(), countLikes, post.getMyLike(), comments, tags,
                 post.getTime().before(new Date()) ?
                                 PostTypeEnum.POSTED.getType()
                                 :
@@ -108,6 +108,7 @@ public class PostService {
         post.setTitle(dto.getTitle());
         post.setPostText(dto.getPostText());
         post.setIsBlocked(false);
+        post.setMyLike(false);
         Post finalPost = postRepository.save(post);
 
         if (publishTime.before(new Date())) {
@@ -139,10 +140,12 @@ public class PostService {
                 }
 
                 if (!post.getTagList().contains(tag2DB)) {
-                    Post2Tag post2Tag = new Post2Tag();
-                    post2Tag.setPostId(post.getId());
-                    post2Tag.setTag(tag2DB.getId());
-                    post2TagService.addNewPost2Tag(post2Tag);
+//                    Post2Tag post2Tag = new Post2Tag();
+//                    post2Tag.setPostId(post.getId());
+//                    post2Tag.setTag(tag2DB.getId());
+//                    post2TagService.addNewPost2Tag(post2Tag);
+                    post.getTagList().add(tag2DB);
+                    postRepository.save(post);
                 }
             });
         }
@@ -221,5 +224,11 @@ public class PostService {
             return calendar.getTime();
         }
         return null;
+    }
+
+    public void setMyLike(Integer postId, Boolean isLiked) {
+        Post post = getPostById(postId);
+        post.setMyLike(isLiked);
+        postRepository.save(post);
     }
 }

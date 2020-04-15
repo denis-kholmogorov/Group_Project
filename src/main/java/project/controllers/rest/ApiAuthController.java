@@ -8,7 +8,6 @@ import project.dto.requestDto.LoginRequestDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
-import project.handlerExceptions.UnauthorizationException401;
 import project.models.Person;
 import project.security.TokenProvider;
 import project.services.PersonService;
@@ -47,16 +46,15 @@ public class ApiAuthController {
 
     @PostMapping(value = "logout")
     ResponseEntity logout(HttpServletRequest servletRequest) {
-//        try {
-//            Person person = tokenProvider.getPersonByRequest(servletRequest);
-//            person.setLastOnlineTime(new Date());
-//            personService.saveLastOnlineTime(person);
-//        }
-//        catch (Exception ex) {
-//            log.info("user was deleted");
-//        }
-            return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
-
+        try {
+            Person person = tokenProvider.getPersonByRequest(servletRequest);
+            person.setLastOnlineTime(new Date());
+            personService.saveLastOnlineTime(person);
+        }
+        catch (Exception ex) {
+            log.info("user was deleted");
+        }
+        return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
 }

@@ -2,7 +2,6 @@ package project.controllers.rest;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import project.dto.CommentModelDto;
 import project.dto.PostDto;
@@ -47,13 +46,11 @@ public class ApiPostController {
         return ResponseEntity.ok(postService.editPostById(id, publishDate, dto));
     }
 
-    //@Secured("ROLE_USER")
     @DeleteMapping("{id}")
     public ResponseEntity<ResponseDto<Integer>> deletePostById(@PathVariable Integer id) {
         return ResponseEntity.ok(postService.deletePostById(id));
     }
 
-    //@Secured("ROLE_USER")
     @GetMapping
     public ResponseEntity<ListResponseDto<PostDto>> findPostsByTitleAndDate(
             @RequestParam String text,
@@ -72,7 +69,6 @@ public class ApiPostController {
         return ResponseEntity.ok(new ListResponseDto<>((long) posts.size(), offset, itemPerPage, listPostsDto));
     }
 
-    @Secured("ROLE_USER")
     @GetMapping("{id}/comments")
     public ResponseEntity<?> getAllComments
             (@PathVariable(value = "id") Integer postId,
@@ -87,7 +83,6 @@ public class ApiPostController {
         return ResponseEntity.ok(commentList);
     }
 
-    @Secured("ROLE_USER")
     @PostMapping("{id}/comments")
     public ResponseEntity<ResponseDto<PostComment>> addNewComent(@PathVariable(value = "id") Integer postId,
                                                                 @RequestBody CommentModelDto commentModelDto,
@@ -99,5 +94,4 @@ public class ApiPostController {
 
         return ResponseEntity.ok(new ResponseDto<>(postComment));
     }
-
 }

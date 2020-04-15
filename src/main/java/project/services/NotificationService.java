@@ -98,7 +98,7 @@ public class NotificationService {
                             Message message = messageService.findMessageById(entityId);
                             if (message != null) {
                                 Person author = personService.findPersonById(message.getAuthorId());
-                                if (author.getId() == person.getId()) continue;
+                                if (author == null || author.getId() == person.getId()) continue;
                                 notificationDtoList.add(new NotificationDto(
                                         notification.getId(),
                                         notificationTypeCode,

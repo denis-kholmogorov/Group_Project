@@ -46,8 +46,8 @@ public interface PersonRepository extends CrudRepository<Person, Integer> {
 
     @Query(value = "select p from Person p where " +
             "p.id != :id and " +
-            "(:firstName is null or p.firstName = :firstName) and " +
-            "(:lastName is null or p.lastName = :lastName) and " +
+            "(:firstName is null or p.firstName like concat('%',:firstName,'%')) and " +
+            "(:lastName is null or p.lastName like concat('%',:lastName,'%')) and " +
             "(:ageFrom is null or timestampdiff(year, p.birthDate, curdate()) >= :ageFrom) and " +
             "(:ageTo is null or timestampdiff(year, p.birthDate, curdate()) <= :ageTo) and " +
             "(:country is null or p.country = :country) and " +
@@ -56,8 +56,8 @@ public interface PersonRepository extends CrudRepository<Person, Integer> {
 
     @Query(value = "select count(p) from Person p where " +
             "p.id != :id and " +
-            "(:firstName is null or p.firstName = :firstName) and " +
-            "(:lastName is null or p.lastName = :lastName) and " +
+            "(:firstName is null or p.firstName like concat('%',:firstName,'%')) and " +
+            "(:lastName is null or p.lastName like concat('%',:lastName,'%')) and " +
             "(:ageFrom is null or timestampdiff(year, p.birthDate, curdate()) >= :ageFrom) and " +
             "(:ageTo is null or timestampdiff(year, p.birthDate, curdate()) <= :ageTo) and " +
             "(:country is null or p.country = :country) and " +

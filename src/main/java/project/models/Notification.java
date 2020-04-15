@@ -24,11 +24,11 @@ public class Notification
     private Date sentTime;
 
     @JoinColumn(name = "person_id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Person person;
 
     @JoinColumn(name = "entity_id")
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne
     private MainEntity mainEntity;
 
     private String contact;

@@ -42,5 +42,8 @@ public class PostComment {
     @Column(name = "is_blocked")
     @Type(type = "yes_no")
     private Boolean isBlocked;
+
+    @JsonProperty("my_like")
+    private Boolean myLike;
 }
 

@@ -20,6 +20,6 @@ public abstract class MainEntity {
 
     @JsonIgnore
     @Getter
-    @OneToMany(mappedBy = "mainEntity")
+    @OneToMany(mappedBy = "mainEntity", cascade = CascadeType.ALL)
     protected List<Notification> sentNotifications = new ArrayList<>();
 }

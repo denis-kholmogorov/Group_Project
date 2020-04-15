@@ -155,12 +155,13 @@ public class FriendshipService {
             friendship.getStatus().setCode(FriendshipStatusCode.FRIEND);
 
             List<Person> srcFriendList = getFriendsList(src);
+            srcFriendList.remove(dst);
             List<Person> dstFriendList = getFriendsList(dst);
+            dstFriendList.remove(src);
 
-            List<Person> friendListBoth = srcFriendList.stream()
-                    .distinct()
-                    .filter(dstFriendList::contains)
-                    .collect(Collectors.toList());
+            srcFriendList.addAll(dstFriendList);
+
+            List<Person> friendListBoth = srcFriendList.stream().distinct().collect(Collectors.toList());
 
             sendFriendshipAgreementToPersonFriends(friendListBoth, friendship);
         } else {

@@ -13,7 +13,6 @@ import project.dto.LikedDto;
 import project.dto.PostDto;
 import project.dto.responseDto.FileUploadResponseDto;
 import project.dto.responseDto.ListResponseDto;
-import project.dto.responseDto.NotificationDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
 import project.models.Image;

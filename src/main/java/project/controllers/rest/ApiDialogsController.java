@@ -3,7 +3,6 @@ package project.controllers.rest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import project.dto.CountResponseDto;
 import project.dto.dialog.request.CreateDialogDto;
@@ -39,7 +38,6 @@ public class ApiDialogsController {
         this.tokenProvider = tokenProvider;
     }
 
-    @Secured("ROLE_USER")
     @GetMapping
     public ResponseEntity<?> getAllDialogs(@RequestParam(name = "query",required = false) String query,
                                            @RequestParam(name = "offset", required = false, defaultValue = "0") Integer offset,
@@ -56,7 +54,6 @@ public class ApiDialogsController {
         return ResponseEntity.ok(answer);
     }
 
-    @Secured("ROLE_USER")
     @PostMapping
     public ResponseEntity<?> createDialog(HttpServletRequest request,
                                              @RequestBody CreateDialogDto createDialogDto) throws BadRequestException400 {
@@ -64,14 +61,12 @@ public class ApiDialogsController {
         return ResponseEntity.ok(new ResponseDto<>(dialogResponseDto));
     }
 
-    @Secured("ROLE_USER")
     @GetMapping(value = "/unreaded")
     public ResponseEntity<?> countSentMessage(HttpServletRequest servletRequest) throws BadRequestException400 {
         CountResponseDto responseDto = new CountResponseDto(messageService.getCountSendMessage(servletRequest));
         return ResponseEntity.ok(new ResponseDto<>(responseDto));
     }
 
-    @Secured("ROLE_USER")
     @GetMapping("/{id}/messages")
     public ResponseEntity<?> getDialogMessages(@PathVariable(value = "id") Integer id,
                                         @RequestParam(name = "query",required = false) String query,
@@ -81,7 +76,6 @@ public class ApiDialogsController {
         return ResponseEntity.ok(messageService.getDialogMessages(id, offset, itemPerPage, request));
     }
 
-    @Secured("ROLE_USER")
     @PostMapping("/{id}/messages")
     public ResponseEntity<?> sentMessage(@PathVariable Integer id,
                                          @RequestBody MessageRequestDto dto,
@@ -96,7 +90,6 @@ public class ApiDialogsController {
         return ResponseEntity.ok(new ResponseDto<>(message));
     }
 
-    @Secured("ROLE_USER")
     @PutMapping("{dialog_id}/messages/{message_id}/read")
     public ResponseEntity<?> readMessage(@PathVariable(value = "dialog_id") Integer dialogId,
                                          @PathVariable(value = "message_id") Integer messageId,

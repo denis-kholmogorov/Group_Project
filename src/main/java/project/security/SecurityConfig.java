@@ -11,13 +11,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import project.handlerExceptions.CustomAccessDeniedHandler;
 
 /**
  * Основные конфигурации security находятся здесь*/
 
 @Configuration
 @EnableWebSecurity
-//@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig  extends WebSecurityConfigurerAdapter {
 
     private UserDetailsService userDetailsService;
@@ -36,6 +38,11 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
+    }
+
     /** Настраиваю конфигурацию хранения Person для security. antMatchers("/**").permitAll() создает полный доступ
      * ко всем urls */
 
@@ -49,11 +56,22 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
         http
                 .httpBasic().disable()
                 .csrf().disable()
-                .cors().and()
+                .cors()
+                .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests().antMatchers("/api/v1/**").permitAll().and()
-                .exceptionHandling().and()
+                .authorizeRequests()
+                .antMatchers(
+                        "/api/v1/auth/*",
+                        "/api/v1/account/register",
+                        "/api/v1/platform/languages",
+                        "/api/v1/storage/*"
+                        )
+                .permitAll()
+                .antMatchers("/api/v1/**").hasRole("USER")
+                .and()
+                .exceptionHandling().accessDeniedHandler(accessDeniedHandler())
+                .and()
                 .apply(new TokenConfig(tokenProvider));
     }
 

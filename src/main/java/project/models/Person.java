@@ -96,15 +96,15 @@ public class Person extends MainEntity {
     private Set<Role> roles = new HashSet<>();
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "persons", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "persons", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Dialog> dialogs;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<Post> postList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<PostComment> commentList = new ArrayList<>();
 
     @JsonIgnore
@@ -123,9 +123,10 @@ public class Person extends MainEntity {
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private List<PersonNotificationSetting> notificationSettings = new ArrayList<>();
 
-    @PreRemove
-    public void removeUser() {
-        roles.forEach(role -> role.getUsers().remove(this));
-        dialogs.forEach(dialog -> dialog.getPersons().remove(this));
-    }
+//    @PreRemove
+//    public void removeUser() {
+//        roles.forEach(role -> role.getUsers().remove(this));
+//        dialogs.forEach(dialog -> dialog.getPersons().remove(this));
+//        notificationList.removeIf(notification -> notification.getMainEntity().getId() == this.getId());
+//    }
 }
