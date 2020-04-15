@@ -19,13 +19,11 @@ import java.util.List;
 @Slf4j
 public class NotificationService {
 
-    private NotificationRepository notificationRepository;
-    private PersonService personService;
-    private MessageService messageService;
-    private PostService postService;
-    private PostCommentsService postCommentsService;
-    private FriendshipService friendshipService;
-    private static List<Integer> friendshipIds = new ArrayList<>();
+    private final PersonService personService;
+    private final MessageService messageService;
+    private final PostService postService;
+    private final FriendshipService friendshipService;
+    private static final List<Integer> friendshipIds = new ArrayList<>();
 
 
     @Autowired
@@ -34,11 +32,9 @@ public class NotificationService {
                                MessageService messageService,
                                PostService postService,
                                PostCommentsService postCommentsService, FriendshipService friendshipService) {
-        this.notificationRepository = notificationRepository;
         this.personService = personService;
         this.messageService = messageService;
         this.postService = postService;
-        this.postCommentsService = postCommentsService;
         this.friendshipService = friendshipService;
     }
 

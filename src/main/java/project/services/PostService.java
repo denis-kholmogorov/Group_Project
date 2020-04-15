@@ -213,8 +213,6 @@ public class PostService {
         postRepository.deleteAllByAuthorId(id);
     }
 
-
-
     public Date getDateFromLong(String date) {
         if (!date.isEmpty() && !date.equals("null")) {
             Calendar calendar = Calendar.getInstance();

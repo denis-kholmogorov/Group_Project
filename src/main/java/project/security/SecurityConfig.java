@@ -17,7 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+//@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig  extends WebSecurityConfigurerAdapter {
 
     private UserDetailsService userDetailsService;
@@ -49,10 +49,11 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
         http
                 .httpBasic().disable()
                 .csrf().disable()
+                .cors().and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests().antMatchers("/api/v1/**").permitAll()
-                .and()
+                .authorizeRequests().antMatchers("/api/v1/**").permitAll().and()
+                .exceptionHandling().and()
                 .apply(new TokenConfig(tokenProvider));
     }
 

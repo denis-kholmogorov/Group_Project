@@ -62,8 +62,8 @@ public class ApiUsersController {
     @DeleteMapping("me")
     public ResponseEntity<?> deleteUser(ServletRequest servletRequest){
         Person person = personService.getPersonByToken(servletRequest);
-        personService.deletePersonByEmail(person.getEmail());
         postService.deleteAllPostsByAuthorId(person.getId());
+        personService.deletePersonByEmail(person.getEmail());
         return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 

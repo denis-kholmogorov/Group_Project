@@ -32,7 +32,8 @@ public class TokenFilter extends GenericFilterBean
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException
     {
        String token = tokenProvider.resolveToken((HttpServletRequest) servletRequest); //Берем заголовок
-       if(token != null && tokenProvider.validateToken(token)){ //проверяем его валидность
+       if(token != null && !((HttpServletRequest) servletRequest).getRequestURI().equals("/api/v1/auth/logout")
+        && tokenProvider.validateToken(token)){ //проверяем его валидность
            Authentication auth = tokenProvider.getAuthentication(token); //получаем аутентификацию
            if(auth != null){
                SecurityContextHolder.getContext().setAuthentication(auth); // добавляем в контекст security

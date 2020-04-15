@@ -94,9 +94,14 @@ public class MessageService {
                     .build());
             List<Person> dialogPersons = new ArrayList<>(dialog.getPersons());
             dialogPersons.remove(person);
-            dialogDto.setUnreadCount(messageRepository.countByAuthorIdAndReadStatusAndDialogId(dialogPersons.get(0).getId(),//
-                    ReadStatus.SENT,
-                    dialog.getId()));
+            if(dialogPersons.size()>0) {
+                dialogDto.setUnreadCount(messageRepository.countByAuthorIdAndReadStatusAndDialogId(
+                        dialogPersons.get(0).getId(),//
+                        ReadStatus.SENT,
+                        dialog.getId()));
+            }else{
+                dialogDto.setUnreadCount(0);
+            }
             return dialogDto;
         }).collect(Collectors.toList());
 
