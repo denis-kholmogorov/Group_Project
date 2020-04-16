@@ -123,10 +123,10 @@ public class Person extends MainEntity {
     @OneToMany(mappedBy = "person", cascade = CascadeType.ALL)
     private List<PersonNotificationSetting> notificationSettings = new ArrayList<>();
 
-//    @PreRemove
-//    public void removeUser() {
-//        roles.forEach(role -> role.getUsers().remove(this));
-//        dialogs.forEach(dialog -> dialog.getPersons().remove(this));
-//        notificationList.removeIf(notification -> notification.getMainEntity().getId() == this.getId());
-//    }
+    @PreRemove
+    public void removeUser() {
+        roles.forEach(role -> role.getUsers().remove(this));
+        dialogs.forEach(dialog -> dialog.getPersons().remove(this));
+        notificationList.removeIf(notification -> notification.getMainEntity().getId() == this.getId());
+    }
 }
