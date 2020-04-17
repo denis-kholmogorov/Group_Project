@@ -9,14 +9,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import project.dto.requestDto.AddTag;
-import project.models.Tag;
-import project.services.TagService;
+import project.repositories.TagRepository;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -33,8 +33,8 @@ public class ApiTagsControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    @Autowired
-    private TagService tagService;
+    @MockBean
+    private TagRepository repository;
 
     @Test
     @SneakyThrows
@@ -46,7 +46,7 @@ public class ApiTagsControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-             //   .andExpect(jsonPath("$.total", is(0)));
+        //   .andExpect(jsonPath("$.total", is(0)));
     }
 
     @Test
@@ -72,11 +72,8 @@ public class ApiTagsControllerTest {
     @SneakyThrows
     public void deleteTagTest(){
 
-        Tag tag = tagService.saveTag("tag123");
-        String tagId = Integer.toString(tag.getId());
-
         mvc.perform(delete("/api/v1/tags/")
-                .param("tagId", tagId))
+                .param("tagId", "1"))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
