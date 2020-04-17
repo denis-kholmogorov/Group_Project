@@ -19,7 +19,7 @@ public class CommentDto {
     private Integer id;
 
     @JsonProperty("post_id")
-    private Integer postId;
+    private String postId;
 
     private Date time;
 
