@@ -56,6 +56,6 @@ class ApiAuthControllerTest {
                         ".puucO74gPBqV5OOFhBbafLnLFWrDC6igrGZdeBKJ8NQ"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.message", is("ok")));
+                .andExpect(jsonPath("$data.message", is("ok")));
     }
 }
