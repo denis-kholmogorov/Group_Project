@@ -32,7 +32,7 @@ public class PersonServiceTest {
     @Autowired
     private PersonService personService;
 
-    @MockBean
+    @Autowired
     private PersonRepository personRepository;
 
     private static final ObjectMapper om = new ObjectMapper();
@@ -41,17 +41,19 @@ public class PersonServiceTest {
     public void login() throws Exception {
         LoginRequestDto loginRequestDto = new LoginRequestDto("ilyxa043@gmail.com", "qweasdzxc");
 
-        Person person = new Person();
-        person.setEmail("ilyxa043@gmail.com");
-        personRepository.save(person);
+//        Person person = new Person();
+//        person.setEmail("ilyxa043@gmail.com");
+//        personRepository.save(person);
 
         ResponseDto responseDto = personService.login(loginRequestDto);
 
-        //PersonDtoWithToken person = (PersonDtoWithToken) responseDto.getData();
+        PersonDtoWithToken person = (PersonDtoWithToken) responseDto.getData();
         //ResponseDto<PersonDtoWithToken> person = new ResponseDto<>();
 
-        Mockito.verify(personRepository, Mockito.times(1))
-                .findPersonByEmail(loginRequestDto.getEmail());
+//        Mockito.verify(personRepository, Mockito.times(1))
+//                .findPersonByEmail(loginRequestDto.getEmail());
+
+        Assert.assertEquals(loginRequestDto.getEmail(), person.getEmail());
     }
 
     @Test(expected = BadRequestException400.class)
