@@ -114,7 +114,7 @@ public class PersonService {
 
     public ResponseDto<PersonDtoWithToken> login(LoginRequestDto dto){
         String email = dto.getEmail();
-        Person person = personRepository.findPersonByEmail(email).orElseThrow(BadRequestException400::new);//необходимо оставить
+        Person person = personRepository.findPersonByEmail(email).orElseThrow(BadRequestException400::new);
         person.setLastOnlineTime(new Date());
         saveLastOnlineTime(person);
 
