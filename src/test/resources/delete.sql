@@ -1,0 +1,12 @@
+DELETE FROM Message;
+
+DELETE FROM Dialog_User;
+
+DELETE FROM Dialog;
+
+DELETE FROM User_Roles;
+
+DELETE FROM Roles;
+
+DELETE FROM Person;
+
