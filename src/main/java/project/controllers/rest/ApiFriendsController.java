@@ -3,6 +3,7 @@ package project.controllers.rest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
@@ -22,6 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/v1/friends")
 @Slf4j
+@Validated
 public class ApiFriendsController {
 
     private FriendshipService friendshipService;

@@ -3,6 +3,7 @@ package project.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -245,7 +246,7 @@ public class PersonService {
         personRepository.save(person);
     }
 
-    public List<Person> search(Person person,
+    public Page<Person> search(Person person,
                                String firstName,
                                String lastName,
                                Integer ageFrom,
@@ -256,44 +257,5 @@ public class PersonService {
                                Integer itemPerPage) {
         Pageable pageable = PageRequest.of(offset, itemPerPage);
         return personRepository.search(person.getId(), firstName, lastName, ageFrom, ageTo, country, city, pageable);
-    }
-
-    public long searchCount(Person person,
-                            String firstName,
-                            String lastName,
-                            Integer ageFrom,
-                            Integer ageTo,
-                            String country,
-                            String city) {
-        return personRepository.searchCount(person.getId(), firstName, lastName, ageFrom, ageTo, country, city);
-    }
-
-    @Deprecated
-    public List<Person> recommendations(Person person, Integer offset, Integer itemPerPage) {
-        if (person.getCity() != null && person.getBirthDate() != null) {
-            Pageable pageable = PageRequest.of(offset, itemPerPage);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(person.getBirthDate());
-            calendar.add(Calendar.YEAR, -3);
-            Date dateFrom = calendar.getTime();
-            calendar.add(Calendar.YEAR, 6);
-            Date dateTo = calendar.getTime();
-            return personRepository.findByIdNotAndCityEqualsAndBirthDateBetween(person.getId(), person.getCity(), dateFrom, dateTo, pageable);
-        }
-        return new ArrayList<>();
-    }
-
-    @Deprecated
-    public long recommendationsCount(Person person) {
-        if (person.getCity() != null && person.getBirthDate() != null) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(person.getBirthDate());
-            calendar.add(Calendar.YEAR, -3);
-            Date dateFrom = calendar.getTime();
-            calendar.add(Calendar.YEAR, 6);
-            Date dateTo = calendar.getTime();
-            return personRepository.countByIdNotAndCityEqualsAndBirthDateBetween(person.getId(), person.getCity(), dateFrom, dateTo);
-        }
-        return 0;
     }
 }
