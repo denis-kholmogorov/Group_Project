@@ -9,7 +9,6 @@ import project.dto.requestDto.PasswordSetDto;
 import project.dto.requestDto.RegistrationRequestDto;
 import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.ResponseDto;
-import project.handlerExceptions.BadRequestException400;
 import project.models.NotificationType;
 import project.models.Person;
 import project.models.PersonNotificationSetting;
@@ -41,25 +40,21 @@ public class ApiAccountController {
         this.notificationTypeService = notificationTypeService;
     }
 
-
-
     @PostMapping(value = "register")
-    public ResponseEntity<ResponseDto<MessageResponseDto>> register(@RequestBody RegistrationRequestDto dto)
-            throws BadRequestException400 {
+    public ResponseEntity<ResponseDto<MessageResponseDto>> register(@RequestBody RegistrationRequestDto dto) {
         log.info("контроллер Register отработал");
         personService.registrationPerson(dto);
         return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
     @PutMapping(value = "password/recovery")
-    public ResponseEntity<ResponseDto<MessageResponseDto>> sendRecoveryEmail(@RequestBody Map<String, String> email)
-            throws BadRequestException400 {
+    public ResponseEntity<ResponseDto<MessageResponseDto>> sendRecoveryEmail(@RequestBody Map<String, String> email) {
         return ResponseEntity.ok(personService.sendRecoveryPasswordEmail(email.get("email")));
     }
 
     @PutMapping("password/set")
     public ResponseEntity<ResponseDto<MessageResponseDto>> setNewPassword(
-            @RequestBody PasswordSetDto passwordSetDto, HttpServletRequest request) throws BadRequestException400 {
+            @RequestBody PasswordSetDto passwordSetDto, HttpServletRequest request) {
         return ResponseEntity.ok(personService.setNewPassword(passwordSetDto, request));
     }
 

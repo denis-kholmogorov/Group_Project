@@ -60,12 +60,13 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(
-                        "/api/v1/auth/*",
-                        "/api/v1/account/register",
-                        "/api/v1/account/password/recovery",
-                        "/api/v1/platform/languages",
-                        "/api/v1/storage/*"
-                        )
+                    "/api/v1/auth/*",
+                    "/api/v1/account/register",
+                    "/api/v1/account/password/recovery",
+                    "/api/v1/account/password/set",
+                    "/api/v1/platform/languages",
+                    "/api/v1/storage/*"
+                )
                 .permitAll()
                 .antMatchers("/api/v1/**").hasRole("USER")
                 .and()

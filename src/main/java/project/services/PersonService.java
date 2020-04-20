@@ -2,6 +2,7 @@ package project.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,7 +17,10 @@ import project.dto.responseDto.PersonDtoWithToken;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
 import project.handlerExceptions.UnauthorizationException401;
-import project.models.*;
+import project.models.Person;
+import project.models.PersonNotificationSetting;
+import project.models.Role;
+import project.models.VerificationToken;
 import project.models.enums.MessagesPermission;
 import project.models.util.entity.ImagePath;
 import project.repositories.PersonRepository;
@@ -31,6 +35,9 @@ import java.util.*;
 @Slf4j
 @Service
 public class PersonService {
+
+    @Value("${response.host}")
+    private String host;
 
     @Autowired
     private PersonRepository personRepository;
@@ -138,14 +145,13 @@ public class PersonService {
         return new ResponseDto<>(personDto);
     }
 
-    public ResponseDto<MessageResponseDto> sendRecoveryPasswordEmail(String email) throws BadRequestException400 {
+    public ResponseDto<MessageResponseDto> sendRecoveryPasswordEmail(String email) {
 
         Person person = findPersonByEmail(email);
         if (person != null) {
             String token = UUID.randomUUID().toString();
             VerificationToken verificationToken = new VerificationToken(token, person.getId(), 20);
-            //String link = "http://localhost/change-password?token=" + token;
-            String link = "http://176.118.165.204/change-password?token=" + token;
+            String link = "http://" + host + "/change-password?token=" + token;
             String message = String.format("Для восстановления пароля перейдите по ссылке %s", link );
             verificationTokenService.save(verificationToken);
             emailService.send(email, "Password recovery", message);
@@ -156,7 +162,7 @@ public class PersonService {
         return new ResponseDto<>(new MessageResponseDto());
     }
 
-    public ResponseDto<MessageResponseDto> setNewPassword(PasswordSetDto passwordSetDto, HttpServletRequest request) throws BadRequestException400 {
+    public ResponseDto<MessageResponseDto> setNewPassword(PasswordSetDto passwordSetDto, HttpServletRequest request) {
 
         String token = request.getHeader("referer");
         token = token.substring(token.indexOf('=') + 1);
@@ -175,6 +181,8 @@ public class PersonService {
                 person.setPassword(password);
                 personRepository.save(person);
             }
+
+            verificationTokenService.delete(verificationToken.getId());
 
             return new ResponseDto<>(new MessageResponseDto());
         }

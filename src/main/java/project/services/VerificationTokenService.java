@@ -20,4 +20,8 @@ public class VerificationTokenService {
     public void save(VerificationToken token){
         verificationTokenRepository.save(token);
     }
+
+    public void delete(int id) {
+        verificationTokenRepository.deleteById(id);
+    }
 }
