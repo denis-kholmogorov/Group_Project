@@ -30,7 +30,8 @@ public class TagService {
     public Tag saveTag(String tagName){
         Tag tag = new Tag();
         tag.setTag(tagName);
-        return tagRepository.save(tag);
+        tagRepository.save(tag);
+        return tag;
     }
 
     public Tag findByTagName(String tagName) {
