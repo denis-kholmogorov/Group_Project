@@ -10,6 +10,8 @@ DELETE FROM Roles;
 
 DELETE FROM Friendship;
 
+DELETE FROM Friendship_status;
+
 DELETE FROM Notification;
 
 DELETE FROM Post_Comments;
