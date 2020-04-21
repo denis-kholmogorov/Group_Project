@@ -122,7 +122,7 @@ class ApiUsersControllerTest {
         mockMvc.perform(post("/api/v1/users/2/wall")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
-                .header("Authorization", token2)
+                .header("Authorization", token)
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -150,7 +150,7 @@ class ApiUsersControllerTest {
     }
 
     @Test
-    void search() throws Exception {    //не брался еще
+    void search() throws Exception {
         mockMvc.perform(get("/api/v1/users/search")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)

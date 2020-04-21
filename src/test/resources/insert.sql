@@ -27,5 +27,11 @@ INSERT INTO `friendship` (`id`, `dst_person_id`, `src_person_id`, `status_id`) V
 INSERT INTO `friendship` (`id`, `dst_person_id`, `src_person_id`, `status_id`) VALUES ('33', '10', '3', '30');
 INSERT INTO `friendship` (`id`, `dst_person_id`, `src_person_id`, `status_id`) VALUES ('34', '2', '3', '31');
 
+INSERT INTO `notification_type` VALUES ('1','POST','Новый пост');
+INSERT INTO `notification_type` VALUES ('2','POST_COMMENT','Комментарий к посту');
+INSERT INTO `notification_type` VALUES ('3','COMMENT_COMMENT','Ответ на комментарий');
+INSERT INTO `notification_type` VALUES ('4','FRIEND_REQUEST','Запрос дружбы');
+INSERT INTO `notification_type` VALUES ('5','MESSAGE','Личное сообщение');
+INSERT INTO `notification_type` VALUES ('6','FRIEND_BIRTHDAY ','День рождения друга');
 
 
