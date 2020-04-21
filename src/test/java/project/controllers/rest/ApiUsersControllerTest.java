@@ -34,26 +34,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("dev")
-@WithMockUser("ROLE_USER")
-@TestPropertySource("/application-test.properties")
+@TestPropertySource("/application_test.properties")
 class ApiUsersControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     private static final ObjectMapper om = new ObjectMapper();
+    private final String token;
     private final String token2;
 
     @Autowired
     public ApiUsersControllerTest(TokenProvider tokenProvider, PersonService personService) {
-        token2 = tokenProvider.createToken("test2@mail.ru");
+        token2 = tokenProvider.createToken("test4@mail.ru");
+        token = tokenProvider.createToken("test2@mail.ru");
     }
 
     @Test
     void getAuthUser() throws Exception {
         mockMvc.perform(get("/api/v1/users/me")
                 .accept(MediaType.APPLICATION_JSON)
-                .header("Authorization", token2))
+                .header("Authorization", token))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.id", is(2)))
@@ -68,15 +69,15 @@ class ApiUsersControllerTest {
         System.out.println(json);
 
         mockMvc.perform(put("/api/v1/users/me")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(json)
-        .header("Authorization", token2)
-        .accept(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .header("Authorization", token)
+                .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.id", is(2)))
                 .andExpect(jsonPath("$.data.first_name", is("firstOne")));
-                //.andExpect(jsonPath("$.data.last_name", is()));
+        //.andExpect(jsonPath("$.data.last_name", is()));
     }
 
     @Test
@@ -150,5 +151,17 @@ class ApiUsersControllerTest {
 
     @Test
     void search() throws Exception {    //не брался еще
+        mockMvc.perform(get("/api/v1/users/search")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("Authorization", token)
+                .param("first_name", "first4")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total",is(1)))
+                .andExpect(jsonPath("$.data[0].id",is(4)))
+                .andExpect(jsonPath("$.data[0].email",is("test4@mail.ru")))
+                .andExpect(jsonPath("$.data[0].first_name",is("first4")));
     }
 }
