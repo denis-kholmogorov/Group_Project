@@ -102,12 +102,14 @@ class ApiUsersControllerTest {
     }
 
     @Test
-    void getWallPostsById() throws Exception {  //нужна вставка в Insert.sql
+    void getWallPostsById() throws Exception {
         mockMvc.perform(get("/api/v1/users/2/wall")
                 .accept(MediaType.APPLICATION_JSON)
-                .header("Authorization", token2))
-                //.andExpect(status().isOk())
-                .andDo(print());
+                .header("Authorization", token))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].title", is("Title1")))
+                .andExpect(jsonPath("$.data[1].title", is("Title2")));
     }
 
     @Test
@@ -142,7 +144,7 @@ class ApiUsersControllerTest {
     @Test
     void unblockPersonById() throws Exception {
         mockMvc.perform(delete("/api/v1/users/block/2")
-                .header("Authorization", token2)
+                .header("Authorization", token)
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())

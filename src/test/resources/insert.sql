@@ -34,4 +34,11 @@ INSERT INTO `notification_type` VALUES ('4','FRIEND_REQUEST','Запрос др�
 INSERT INTO `notification_type` VALUES ('5','MESSAGE','Личное сообщение');
 INSERT INTO `notification_type` VALUES ('6','FRIEND_BIRTHDAY ','День рождения друга');
 
+INSERT INTO `post` VALUES ('100', 'N', 'N', 'post text', '2020-04-19 17:02:14', 'Title1', '2');
+INSERT INTO `post` VALUES ('101', 'N', 'N', 'post text', '2020-04-19 17:02:14', 'Title2', '2');
+
+INSERT INTO `tag` VALUES ('1', 'tag1');
+
+INSERT INTO `post2tag` VALUES ('100', '1');
+
 

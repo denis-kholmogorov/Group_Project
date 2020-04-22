@@ -26,3 +26,4 @@ DELETE FROM Notification_Type;
 
 DELETE FROM Person;
 
+DELETE FROM Tag;
