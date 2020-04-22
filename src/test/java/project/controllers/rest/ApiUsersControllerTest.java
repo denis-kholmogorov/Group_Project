@@ -1,14 +1,13 @@
 package project.controllers.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
@@ -22,7 +21,7 @@ import project.services.PersonService;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -51,7 +50,8 @@ class ApiUsersControllerTest {
     }
 
     @Test
-    void getAuthUser() throws Exception {
+    @SneakyThrows
+    void getAuthUser() {
         mockMvc.perform(get("/api/v1/users/me")
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token))
@@ -62,7 +62,8 @@ class ApiUsersControllerTest {
     }
 
     @Test
-    void personEditBody() throws Exception {
+    @SneakyThrows
+    void personEditBody() {
         UpdatePersonDto dto = new UpdatePersonDto();
         dto.setFirstName("firstOne");
         String json = om.writeValueAsString(dto);
@@ -81,7 +82,8 @@ class ApiUsersControllerTest {
     }
 
     @Test
-    void deleteUser() throws Exception {
+    @SneakyThrows
+    void deleteUser() {
         mockMvc.perform(delete("/api/v1/users/me")
                 .header("Authorization", token2)
                 .accept(MediaType.APPLICATION_JSON))
@@ -91,7 +93,8 @@ class ApiUsersControllerTest {
     }
 
     @Test
-    void getPersonById() throws Exception {
+    @SneakyThrows
+    void getPersonById() {
         mockMvc.perform(get("/api/v1/users/2")
                 //.param("id", "2")
                 .accept(MediaType.APPLICATION_JSON)
@@ -102,7 +105,8 @@ class ApiUsersControllerTest {
     }
 
     @Test
-    void getWallPostsById() throws Exception {
+    @SneakyThrows
+    void getWallPostsById() {
         mockMvc.perform(get("/api/v1/users/2/wall")
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token))
@@ -113,7 +117,8 @@ class ApiUsersControllerTest {
     }
 
     @Test
-    void addWallPostById() throws Exception {
+    @SneakyThrows
+    void addWallPostById() {
         List<String> tags = new ArrayList<>();
         tags.add("tag1");
         tags.add("tag2");
@@ -132,7 +137,8 @@ class ApiUsersControllerTest {
     }
 
     @Test
-    void blockPersonById() throws Exception {   //не нужно ли никак проверять поле blocker у юзера?
+    @SneakyThrows
+    void blockPersonById() {   //не нужно ли никак проверять поле blocker у юзера?
         mockMvc.perform(put("/api/v1/users/block/2")
                 .header("Authorization", token2)
                 .accept(MediaType.APPLICATION_JSON))
@@ -142,7 +148,8 @@ class ApiUsersControllerTest {
     }
 
     @Test
-    void unblockPersonById() throws Exception {
+    @SneakyThrows
+    void unblockPersonById() {
         mockMvc.perform(delete("/api/v1/users/block/2")
                 .header("Authorization", token)
                 .accept(MediaType.APPLICATION_JSON))
@@ -152,7 +159,8 @@ class ApiUsersControllerTest {
     }
 
     @Test
-    void search() throws Exception {
+    @SneakyThrows
+    void search() {
         mockMvc.perform(get("/api/v1/users/search")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)

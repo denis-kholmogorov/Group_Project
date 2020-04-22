@@ -1,6 +1,7 @@
 package project.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("dev")
-@TestPropertySource("/application-test.properties")
+@TestPropertySource("/test.properties")
 public class PersonServiceTest {
 
     @Autowired
@@ -38,7 +39,8 @@ public class PersonServiceTest {
     private static final ObjectMapper om = new ObjectMapper();
 
     @Test
-    public void login() throws Exception {
+    @SneakyThrows
+    public void login() {
         LoginRequestDto loginRequestDto = new LoginRequestDto("ilyxa043@gmail.com", "qweasdzxc");
 
 //        Person person = new Person();

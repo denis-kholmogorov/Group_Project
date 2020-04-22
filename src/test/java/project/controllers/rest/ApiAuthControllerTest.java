@@ -1,6 +1,7 @@
 package project.controllers.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,8 @@ class ApiAuthControllerTest {
     }
 
     @Test
-    void login() throws Exception {
+    @SneakyThrows
+    void login() {
         LoginRequestDto dto = new LoginRequestDto("test2@mail.ru", "123123123");
         String json = om.writeValueAsString(dto);
         System.out.println(json);
@@ -58,8 +60,9 @@ class ApiAuthControllerTest {
     }
 
     @Test
+    @SneakyThrows
     @WithMockUser("ROLE_USER")
-    void logout() throws Exception {
+    void logout() {
         mockMvc.perform(post("/api/v1/auth/logout")
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token2))

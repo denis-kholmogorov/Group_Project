@@ -1,6 +1,7 @@
 package project.controllers.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -62,7 +63,8 @@ public class ApiAccountControllerTest {
 
     @Test
     @Order(1)
-    public void registerSuccessTest() throws Exception {
+    @SneakyThrows
+    public void registerSuccessTest() {
         RegistrationRequestDto requestContent = new RegistrationRequestDto(
             EMAIL,
             PASSWORD,
@@ -81,7 +83,8 @@ public class ApiAccountControllerTest {
 
     @Test
     @Order(2)
-    public void sendRecoveryEmailSuccessTest() throws Exception {
+    @SneakyThrows
+    public void sendRecoveryEmailSuccessTest() {
         mvc.perform(
             put(BASE_PATH + "password/recovery")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -91,9 +94,10 @@ public class ApiAccountControllerTest {
     }
 
     @Test
+    @SneakyThrows
     @Order(3)
-    @Sql(scripts = "/api-account-controller-after.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    public void setNewPasswordSuccessTest() throws Exception {
+    @Sql(value = {"/delete.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    public void setNewPasswordSuccessTest() {
         Person person = personRepository.findPersonByEmail(EMAIL).orElseThrow(
             () -> new IllegalArgumentException("There is no email: " + EMAIL + " in database")
         );

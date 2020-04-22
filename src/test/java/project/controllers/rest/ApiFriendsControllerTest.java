@@ -1,5 +1,6 @@
 package project.controllers.rest;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,8 @@ class ApiFriendsControllerTest {
     }
 
     @Test
-    void getFriendList() throws Exception {
+    @SneakyThrows
+    void getFriendList() {
         mvc.perform(get("/api/v1/friends")
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token))
@@ -53,7 +55,8 @@ class ApiFriendsControllerTest {
     }
 
     @Test
-    void sendFriendRequest() throws Exception {
+    @SneakyThrows
+    void sendFriendRequest() {
         mvc.perform(post("/api/v1/friends/3")
                 //.contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", token2))
@@ -62,7 +65,8 @@ class ApiFriendsControllerTest {
     }
 
     @Test
-    void deleteFriend() throws Exception {
+    @SneakyThrows
+    void deleteFriend() {
         mvc.perform(delete("/api/v1/friends/10")
                 .header("Authorization", token))
                 .andDo(print())
@@ -70,7 +74,8 @@ class ApiFriendsControllerTest {
     }
 
     @Test
-    void getFriendRequests() throws Exception {
+    @SneakyThrows
+    void getFriendRequests() {
         mvc.perform(get("/api/v1/friends/request")
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token2))
@@ -81,7 +86,8 @@ class ApiFriendsControllerTest {
     }
 
     @Test
-    void recommendations() throws Exception {
+    @SneakyThrows
+    void recommendations() {
         mvc.perform(get("/api/v1/friends/recommendations")
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token2))

@@ -1,6 +1,7 @@
 package project.controllers.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +53,9 @@ class ApiDialogsControllerTest {
     }
 
     @Test
+    @SneakyThrows
     @WithMockUser("ROLE_USER")
-    void getAllDialogs() throws Exception {
+    void getAllDialogs() {
         System.out.println(token);
 
         mvc.perform(get("/api/v1/dialogs/")
@@ -72,7 +74,8 @@ class ApiDialogsControllerTest {
     }
 
     @Test
-    void createDialog()  throws Exception{
+    @SneakyThrows
+    void createDialog() {
 
         List<Integer> list = new ArrayList<>(1);
         list.add(4);
@@ -92,8 +95,9 @@ class ApiDialogsControllerTest {
 
 
     @Test
+    @SneakyThrows
     @WithMockUser("ROLE_USER")
-    void countSentMessage() throws Exception {
+    void countSentMessage() {
 
         mvc.perform(get("/api/v1/dialogs/unreaded") .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token))
@@ -103,7 +107,8 @@ class ApiDialogsControllerTest {
     }
 
     @Test
-    void getDialogMessages() throws Exception {
+    @SneakyThrows
+    void getDialogMessages() {
         mvc.perform(get("/api/v1/dialogs/6/messages").accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token))
                 .andDo(print())
@@ -121,7 +126,8 @@ class ApiDialogsControllerTest {
     }
 
     @Test
-    void sentMessage() throws Exception {
+    @SneakyThrows
+    void sentMessage() {
 
         MessageRequestDto dto = new MessageRequestDto("Haba haba");
 
@@ -140,7 +146,8 @@ class ApiDialogsControllerTest {
     }
 
     @Test
-    void readMessage() throws Exception {
+    @SneakyThrows
+    void readMessage() {
         mvc.perform(put("/api/v1/dialogs/6/messages/9/read")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization",token2))
