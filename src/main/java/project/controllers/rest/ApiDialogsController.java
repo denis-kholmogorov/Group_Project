@@ -86,7 +86,7 @@ public class ApiDialogsController {
         person.setLastOnlineTime(new Date());
         personService.saveLastOnlineTime(person);
 
-        Message message = messageService.sentMessage(id, dto, request);
+        Message message = messageService.sentMessage(id, dto, person);
         return ResponseEntity.ok(new ResponseDto<>(message));
     }
 

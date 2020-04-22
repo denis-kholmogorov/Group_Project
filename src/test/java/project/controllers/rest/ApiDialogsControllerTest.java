@@ -128,12 +128,12 @@ class ApiDialogsControllerTest {
         mvc.perform(post("/api/v1/dialogs/6/messages")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto))
-                .header("Authorization",token2)
+                .header("Authorization", token2)
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.recipientId", is(2)))
-                .andExpect(jsonPath("$.data.authorId", is(10)))
+                .andExpect(jsonPath("$.data.recipientId", is(10)))
+                .andExpect(jsonPath("$.data.authorId", is(2)))
                 .andExpect(jsonPath("$.data.messageText", is("Haba haba")))
                 .andExpect(jsonPath("$.data.readStatus", is("SENT")));
 

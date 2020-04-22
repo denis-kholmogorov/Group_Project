@@ -45,8 +45,8 @@ public class ApiTagsControllerTest {
                 .param("query", ""))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-        //   .andExpect(jsonPath("$.total", is(0)));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.total", is(0)));
     }
 
     @Test
