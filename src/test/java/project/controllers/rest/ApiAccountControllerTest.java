@@ -92,7 +92,7 @@ public class ApiAccountControllerTest {
 
     @Test
     @Order(3)
-    @Sql(scripts = "/api-account-controller-after.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    @Sql(value = {"/delete.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void setNewPasswordSuccessTest() throws Exception {
         Person person = personRepository.findPersonByEmail(EMAIL).orElseThrow(
             () -> new IllegalArgumentException("There is no email: " + EMAIL + " in database")
