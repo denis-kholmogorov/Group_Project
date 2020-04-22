@@ -34,6 +34,7 @@ class ApiFriendsControllerTest {
 
     private final String token;
     private final String token2;
+    private final String BASE_PATH = "/api/v1/friends";
 
     @Autowired
     public ApiFriendsControllerTest(TokenProvider tokenProvider) {
@@ -44,7 +45,7 @@ class ApiFriendsControllerTest {
     @Test
     @SneakyThrows
     void getFriendList() {
-        mvc.perform(get("/api/v1/friends")
+        mvc.perform(get(BASE_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token))
                 .andDo(print())
@@ -57,7 +58,7 @@ class ApiFriendsControllerTest {
     @Test
     @SneakyThrows
     void sendFriendRequest() {
-        mvc.perform(post("/api/v1/friends/3")
+        mvc.perform(post(BASE_PATH + "/3")
                 //.contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", token2))
                 .andDo(print())
@@ -67,7 +68,7 @@ class ApiFriendsControllerTest {
     @Test
     @SneakyThrows
     void deleteFriend() {
-        mvc.perform(delete("/api/v1/friends/10")
+        mvc.perform(delete(BASE_PATH + "/10")
                 .header("Authorization", token))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -76,7 +77,7 @@ class ApiFriendsControllerTest {
     @Test
     @SneakyThrows
     void getFriendRequests() {
-        mvc.perform(get("/api/v1/friends/request")
+        mvc.perform(get(BASE_PATH + "/request")
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token2))
                 .andDo(print())
@@ -88,7 +89,7 @@ class ApiFriendsControllerTest {
     @Test
     @SneakyThrows
     void recommendations() {
-        mvc.perform(get("/api/v1/friends/recommendations")
+        mvc.perform(get(BASE_PATH + "/recommendations")
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token2))
                 .andDo(print())

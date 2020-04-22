@@ -45,6 +45,7 @@ class ApiDialogsControllerTest {
     private static final ObjectMapper om = new ObjectMapper();
     private final String token;
     private final String token2;
+    private final String BASE_PATH = "/api/v1/dialogs";
 
     @Autowired
     public ApiDialogsControllerTest(TokenProvider tokenProvider, PersonService personService) {
@@ -58,7 +59,7 @@ class ApiDialogsControllerTest {
     void getAllDialogs() {
         System.out.println(token);
 
-        mvc.perform(get("/api/v1/dialogs/")
+        mvc.perform(get(BASE_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token))
                 .andDo(print())
@@ -82,7 +83,7 @@ class ApiDialogsControllerTest {
         CreateDialogDto dto = new CreateDialogDto(list);
         System.out.println(om.writeValueAsString(dto));
 
-        mvc.perform(post("/api/v1/dialogs")
+        mvc.perform(post(BASE_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto))
 
@@ -99,7 +100,7 @@ class ApiDialogsControllerTest {
     @WithMockUser("ROLE_USER")
     void countSentMessage() {
 
-        mvc.perform(get("/api/v1/dialogs/unreaded") .accept(MediaType.APPLICATION_JSON)
+        mvc.perform(get(BASE_PATH + "/unreaded") .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -109,7 +110,7 @@ class ApiDialogsControllerTest {
     @Test
     @SneakyThrows
     void getDialogMessages() {
-        mvc.perform(get("/api/v1/dialogs/6/messages").accept(MediaType.APPLICATION_JSON)
+        mvc.perform(get(BASE_PATH + "/6/messages").accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -131,7 +132,7 @@ class ApiDialogsControllerTest {
 
         MessageRequestDto dto = new MessageRequestDto("Haba haba");
 
-        mvc.perform(post("/api/v1/dialogs/6/messages")
+        mvc.perform(post(BASE_PATH + "/6/messages")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto))
                 .header("Authorization", token2)
@@ -148,7 +149,7 @@ class ApiDialogsControllerTest {
     @Test
     @SneakyThrows
     void readMessage() {
-        mvc.perform(put("/api/v1/dialogs/6/messages/9/read")
+        mvc.perform(put(BASE_PATH + "/6/messages/9/read")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization",token2))
                 .andDo(print())

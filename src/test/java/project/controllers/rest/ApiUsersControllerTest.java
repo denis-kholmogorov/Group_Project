@@ -42,6 +42,7 @@ class ApiUsersControllerTest {
     private static final ObjectMapper om = new ObjectMapper();
     private final String token;
     private final String token2;
+    private final String BASE_PATH = "/api/v1/users";
 
     @Autowired
     public ApiUsersControllerTest(TokenProvider tokenProvider, PersonService personService) {
@@ -52,7 +53,7 @@ class ApiUsersControllerTest {
     @Test
     @SneakyThrows
     void getAuthUser() {
-        mockMvc.perform(get("/api/v1/users/me")
+        mockMvc.perform(get(BASE_PATH + "/me")
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token))
                 .andDo(print())
@@ -69,7 +70,7 @@ class ApiUsersControllerTest {
         String json = om.writeValueAsString(dto);
         System.out.println(json);
 
-        mockMvc.perform(put("/api/v1/users/me")
+        mockMvc.perform(put(BASE_PATH + "/me")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
                 .header("Authorization", token)
@@ -84,7 +85,7 @@ class ApiUsersControllerTest {
     @Test
     @SneakyThrows
     void deleteUser() {
-        mockMvc.perform(delete("/api/v1/users/me")
+        mockMvc.perform(delete(BASE_PATH + "/me")
                 .header("Authorization", token2)
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -95,7 +96,7 @@ class ApiUsersControllerTest {
     @Test
     @SneakyThrows
     void getPersonById() {
-        mockMvc.perform(get("/api/v1/users/2")
+        mockMvc.perform(get(BASE_PATH + "/2")
                 //.param("id", "2")
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token2))
@@ -107,7 +108,7 @@ class ApiUsersControllerTest {
     @Test
     @SneakyThrows
     void getWallPostsById() {
-        mockMvc.perform(get("/api/v1/users/2/wall")
+        mockMvc.perform(get(BASE_PATH + "/2/wall")
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token))
                 .andDo(print())
@@ -126,7 +127,7 @@ class ApiUsersControllerTest {
         String json = om.writeValueAsString(dto);
         System.out.println(json);
 
-        mockMvc.perform(post("/api/v1/users/2/wall")
+        mockMvc.perform(post(BASE_PATH + "/2/wall")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
                 .header("Authorization", token)
@@ -139,7 +140,7 @@ class ApiUsersControllerTest {
     @Test
     @SneakyThrows
     void blockPersonById() {   //не нужно ли никак проверять поле blocker у юзера?
-        mockMvc.perform(put("/api/v1/users/block/2")
+        mockMvc.perform(put(BASE_PATH + "/block/2")
                 .header("Authorization", token2)
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -150,8 +151,8 @@ class ApiUsersControllerTest {
     @Test
     @SneakyThrows
     void unblockPersonById() {
-        mockMvc.perform(delete("/api/v1/users/block/2")
-                .header("Authorization", token)
+        mockMvc.perform(delete(BASE_PATH + "/block/2")
+                .header("Authorization", token2)
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -161,7 +162,7 @@ class ApiUsersControllerTest {
     @Test
     @SneakyThrows
     void search() {
-        mockMvc.perform(get("/api/v1/users/search")
+        mockMvc.perform(get(BASE_PATH + "/search")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", token)
