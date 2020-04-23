@@ -2,6 +2,7 @@ package project.controllers.rest;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.dto.CommentModelDto;
 import project.dto.PostDto;
@@ -28,6 +29,7 @@ import static java.util.stream.Collectors.toList;
 @RestController
 @RequestMapping(value = "/api/v1/post")
 @AllArgsConstructor
+@Validated
 public class ApiPostController {
     private PostService postService;
     private PostCommentsService postCommentsService;

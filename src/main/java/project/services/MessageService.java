@@ -77,7 +77,7 @@ public class MessageService {
                 message = sentMessage(
                         dialog.getId(),
                         new MessageRequestDto("Привет! Я " + person.getFirstName() + " " + person.getLastName()),
-                        request);
+                        person);
             } else {
                 message = messageList.get(0);//
             }
@@ -161,8 +161,7 @@ public class MessageService {
         return new ListResponseDto<>((long) messageDtoList.size(), offset, itemPerPage, messageDtoList);
     }
 
-    public Message sentMessage(Integer id, MessageRequestDto dto, HttpServletRequest request) throws BadRequestException400 {
-        Person author = tokenProvider.getPersonByRequest(request);
+    public Message sentMessage(Integer id, MessageRequestDto dto, Person author) throws BadRequestException400 {
         Dialog dialog = dialogRepository.findById(id).orElseThrow(BadRequestException400::new);
         List<Person> personList = new ArrayList<>(dialog.getPersons());
         personList.remove(author);

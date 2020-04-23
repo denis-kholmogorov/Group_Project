@@ -1,5 +1,6 @@
 package project.repositories;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -52,19 +53,5 @@ public interface PersonRepository extends CrudRepository<Person, Integer> {
             "(:ageTo is null or timestampdiff(year, p.birthDate, curdate()) <= :ageTo) and " +
             "(:country is null or p.country = :country) and " +
             "(:city is null or p.city = :city)")
-    List<Person> search(Integer id, String firstName, String lastName, Integer ageFrom, Integer ageTo, String country, String city, Pageable pageable);
-
-    @Query(value = "select count(p) from Person p where " +
-            "p.id != :id and " +
-            "(:firstName is null or p.firstName like concat('%',:firstName,'%')) and " +
-            "(:lastName is null or p.lastName like concat('%',:lastName,'%')) and " +
-            "(:ageFrom is null or timestampdiff(year, p.birthDate, curdate()) >= :ageFrom) and " +
-            "(:ageTo is null or timestampdiff(year, p.birthDate, curdate()) <= :ageTo) and " +
-            "(:country is null or p.country = :country) and " +
-            "(:city is null or p.city = :city)")
-    long searchCount(Integer id, String firstName, String lastName, Integer ageFrom, Integer ageTo, String country, String city);
-
-    List<Person> findByIdNotAndCityEqualsAndBirthDateBetween(Integer id, String city, Date dateFrom, Date DateTo, Pageable pageable);
-
-    long countByIdNotAndCityEqualsAndBirthDateBetween(Integer id, String city, Date dateFrom, Date DateTo);
+    Page<Person> search(Integer id, String firstName, String lastName, Integer ageFrom, Integer ageTo, String country, String city, Pageable pageable);
 }

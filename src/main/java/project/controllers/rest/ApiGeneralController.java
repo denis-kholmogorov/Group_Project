@@ -15,6 +15,7 @@ import project.dto.responseDto.FileUploadResponseDto;
 import project.dto.responseDto.ListResponseDto;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
+import project.handlerExceptions.EntityNotFoundException;
 import project.models.Image;
 import project.models.Person;
 import project.models.util.entity.ImagePath;
@@ -94,34 +95,35 @@ public class ApiGeneralController {
                              HttpServletRequest request) throws IOException {
         FileUploadResponseDto response = new FileUploadResponseDto();
 
-        if (type.equals("IMAGE")) {
-            if (multipartFile.isEmpty())
-                throw  new BadRequestException400();
+        if (!type.equals("IMAGE") || multipartFile.isEmpty())
+            throw  new BadRequestException400();
 
-            response.setFileName(multipartFile.getOriginalFilename());
-            response.setRelativeFilePath("");
-            response.setFileFormat(multipartFile.getContentType());
-            response.setBytes(multipartFile.getSize());
-            response.setFileType("IMAGE");
-            response.setCreatedAt(new Date().getTime());
+        response.setFileName(multipartFile.getOriginalFilename());
+        response.setRelativeFilePath("");
+        response.setFileFormat(multipartFile.getContentType());
+        response.setBytes(multipartFile.getSize());
+        response.setFileType("IMAGE");
+        response.setCreatedAt(new Date().getTime());
 
-            Person person = tokenProvider.getPersonByRequest(request);
-            response.setOwnerId(person.getId());
-            String photo = person.getPhoto();
-            if (photo.equals(imagePath.getDefaultImagePath())) {
-                Integer id = generalService.saveImage(multipartFile.getBytes(), multipartFile.getContentType());
-                response.setId(String.valueOf(id));
-                String URL = imagePath.getImagePath()  + id;
-                response.setRawFileURL(URL);
-                personService.updatePhoto(person, URL);
-            } else {
-                Integer oldId = Integer.valueOf(photo.replace(imagePath.getImagePath(), ""));
-                response.setId(String.valueOf(oldId));
-                response.setRawFileURL(imagePath.getImagePath());
-                generalService.updateImage(multipartFile.getBytes(), multipartFile.getContentType(), oldId);
-            }
+        Person person = tokenProvider.getPersonByRequest(request);
+        response.setOwnerId(person.getId());
+        String photo = person.getPhoto();
+        if (photo.equals(imagePath.getDefaultImagePath())) {
+            Integer id = generalService.saveImage(multipartFile.getBytes(), multipartFile.getContentType());
+            response.setId(String.valueOf(id));
+            String URL = imagePath.getImagePath()  + id;
+            response.setRawFileURL(URL);
+            personService.updatePhoto(person, URL);
         } else {
-            throw new BadRequestException400();
+            Integer oldId = Integer.valueOf(photo.replace(imagePath.getImagePath(), ""));
+            response.setId(String.valueOf(oldId));
+            response.setRawFileURL(imagePath.getImagePath());
+            try {
+                generalService.updateImage(multipartFile.getBytes(), multipartFile.getContentType(), oldId);
+            } catch(EntityNotFoundException e) {
+                log.error(e.getMessage(), e);
+                throw new BadRequestException400();
+            }
         }
 
         return ResponseEntity.ok(new ResponseDto<>(response));
@@ -129,7 +131,14 @@ public class ApiGeneralController {
 
     @GetMapping(value = "storage/{id}")
     ResponseEntity<?> download(@PathVariable Integer id) {
-        Image image = generalService.findImage(id);
+        Image image;
+        try {
+            image = generalService.findImage(id);
+        } catch(EntityNotFoundException e) {
+            log.error(e.getMessage(), e);
+            throw new BadRequestException400();
+        }
+
         return ResponseEntity.ok().contentType(MediaType.valueOf(image.getType())).body(image.getImage());
     }
 

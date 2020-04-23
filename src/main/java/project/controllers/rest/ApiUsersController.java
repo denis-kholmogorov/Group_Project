@@ -2,7 +2,9 @@ package project.controllers.rest;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.dto.requestDto.PostRequestBodyTagsDto;
 import project.dto.requestDto.UpdatePersonDto;
@@ -29,6 +31,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/v1/users/")
 @AllArgsConstructor
+@Validated
 public class ApiUsersController {
 
     private PersonService personService;
@@ -52,7 +55,7 @@ public class ApiUsersController {
     }
 
     @DeleteMapping("me")
-    public ResponseEntity<?> deleteUser(ServletRequest servletRequest){
+    public ResponseEntity<?> deleteUser(ServletRequest servletRequest) {
         Person person = personService.getPersonByToken(servletRequest);
         postService.deleteAllPostsByAuthorId(person.getId());
         personService.deletePersonByEmail(person.getEmail());
@@ -71,7 +74,8 @@ public class ApiUsersController {
     @GetMapping("{id}/wall")
     public ResponseEntity<?> getWallPostsById(
             @PathVariable Integer id, @RequestParam(defaultValue = "0") Integer offset,
-            @RequestParam(defaultValue = "20") Integer itemPerPage, HttpServletRequest servletRequest) throws BadRequestException400 {
+            @RequestParam(defaultValue = "20") Integer itemPerPage, HttpServletRequest servletRequest)
+            throws BadRequestException400 {
         int compareId = tokenProvider.getPersonByRequest(servletRequest).getId();
         return ResponseEntity.ok(postService.findAllByAuthorId(id, offset, itemPerPage, compareId));
     }
@@ -108,8 +112,7 @@ public class ApiUsersController {
                              @RequestParam(required = false, defaultValue = "20") @Positive @Max(20) Integer itemPerPage,
                              HttpServletRequest request) {
         Person person = tokenProvider.getPersonByRequest(request);
-        long personCount = personService.searchCount(person, firstName, lastName, ageFrom, ageTo, country, city);
-        List<Person> persons = personService.search(person, firstName, lastName, ageFrom, ageTo, country, city, offset, itemPerPage);
-        return ResponseEntity.ok(new ListResponseDto<>(personCount, offset, itemPerPage, persons));
+        Page<Person> persons = personService.search(person, firstName, lastName, ageFrom, ageTo, country, city, offset, itemPerPage);
+        return ResponseEntity.ok(new ListResponseDto<>(persons.getTotalElements(), offset, itemPerPage, persons.getContent()));
     }
 }

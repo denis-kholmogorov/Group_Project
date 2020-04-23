@@ -15,6 +15,7 @@ public class NotificationType
     private Integer id;
 
     @Enumerated(EnumType.STRING)
+    @Column(unique = true, nullable = false)
     private NotificationTypeEnum code;
 
     @Column(nullable = false)

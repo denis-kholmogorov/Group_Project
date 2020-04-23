@@ -38,7 +38,7 @@ public class PostCommentsService {
         postComment.setAuthor(author);
         postComment.setIsBlocked(false);
         postComment.setTime(new Date());
-        postComment.setParentId(commentModelDto.getParentId());
+        postComment.setParentId(postId);
         postComment.setMyLike(false);
         postCommentsRepository.save(postComment);
 

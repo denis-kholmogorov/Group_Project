@@ -113,7 +113,7 @@ public class TokenProvider
     public List<String> getRoleName(List<Role> personRole){
         List<String> result = new ArrayList<>();
 
-        personRole.forEach(role -> result.add(role.getName()));
+        personRole.forEach(role -> result.add(role.getName().name()));
         return result;
     }
 }

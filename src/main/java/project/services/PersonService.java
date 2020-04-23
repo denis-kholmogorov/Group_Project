@@ -1,7 +1,10 @@
 package project.services;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,9 +18,14 @@ import project.dto.responseDto.MessageResponseDto;
 import project.dto.responseDto.PersonDtoWithToken;
 import project.dto.responseDto.ResponseDto;
 import project.handlerExceptions.BadRequestException400;
+import project.handlerExceptions.EntityNotFoundException;
 import project.handlerExceptions.UnauthorizationException401;
-import project.models.*;
+import project.models.Person;
+import project.models.PersonNotificationSetting;
+import project.models.Role;
+import project.models.VerificationToken;
 import project.models.enums.MessagesPermission;
+import project.models.enums.RoleEnum;
 import project.models.util.entity.ImagePath;
 import project.repositories.PersonRepository;
 import project.repositories.RoleRepository;
@@ -31,6 +39,9 @@ import java.util.*;
 @Slf4j
 @Service
 public class PersonService {
+
+    @Value("${response.host}")
+    private String host;
 
     @Autowired
     private PersonRepository personRepository;
@@ -75,23 +86,16 @@ public class PersonService {
 //
 //    }
 
+    @SneakyThrows(EntityNotFoundException.class)
+    public Boolean registrationPerson(RegistrationRequestDto dto) {
+        if (personRepository.findPersonByEmail(dto.getEmail()).isPresent())
+            throw new BadRequestException400();
 
-    public Boolean registrationPerson(RegistrationRequestDto dto) throws BadRequestException400 {
-        Person exist = personRepository.findPersonByEmail(dto.getEmail()).orElse(null);
-        if (exist != null) throw new BadRequestException400();
+        Role role = roleRepository.findByName(RoleEnum.ROLE_USER).orElseThrow(
+            () -> new EntityNotFoundException("User role not found")
+        );
+
         Person person = new Person();
-        Boolean existsById = roleRepository.existsById(1);
-
-        Role role;
-        if (!existsById) {
-            role = new Role();
-            role.setId(1);
-            role.setName("ROLE_USER");
-        }
-        else {
-            role = roleRepository.findById(1).get();
-        }
-
         person.setEmail(dto.getEmail());
         person.setPassword(encoder.encode(dto.getPasswd1()));
         person.setPhoto(imagePath.getDefaultImagePath());
@@ -114,7 +118,7 @@ public class PersonService {
 
     public ResponseDto<PersonDtoWithToken> login(LoginRequestDto dto){
         String email = dto.getEmail();
-        Person person = personRepository.findPersonByEmail(email).orElseThrow(BadRequestException400::new);//необходимо оставить
+        Person person = personRepository.findPersonByEmail(email).orElseThrow(BadRequestException400::new);
         person.setLastOnlineTime(new Date());
         saveLastOnlineTime(person);
 
@@ -138,14 +142,13 @@ public class PersonService {
         return new ResponseDto<>(personDto);
     }
 
-    public ResponseDto<MessageResponseDto> sendRecoveryPasswordEmail(String email) throws BadRequestException400 {
+    public ResponseDto<MessageResponseDto> sendRecoveryPasswordEmail(String email) {
 
         Person person = findPersonByEmail(email);
         if (person != null) {
             String token = UUID.randomUUID().toString();
             VerificationToken verificationToken = new VerificationToken(token, person.getId(), 20);
-            //String link = "http://localhost/change-password?token=" + token;
-            String link = "http://176.118.165.204/change-password?token=" + token;
+            String link = "http://" + host + "/change-password?token=" + token;
             String message = String.format("Для восстановления пароля перейдите по ссылке %s", link );
             verificationTokenService.save(verificationToken);
             emailService.send(email, "Password recovery", message);
@@ -156,7 +159,7 @@ public class PersonService {
         return new ResponseDto<>(new MessageResponseDto());
     }
 
-    public ResponseDto<MessageResponseDto> setNewPassword(PasswordSetDto passwordSetDto, HttpServletRequest request) throws BadRequestException400 {
+    public ResponseDto<MessageResponseDto> setNewPassword(PasswordSetDto passwordSetDto, HttpServletRequest request) {
 
         String token = request.getHeader("referer");
         token = token.substring(token.indexOf('=') + 1);
@@ -175,6 +178,8 @@ public class PersonService {
                 person.setPassword(password);
                 personRepository.save(person);
             }
+
+            verificationTokenService.delete(verificationToken.getId());
 
             return new ResponseDto<>(new MessageResponseDto());
         }
@@ -237,7 +242,7 @@ public class PersonService {
         personRepository.save(person);
     }
 
-    public List<Person> search(Person person,
+    public Page<Person> search(Person person,
                                String firstName,
                                String lastName,
                                Integer ageFrom,
@@ -248,44 +253,5 @@ public class PersonService {
                                Integer itemPerPage) {
         Pageable pageable = PageRequest.of(offset, itemPerPage);
         return personRepository.search(person.getId(), firstName, lastName, ageFrom, ageTo, country, city, pageable);
-    }
-
-    public long searchCount(Person person,
-                            String firstName,
-                            String lastName,
-                            Integer ageFrom,
-                            Integer ageTo,
-                            String country,
-                            String city) {
-        return personRepository.searchCount(person.getId(), firstName, lastName, ageFrom, ageTo, country, city);
-    }
-
-    @Deprecated
-    public List<Person> recommendations(Person person, Integer offset, Integer itemPerPage) {
-        if (person.getCity() != null && person.getBirthDate() != null) {
-            Pageable pageable = PageRequest.of(offset, itemPerPage);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(person.getBirthDate());
-            calendar.add(Calendar.YEAR, -3);
-            Date dateFrom = calendar.getTime();
-            calendar.add(Calendar.YEAR, 6);
-            Date dateTo = calendar.getTime();
-            return personRepository.findByIdNotAndCityEqualsAndBirthDateBetween(person.getId(), person.getCity(), dateFrom, dateTo, pageable);
-        }
-        return new ArrayList<>();
-    }
-
-    @Deprecated
-    public long recommendationsCount(Person person) {
-        if (person.getCity() != null && person.getBirthDate() != null) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(person.getBirthDate());
-            calendar.add(Calendar.YEAR, -3);
-            Date dateFrom = calendar.getTime();
-            calendar.add(Calendar.YEAR, 6);
-            Date dateTo = calendar.getTime();
-            return personRepository.countByIdNotAndCityEqualsAndBirthDateBetween(person.getId(), person.getCity(), dateFrom, dateTo);
-        }
-        return 0;
     }
 }

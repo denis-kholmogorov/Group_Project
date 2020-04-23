@@ -27,7 +27,7 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -177,7 +177,8 @@ class ApiDialogsControllerTest {
         mvc.perform(post("/api/v1/dialogs")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto))
-                .header("Authorization","eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0MUBtYWlsLnJ1IiwiaWF0IjoxNTg3MDY5MDAwLCJleHAiOjE1ODc0MjkwMDB9.dCKyqLhoCkF5g7nmag5VZadez-vvGV8otVSW5SThsS8")
+                .header("Authorization","eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZW5kaWVzZWw4OEB5YW5kZXgucnUi" +
+                        "LCJpYXQiOjE1ODcwNDA2OTYsImV4cCI6MTU5MDY0MDY5Nn0.CO_NencXo7Yn1sj7t7dMzgerXUwhHv_OTuJmQmT93_s")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
@@ -189,7 +190,7 @@ class ApiDialogsControllerTest {
     void countSentMessage() throws Exception {
 
         mvc.perform(get("/api/v1/dialogs/unreaded") .accept(MediaType.APPLICATION_JSON)
-                .header("Authorization", token))
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ6dWJheXJfQGxpdmUuY29tIiwiaWF0IjoxNTg3MDIzOTc3LCJleHAiOjE1ODczODM5Nzd9.EgO6JIVmMAo9aZBmWDOMPNK7nRvTDw9YiRCfKG0Tkjc"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.count", is(1)));
@@ -198,7 +199,7 @@ class ApiDialogsControllerTest {
     @Test
     void getDialogMessages() throws Exception {
         mvc.perform(get("/api/v1/dialogs/12/messages").accept(MediaType.APPLICATION_JSON)
-                .header("Authorization", token))
+                .header("Authorization", "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ6dWJheXJfQGxpdmUuY29tIiwiaWF0IjoxNTg3MDIzOTc3LCJleHAiOjE1ODczODM5Nzd9.EgO6JIVmMAo9aZBmWDOMPNK7nRvTDw9YiRCfKG0Tkjc"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total",is(2)))
@@ -221,7 +222,8 @@ class ApiDialogsControllerTest {
         mvc.perform(post("/api/v1/dialogs/1/messages")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(dto))//"{\"message_text\":\"Haba haba\"}")
-                .header("Authorization",token)
+                .header("Authorization","eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZW5kaWVzZWw4OEB5YW5kZXgucnUi" +
+                        "LCJpYXQiOjE1ODcwNDA2OTYsImV4cCI6MTU5MDY0MDY5Nn0.CO_NencXo7Yn1sj7t7dMzgerXUwhHv_OTuJmQmT93_s")
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
@@ -234,6 +236,5 @@ class ApiDialogsControllerTest {
 
     @Test
     void readMessage() {
-    }*/
-
-
+    }
+}

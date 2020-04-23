@@ -33,11 +33,12 @@ public class Post extends MainEntity {
     @Column(name = "post_text")
     private String postText;
 
-    @Column(name = "id_blocked")
+    @Column(name = "is_blocked")
     @Type(type = "yes_no")
     private Boolean isBlocked;
 
     @JsonProperty("my_like")
+    @Type(type = "yes_no")
     private Boolean myLike;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
