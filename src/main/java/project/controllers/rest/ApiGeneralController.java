@@ -64,7 +64,7 @@ public class ApiGeneralController {
             HttpServletRequest servletRequest)
             throws BadRequestException400 {
 
-        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        Person person = personService.getPersonByToken(servletRequest);
         person.setLastOnlineTime(new Date());
         personService.saveLastOnlineTime(person);
 
@@ -75,7 +75,7 @@ public class ApiGeneralController {
     public ResponseEntity<?> getAllNotifications(@RequestParam(defaultValue = "0") Integer offset,
                                                  @RequestParam(defaultValue = "20") Integer itemPerPage,
                                                  HttpServletRequest servletRequest) {
-        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        Person person = personService.getPersonByToken(servletRequest);
         return ResponseEntity.ok(
                 notificationService.findAllNotificationsByPersonId(person, offset, itemPerPage));
     }
@@ -84,7 +84,7 @@ public class ApiGeneralController {
     public ResponseEntity<?> readNotifications(@RequestParam(required = false) Integer id,
                                                @RequestParam(required = false) Boolean all,
                                                HttpServletRequest servletRequest) {
-        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        Person person = personService.getPersonByToken(servletRequest);
         return ResponseEntity.ok(new ListResponseDto<>((long) 0, 0, 0, new ArrayList<>()));
                 //notificationService.findAllNotificationsByPersonId(person, 0, 20));
     }
@@ -105,7 +105,7 @@ public class ApiGeneralController {
         response.setFileType("IMAGE");
         response.setCreatedAt(new Date().getTime());
 
-        Person person = tokenProvider.getPersonByRequest(request);
+        Person person = personService.getPersonByToken(request);
         response.setOwnerId(person.getId());
         String photo = person.getPhoto();
         if (photo.equals(imagePath.getDefaultImagePath())) {

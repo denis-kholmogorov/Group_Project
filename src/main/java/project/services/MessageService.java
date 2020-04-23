@@ -62,7 +62,7 @@ public class MessageService {
 
     public ListResponseDto<DialogDto> getAllDialogs(String query, Integer offset, Integer itemPerPage,
                                          HttpServletRequest request) throws BadRequestException400 {
-        Person person = tokenProvider.getPersonByRequest(request);
+        Person person = personService.getPersonByToken(request);
         //int toIndex = offset + itemPerPage;
         //int listSize =  person.getDialogs().size();
         List<Dialog> dialogList = person.getDialogs(); //.subList(offset, Math.min(toIndex, listSize));
@@ -110,7 +110,7 @@ public class MessageService {
     }
 
     public DialogResponseDto createDialog(HttpServletRequest request, CreateDialogDto userIds) {
-        Person personAuthor = tokenProvider.getPersonByRequest(request); // как этого чувака привязать к диалогам
+        Person personAuthor = personService.getPersonByToken(request); // как этого чувака привязать к диалогам
         Person personRecipient = personRepository.findById(userIds.getUserIds().get(0)).orElse(null);
 
         if (personAuthor == personRecipient) return new DialogResponseDto(null); //шобы не написать самому себе
@@ -139,7 +139,7 @@ public class MessageService {
     }
 
     public Integer getCountSendMessage(HttpServletRequest request) throws BadRequestException400 {
-        Person recipient = tokenProvider.getPersonByRequest(request);
+        Person recipient = personService.getPersonByToken(request);
         return messageRepository
                 .countByRecipientIdAndReadStatus(recipient.getId(), ReadStatus.SENT);
     }
@@ -147,7 +147,7 @@ public class MessageService {
     public ListResponseDto getDialogMessages(
             Integer id, Integer offset, Integer itemPerPage, HttpServletRequest servletRequest) {
         //Pageable pageable = PageRequest.of((offset / itemPerPage), itemPerPage);
-        Person author = tokenProvider.getPersonByRequest(servletRequest);
+        Person author = personService.getPersonByToken(servletRequest);
         List<Message> dialogMessages = messageRepository.findAllByDialogId(id);
         List<MessageDto> messageDtoList = dialogMessages.stream().distinct().map(message -> MessageDto.builder()
                .id(message.getId())

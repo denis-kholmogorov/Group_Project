@@ -47,7 +47,7 @@ public class ApiAuthController {
     @PostMapping(value = "logout")
     ResponseEntity logout(HttpServletRequest servletRequest) {
         try {
-            Person person = tokenProvider.getPersonByRequest(servletRequest);
+            Person person = personService.getPersonByToken(servletRequest);
             person.setLastOnlineTime(new Date());
             personService.saveLastOnlineTime(person);
         }

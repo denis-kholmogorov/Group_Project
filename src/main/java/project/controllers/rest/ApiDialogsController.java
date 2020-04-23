@@ -45,7 +45,7 @@ public class ApiDialogsController {
                                            HttpServletRequest request) {
 
 
-        Person person = tokenProvider.getPersonByRequest(request);
+        Person person = personService.getPersonByToken(request);
         person.setLastOnlineTime(new Date());
         personService.saveLastOnlineTime(person);
 
@@ -82,7 +82,7 @@ public class ApiDialogsController {
                                          HttpServletRequest request){
         log.error("Отработал POst message");
 
-        Person person = tokenProvider.getPersonByRequest(request);
+        Person person = personService.getPersonByToken(request);
         person.setLastOnlineTime(new Date());
         personService.saveLastOnlineTime(person);
 

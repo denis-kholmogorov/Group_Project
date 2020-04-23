@@ -8,6 +8,7 @@ import project.dto.responseDto.LikeUsersListDto;
 import project.dto.responseDto.ResponseDto;
 import project.models.Person;
 import project.security.TokenProvider;
+import project.services.PersonService;
 import project.services.PostLikeService;
 import project.services.PostService;
 
@@ -23,7 +24,7 @@ public class ApiLikesController {
 
     private PostService postService;
     private PostLikeService postLikeService;
-    private TokenProvider tokenProvider;
+    private PersonService personService;
 
     @GetMapping
     public ResponseEntity<?> getAllLikesFromObject(@RequestParam(value = "item_id") Integer itemId,
@@ -41,7 +42,7 @@ public class ApiLikesController {
     @PutMapping
     public ResponseEntity<?> addLike(@RequestBody AddLikeDto addLikeDto, HttpServletRequest servletRequest){
 
-        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        Person person = personService.getPersonByToken(servletRequest);
 
         List<Integer> personsWhoLikedItem = new ArrayList<>();
 
@@ -60,9 +61,9 @@ public class ApiLikesController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> unLike(@RequestBody AddLikeDto addLikeDto, ServletRequest servletRequest){
+    public ResponseEntity<?> unLike(@RequestBody AddLikeDto addLikeDto, HttpServletRequest servletRequest){
 
-        Person person = tokenProvider.getPersonByRequest((HttpServletRequest) servletRequest);
+        Person person = personService.getPersonByToken(servletRequest);
 
         Integer likeCount;
 

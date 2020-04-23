@@ -219,7 +219,7 @@ public class PersonService {
 
     public Person editBody(UpdatePersonDto dto, HttpServletRequest request) throws UnauthorizationException401
     {
-        Person person = tokenProvider.getPersonByRequest(request);
+        Person person = getPersonByToken(request);
         person.setFirstName(dto.getFirstName());
         person.setLastName(dto.getLastName());
         person.setBirthDate(dto.getBirthDate());

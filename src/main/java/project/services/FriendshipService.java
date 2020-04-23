@@ -134,7 +134,7 @@ public class FriendshipService {
     @Transactional(rollbackFor = Exception.class)
     public void sendFriendshipRequest(Integer id, HttpServletRequest request) throws IllegalStateException {
 
-        Person src = tokenProvider.getPersonByRequest(request);
+        Person src = personService.getPersonByToken(request);
         Person dst = personService.findPersonById(id);
 
         if (src == dst) throw new BadRequestException400(); //шобы не отправить заявку самому себе, но нужно обработать нормально
@@ -199,7 +199,7 @@ public class FriendshipService {
 
     public void deleteFriend(Integer id, HttpServletRequest request) {
 
-        Person firstFriend = tokenProvider.getPersonByRequest(request);
+        Person firstFriend = personService.getPersonByToken(request);
         Person secondFriend = personService.findPersonById(id);
         Friendship friendship = findByFriendsCouple(firstFriend, secondFriend);
         if (friendship != null){

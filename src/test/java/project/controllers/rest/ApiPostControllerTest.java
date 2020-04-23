@@ -13,6 +13,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import project.dto.CommentModelDto;
 import project.dto.requestDto.PostRequestBodyTagsDto;
 import project.security.TokenProvider;
 import project.services.PersonService;
@@ -98,15 +99,44 @@ class ApiPostControllerTest {
     @Test
     @SneakyThrows
     void findPostsByTitleAndDate() {
+        mockMvc.perform(get(BASE_PATH)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("Authorization", token)
+                .queryParam("text", "Title1")
+                .queryParam("date_from", "1587036556085")
+                .queryParam("date_to", "1587641334016"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total", is(1)));
     }
 
     @Test
     @SneakyThrows
     void getAllComments() {
+        mockMvc.perform(get(BASE_PATH + "/100/comments")
+        .accept(MediaType.APPLICATION_JSON)
+        .header("Authorization", token))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total", is(2)));
     }
 
     @Test
     @SneakyThrows
-    void addNewComent() {
+    void addNewComment() {
+        CommentModelDto dto = new CommentModelDto(1, "test comment");
+
+        String json = om.writeValueAsString(dto);
+        System.out.println(json);
+
+        mockMvc.perform(post(BASE_PATH + "/100/comments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", token)
+                .content(json)
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.post_id", is(100)))
+                .andExpect(jsonPath("$.data.comment_text", is("test comment")));
     }
 }
