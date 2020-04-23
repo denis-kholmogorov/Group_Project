@@ -127,6 +127,6 @@ public class Person extends MainEntity {
     public void removeUser() {
         roles.forEach(role -> role.getUsers().remove(this));
         dialogs.forEach(dialog -> dialog.getPersons().remove(this));
-        notificationList.removeIf(notification -> notification.getMainEntity().getId() == this.getId());
+        notificationList.removeIf(notification -> notification.getMainEntity().getId().equals(this.getId()));
     }
 }
