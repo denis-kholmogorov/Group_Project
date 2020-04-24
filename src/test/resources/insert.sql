@@ -37,6 +37,9 @@ INSERT INTO `friendship` (`id`, `dst_person_id`, `src_person_id`, `status_id`) V
 INSERT INTO `post` VALUES ('100', 'N', 'N', 'post text', '2020-04-19 17:02:14', 'Title1', '2');
 INSERT INTO `post` VALUES ('101', 'N', 'N', 'post text', '2020-04-20 17:02:14', 'Title2', '2');
 
+INSERT INTO `post_like` (`id`, `person_id`, `post_id`, `time`) VALUES ('70', '2', '100', '2020-04-06 06:07:11');
+INSERT INTO `post_like` (`id`, `person_id`, `post_id`, `time`) VALUES ('71', '3', '100', '2020-04-06 06:07:11');
+
 INSERT INTO `tag` VALUES ('1', 'tag1');
 
 INSERT INTO `post2tag` VALUES ('100', '1');
