@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import project.dto.requestDto.LoginRequestDto;
@@ -21,7 +20,6 @@ import project.handlerExceptions.BadRequestException400;
 import project.handlerExceptions.EntityNotFoundException;
 import project.handlerExceptions.UnauthorizationException401;
 import project.models.Person;
-import project.models.PersonNotificationSetting;
 import project.models.Role;
 import project.models.VerificationToken;
 import project.models.enums.MessagesPermission;
@@ -34,7 +32,10 @@ import project.services.email.EmailService;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -53,25 +54,16 @@ public class PersonService {
     private TokenProvider tokenProvider;
 
     @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
     VerificationTokenService verificationTokenService;
 
     @Autowired
     EmailService emailService;
 
     @Autowired
-    RoleRepository roleRepository;
+    private RoleRepository roleRepository;
 
     @Autowired
     private ImagePath imagePath;
-
-    @Autowired
-    private PersonNotificationSettingsService notificationSettingsService;
-
-    @Autowired
-    private NotificationTypeService notificationTypeService;
 
     //    @PostConstruct
 //    public void init() {
@@ -87,7 +79,7 @@ public class PersonService {
 //    }
 
     @SneakyThrows(EntityNotFoundException.class)
-    public Boolean registrationPerson(RegistrationRequestDto dto) {
+    public Person add(RegistrationRequestDto dto) {
         if (personRepository.findPersonByEmail(dto.getEmail()).isPresent())
             throw new BadRequestException400();
 
@@ -103,17 +95,7 @@ public class PersonService {
         person.setLastName(dto.getLastName());
         person.setRegDate(new Date());
         person.setRoles(Collections.singleton(role));
-        personRepository.save(person);
-
-        for (int i = 2; i < 7; i++) {
-            PersonNotificationSetting notificationSetting = new PersonNotificationSetting();
-            notificationSetting.setEnable(false);
-            notificationSetting.setNotificationType(notificationTypeService.findById(i));
-            notificationSetting.setPerson(person);
-            notificationSettingsService.save(notificationSetting);
-        }
-
-        return true;
+        return personRepository.save(person);
     }
 
     public ResponseDto<PersonDtoWithToken> login(LoginRequestDto dto){
