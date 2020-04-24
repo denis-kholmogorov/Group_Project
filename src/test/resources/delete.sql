@@ -6,7 +6,7 @@ DELETE FROM Dialog;
 
 DELETE FROM User_Roles;
 
-DELETE FROM Roles;
+
 
 DELETE FROM Friendship;
 
@@ -22,8 +22,10 @@ DELETE FROM Post;
 
 DELETE FROM Person_Notification_Settings;
 
-DELETE FROM Notification_Type;
+
 
 DELETE FROM Person;
 
 DELETE FROM Tag;
+
+DELETE FROM Post_Like;

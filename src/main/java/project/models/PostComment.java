@@ -44,6 +44,7 @@ public class PostComment {
     private Boolean isBlocked;
 
     @JsonProperty("my_like")
+    @Type(type = "yes_no")
     private Boolean myLike;
 }
 

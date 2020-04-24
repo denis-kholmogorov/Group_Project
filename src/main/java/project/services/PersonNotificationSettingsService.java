@@ -10,6 +10,7 @@ import project.models.Person;
 import project.models.PersonNotificationSetting;
 import project.repositories.PersonNotificationSettingsRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -19,7 +20,14 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 public class PersonNotificationSettingsService {
 
-    PersonNotificationSettingsRepository personNotificationSettingsRepository;
+    private PersonNotificationSettingsRepository personNotificationSettingsRepository;
+
+    public void add(Person person, boolean enable, List<NotificationType> types) {
+        List<PersonNotificationSetting> settings = new ArrayList<>();
+        for(NotificationType type : types)
+            settings.add(new PersonNotificationSetting(person, type, enable));
+        personNotificationSettingsRepository.saveAll(settings);
+    }
 
     public void save(PersonNotificationSetting notificationSetting){
         personNotificationSettingsRepository.save(notificationSetting);

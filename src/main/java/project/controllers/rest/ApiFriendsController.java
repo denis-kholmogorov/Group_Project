@@ -42,7 +42,7 @@ public class ApiFriendsController {
             @RequestParam(required = false) String name, @RequestParam(defaultValue = "0") Integer offset,
             @RequestParam(defaultValue = "20") Integer itemPerPage, HttpServletRequest servletRequest) {
 
-        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        Person person = personService.getPersonByToken(servletRequest);
         person.setLastOnlineTime(new Date());
         personService.saveLastOnlineTime(person);
 
@@ -65,7 +65,7 @@ public class ApiFriendsController {
     public ResponseEntity getFriendRequests(
             @RequestParam(required = false, name = "name") String name, @RequestParam(defaultValue = "0") Integer offset,
             @RequestParam(defaultValue = "20") Integer itemPerPage, HttpServletRequest request){
-        Person person = tokenProvider.getPersonByRequest(request);
+        Person person = personService.getPersonByToken(request);
         log.info(person.getLastName());
         return ResponseEntity.ok(friendshipService.getFriendRequests(name, offset, itemPerPage, person));
     }
@@ -74,7 +74,7 @@ public class ApiFriendsController {
     ResponseEntity<?> recommendations(@RequestParam(required = false, defaultValue = "0") @PositiveOrZero Integer offset,
                                    @RequestParam(required = false, defaultValue = "20") @Positive @Max(20) Integer itemPerPage,
                                    HttpServletRequest request) {
-        Person person = tokenProvider.getPersonByRequest(request);
+        Person person = personService.getPersonByToken(request);
         List<Person> friendList = friendshipService.getFriendsList(person);
         List<Person> resultList = new ArrayList<>();
         for(Person friend : friendList)

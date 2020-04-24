@@ -12,12 +12,14 @@ import project.dto.responseDto.ResponseDto;
 import project.models.NotificationType;
 import project.models.Person;
 import project.models.PersonNotificationSetting;
+import project.models.enums.NotificationTypeEnum;
 import project.security.TokenProvider;
 import project.services.NotificationTypeService;
 import project.services.PersonNotificationSettingsService;
 import project.services.PersonService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -43,7 +45,15 @@ public class ApiAccountController {
     @PostMapping(value = "register")
     public ResponseEntity<ResponseDto<MessageResponseDto>> register(@RequestBody RegistrationRequestDto dto) {
         log.info("контроллер Register отработал");
-        personService.registrationPerson(dto);
+        List<NotificationType> types = notificationTypeService.findByCode(
+            NotificationTypeEnum.POST_COMMENT,
+            NotificationTypeEnum.COMMENT_COMMENT,
+            NotificationTypeEnum.FRIEND_REQUEST,
+            NotificationTypeEnum.MESSAGE,
+            NotificationTypeEnum.FRIEND_BIRTHDAY
+        );
+        Person person = personService.add(dto);
+        personNotificationSettingsService.add(person, false, types);
         return ResponseEntity.ok(new ResponseDto<>(new MessageResponseDto()));
     }
 
@@ -61,7 +71,7 @@ public class ApiAccountController {
     @GetMapping("notifications")
     public ResponseEntity<?> getNotificationSettings(HttpServletRequest servletRequest) {
         log.info("trig get");
-        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        Person person = personService.getPersonByToken(servletRequest);
         return ResponseEntity.ok(personNotificationSettingsService.findAllByPerson(person));
     }
 
@@ -69,10 +79,9 @@ public class ApiAccountController {
     public ResponseEntity<ResponseDto<PersonNotificationSetting>> updatePersonNotificationSettings(
             @RequestBody NotificationSettingDto dto, HttpServletRequest servletRequest) {
         log.info("trig put");
-        Person person = tokenProvider.getPersonByRequest(servletRequest);
+        Person person = personService.getPersonByToken(servletRequest);
         NotificationType notificationType = notificationTypeService.findByCode(dto.getNotificationType());
         return ResponseEntity.ok(personNotificationSettingsService.
                 updateNotificationSetting(person, notificationType));
     }
 }
-
